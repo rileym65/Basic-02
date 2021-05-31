@@ -58,6 +58,8 @@ char* cinput(char* line) {
     output(LDI); output(addr%256); output(PLO+RF);
     output(GHI+RC); output(STR+RF); output(INC+RF);
     output(GLO+RC); output(STR+RF);
+    output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
+    output(10); output(13); output(0);
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
