@@ -738,7 +738,6 @@ void library() {
     /* ***** Returns: RC - 16-bit integer ***** */
     /* **************************************** */
     if (passNumber == 1) lblAtoI = address;
-    output(LBR); output(t2/256); output(t2%256);                 //           lbr     divst
     output(LDI); output(0x00);                                   // atoi:     ldi     0
     output(PLO+RC);                                              //           plo     rc
     output(PHI+RC);                                              //           phi     rc
@@ -749,7 +748,7 @@ void library() {
     a = address + 8;
     output(LBNF); output(a/256); output(a%256);            //           lbnf    atoi_no
     output(SMI); output(10);                                     //           smi     10
-    a = address + 1;
+    a = address + 4;
     output(LBNF); output(a/256); output(a%256);            //           lbnf    atoi_0_2
     output(SEP+R5);                                              // atoi_no:  sep     sret
     output(GLO+RE);                                              // atoi_0_2: glo     re
