@@ -77,6 +77,10 @@ Switches:
 -cr             - set line endings to carriag-return
 -lfcr           - set line endings to line-feed/carriage-return
 -crlf           - set line endings to carriage-return/line-feed
+-nq             - normal Q for internal serial port
+-rq             - reverse Q for internal serial port
+-ef?            - Set EF line for internal serial port (?=1-4)
+-ref?           - Set reverse EF line for internal serial port (?=1-4)
 -ram=start-end  - set ram address range
 -rom=start-end  - set rom address range
 -start=hex      - Set start address

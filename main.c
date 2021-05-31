@@ -130,6 +130,8 @@ int main(int argc, char** argv) {
   strcpy(lineEnding,"\n");
   SERSEQ = SEQ;
   SERREQ = REQ;
+  SERN = BN2;
+  SERP = B2;
   i = 1;
   while (i < argc) {
     if (strcmp(argv[i],"-b") == 0) outMode = 'B';
@@ -138,10 +140,50 @@ int main(int argc, char** argv) {
     if (strcmp(argv[i],"-l") == 0) showList = -1;
     if (strcmp(argv[i],"-c") == 0) showCompiler = -1;
     if (strcmp(argv[i],"-v") == 0) showVariables = -1;
+    if (strcmp(argv[i],"-rq") == 0) {
+      SERSEQ = REQ;
+      SERREQ = SEQ;
+      }
+    if (strcmp(argv[i],"-nq") == 0) {
+      SERSEQ = SEQ;
+      SERREQ = REQ;
+      }
     if (strcmp(argv[i],"-lf") == 0) strcpy(lineEnding,"\n");
     if (strcmp(argv[i],"-cr") == 0) strcpy(lineEnding,"\r");
     if (strcmp(argv[i],"-crlf") == 0) strcpy(lineEnding,"\r\n");
     if (strcmp(argv[i],"-lfcr") == 0) strcpy(lineEnding,"\n\r");
+    if (strcmp(argv[i],"-ef1") == 0) {
+      SERN = BN1;
+      SERP = B1;
+      }
+    if (strcmp(argv[i],"-ef2") == 0) {
+      SERN = BN2;
+      SERP = B2;
+      }
+    if (strcmp(argv[i],"-ef3") == 0) {
+      SERN = BN3;
+      SERP = B3;
+      }
+    if (strcmp(argv[i],"-ef4") == 0) {
+      SERN = BN4;
+      SERP = B4;
+      }
+    if (strcmp(argv[i],"-ref1") == 0) {
+      SERN = B1;
+      SERP = BN1;
+      }
+    if (strcmp(argv[i],"-ref2") == 0) {
+      SERN = B2;
+      SERP = BN2;
+      }
+    if (strcmp(argv[i],"-ref3") == 0) {
+      SERN = B3;
+      SERP = BN3;
+      }
+    if (strcmp(argv[i],"-ref4") == 0) {
+      SERN = B4;
+      SERP = BN4;
+      }
     if (strcmp(argv[i],"-term=bios") == 0) {
       useSelfTerm = 0;
       lblF_inmsg = 0xff66;
