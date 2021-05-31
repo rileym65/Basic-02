@@ -1,0 +1,7 @@
+sbc
+*.o
+*.hex
+*.bin
+*.prg
+*.bas
+*.lst

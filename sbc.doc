@@ -1,0 +1,90 @@
+DMA expr
+DPOKE addr,value
+END
+GOSUB line
+GOTO line
+IDLE
+IF expr THEN statement
+INPUT ["prompt",]var[,var][,var][,...]
+INTR line
+IOFF
+ION
+[LET] var=expr
+ON expr GOSUB line,line,...
+ON expr GOTO line,line,...
+OUT port,value
+POKE addr,value
+PRINT expr[,;]expr[,;]...
+Q expr
+REM text
+RETURN
+
+Functions in expressions:
+  DPEEK(addr)
+  FLG(expr)
+  FRE(addr)
+  INP(port)
+  PEEK(addr)
+
+
+*FOR var=expr TO expr [STEP expr]
+*NEXT [var]
+*ISTART
+*IRETURN
+
+*RND(range)
+
+Variables:
+  Variable names can be more than 1 character, but must start with a letter
+and then must consist of either upper or lowercase letter or numbers or the
+underscaore (_) character.  Case is irrelevant.
+
+  Varaibles are stored either at the specified address, else the first byte
+in RAM after the program (if program is compiled for RAM) else the first byte
+of RAM.
+
+Notes:
+  Multiple statements on a line are supported, statements must be separated
+by the colon (:) character.
+
+  Line numbers must be greater than 0 and less than 65536 and must appear
+in order.
+
+  All other numbers are 16-bit signed integers.
+
+  if term=none then PRINT and INPUT will not produce any code, nor will they
+produce errors during compile.
+
+  if term=bios then terminal i/o expects the Elf/OS BIOS to be present at
+its normal address.
+
+  if term=self then terminal i/o functions will be added to the output file
+producing a fully self-contained program that has no external dependencies.
+
+  In general whitespace is ignored and can be used as desired for legibility.
+  
+  A single line number must be contained on a single input line.  Each input
+line is currently limited to 2048 character.
+
+Switches:
+-b              - output as binary
+-c              - show compiler output
+-i              - output as Intel hex
+-l              - show source list
+-r              - output as RCS hex
+-v              - show variables
+-lf             - set line endings to line-feed
+-cr             - set line endings to carriag-return
+-lfcr           - set line endings to line-feed/carriage-return
+-crlf           - set line endings to carriage-return/line-feed
+-ram=start-end  - set ram address range
+-rom=start-end  - set rom address range
+-start=hex      - Set start address
+-vars=hex       - Start of variable table
+-stack=hex      - set address for top of stack
+-estack=hex     - set address for top of expression stack 
+-keybuf=hex     - size of key buffer
+-term=bios      - use BIOS terminal i/o (default)
+     =self      - use internal serial i/o
+     =none      - no terminal
+
