@@ -13,7 +13,6 @@ char* cif(char* line) {
     exit(1);
     }
   output(GHI+RC);
-  addr = address + 6;
   output(LBZ); output(addr/256); output(addr%256);
   if (strncasecmp(line,"then",4) == 0) {
     line += 4;
