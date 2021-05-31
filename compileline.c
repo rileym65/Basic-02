@@ -46,6 +46,7 @@ int compileLine(char* line) {
     else if (strncasecmp(line,"dma",3) == 0) line=cdma(line+3);
     else if (strncasecmp(line,"q",1) == 0) line=cq(line+1);
     else if (strncasecmp(line,"out",3) == 0) line=cout(line+3);
+    else line = clet(line);
   
     line = trim(line);
     if (*line != ':' && *line != 0) {
