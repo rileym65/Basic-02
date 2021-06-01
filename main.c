@@ -77,31 +77,9 @@ void output(byte value) {
   address++;
   }
 
-void processRAM(char* buffer) {
-  ramStart = getHex(buffer);
-  while (*buffer != '-' && *buffer != 0) buffer++;
-  if (*buffer != '-') {
-    printf("Invalid format for -ram\n");
-    exit(1);
-    }
-  buffer++;
-  ramEnd = getHex(buffer);
-  }
-
-void processROM(char* buffer) {
-  romStart = getHex(buffer);
-  while (*buffer != '-' && *buffer != 0) buffer++;
-  if (*buffer != '-') {
-    printf("Invalid format for -rom\n");
-    exit(1);
-    }
-  buffer++;
-  romEnd = getHex(buffer);
-  }
-
-int main(int argc, char** argv) {
+int main(int argc, char** argv, char** envp) {
   int i;
-  char sourceFile[1024];
+  char temp[1024];
   printf("BASIC/02 Compiler v0.1\n");
   printf("by Michael H. Riley\n");
   printf("\n");
@@ -136,183 +114,35 @@ int main(int argc, char** argv) {
   SERREQ = REQ;
   SERN = BN2;
   SERP = B2;
+  for (i=1; i<argc; i++) {
+    if (argv[i][0] != '-') strcpy(sourceFile,argv[i]);
+    }
+  strcpy(baseName, sourceFile);
+  if (strstr(baseName,".bas") != NULL) {
+    *(strstr(baseName,".bas")) = 0;
+    }
+  for (i=0; envp[i] != NULL; i++) {
+    if (strncasecmp(envp[i],"home=",5) == 0) {
+      strcpy(temp,envp[i]+5);
+      if (temp[strlen(temp)-1] != '/') strcat(temp,"/");
+      strcat(temp,".sbc.rc");
+      optionFile(temp);
+      }
+    }
+  optionFile("sbc.rc");
+  strcpy(temp, baseName);
+  strcat(temp, ".rc");
+  optionFile(temp);
   i = 1;
   while (i < argc) {
-    if (strcmp(argv[i],"-b") == 0) outMode = 'B';
-    if (strcmp(argv[i],"-i") == 0) outMode = 'I';
-    if (strcmp(argv[i],"-r") == 0) outMode = 'R';
-    if (strcmp(argv[i],"-l") == 0) showList = -1;
-    if (strcmp(argv[i],"-c") == 0) showCompiler = -1;
-    if (strcmp(argv[i],"-v") == 0) showVariables = -1;
-    if (strcmp(argv[i],"-elfos") == 0) {
-      useElfos = -1;
-      programStart = 0x2000;
-      }
-    if (strcmp(argv[i],"-rq") == 0) {
-      SERSEQ = REQ;
-      SERREQ = SEQ;
-      }
-    if (strcmp(argv[i],"-nq") == 0) {
-      SERSEQ = SEQ;
-      SERREQ = REQ;
-      }
-    if (strcmp(argv[i],"-lf") == 0) strcpy(lineEnding,"\n");
-    if (strcmp(argv[i],"-cr") == 0) strcpy(lineEnding,"\r");
-    if (strcmp(argv[i],"-crlf") == 0) strcpy(lineEnding,"\r\n");
-    if (strcmp(argv[i],"-lfcr") == 0) strcpy(lineEnding,"\n\r");
-    if (strcmp(argv[i],"-ef1") == 0) {
-      SERN = BN1;
-      SERP = B1;
-      }
-    if (strcmp(argv[i],"-ef2") == 0) {
-      SERN = BN2;
-      SERP = B2;
-      }
-    if (strcmp(argv[i],"-ef3") == 0) {
-      SERN = BN3;
-      SERP = B3;
-      }
-    if (strcmp(argv[i],"-ef4") == 0) {
-      SERN = BN4;
-      SERP = B4;
-      }
-    if (strcmp(argv[i],"-ref1") == 0) {
-      SERN = B1;
-      SERP = BN1;
-      }
-    if (strcmp(argv[i],"-ref2") == 0) {
-      SERN = B2;
-      SERP = BN2;
-      }
-    if (strcmp(argv[i],"-ref3") == 0) {
-      SERN = B3;
-      SERP = BN3;
-      }
-    if (strcmp(argv[i],"-ref4") == 0) {
-      SERN = B4;
-      SERP = BN4;
-      }
-    if (strcmp(argv[i],"-term=bios") == 0) {
-      useSelfTerm = 0;
-      lblF_inmsg = 0xff66;
-      lblF_type = 0xff03;
-      lblF_read = 0xff06;
-      lblF_input = 0xff0f;
-      lblF_msg = 0xff09;
-      lblF_setbd = 0xff2d;
-      }
-    if (strcmp(argv[i],"-term=self") == 0) {
-      useSelfTerm = 0xff;
-      lblF_inmsg = 0x0000;
-      lblF_type = 0x0000;
-      lblF_read = 0x0000;
-      lblF_input = 0x0000;
-      lblF_msg = 0x0000;
-      lblF_setbd = 0x0000;
-      }
-    if (strcmp(argv[i],"-term=none") == 0) {
-      useSelfTerm = 0;
-      lblF_inmsg = 0xffff;
-      lblF_type = 0xffff;
-      lblF_read = 0xffff;
-      lblF_input = 0xffff;
-      lblF_msg = 0xffff;
-      lblF_setbd = 0xffff;
-      }
-    if (strcmp(argv[i],"-melf") == 0) {
-      ramStart = 0x0000;
-      ramEnd = 0x7fff;
-      romStart = 0x8000;
-      romEnd = 0xffff;
-      SERN = BN2;
-      SERP = B2;
-      SERSEQ = SEQ;
-      SERREQ = REQ;
-      }
-    if (strcmp(argv[i],"-pev") == 0) {
-      ramStart = 0x0000;
-      ramEnd = 0x7fff;
-      romStart = 0x8000;
-      romEnd = 0xffff;
-      SERN = BN2;
-      SERP = B2;
-      SERSEQ = SEQ;
-      SERREQ = REQ;
-      }
-    if (strcmp(argv[i],"-pev2") == 0) {
-      ramStart = 0x0000;
-      ramEnd = 0x7fff;
-      romStart = 0x8000;
-      romEnd = 0xffff;
-      SERN = B2;
-      SERP = BN2;
-      SERSEQ = REQ;
-      SERREQ = SEQ;
-      }
-    if (strcmp(argv[i],"-elf2k") == 0) {
-      ramStart = 0x0000;
-      ramEnd = 0x7fff;
-      romStart = 0x8000;
-      romEnd = 0xffff;
-      SERN = BN3;
-      SERP = B3;
-      SERSEQ = SEQ;
-      SERREQ = REQ;
-      }
-    if (strcmp(argv[i],"-mclo") == 0) {
-      ramStart = 0x0000;
-      ramEnd = 0x7fff;
-      romStart = 0x8000;
-      romEnd = 0xffff;
-      SERN = BN3;
-      SERP = B3;
-      SERSEQ = SEQ;
-      SERREQ = REQ;
-      }
-    if (strcmp(argv[i],"-mchi") == 0) {
-      ramStart = 0x8000;
-      ramEnd = 0xffff;
-      romStart = 0x0000;
-      romEnd = 0x7fff;
-      SERN = BN3;
-      SERP = B3;
-      SERSEQ = SEQ;
-      SERREQ = REQ;
-      }
-    if (strcmp(argv[i],"-mchip") == 0) {
-      ramStart = 0x8000;
-      ramEnd = 0xffff;
-      romStart = 0x0000;
-      romEnd = 0x7fff;
-      SERN = B3;
-      SERP = BN3;
-      SERSEQ = REQ;
-      SERREQ = SEQ;
-      lblF_inmsg = 0x0f66;
-      lblF_type = 0x0f03;
-      lblF_read = 0x0f06;
-      lblF_input = 0x0f0f;
-      lblF_msg = 0x0f09;
-      lblF_setbd = 0x0f2d;
-      }
-    if (strncmp(argv[i],"-start=",7) == 0) programStart=getHex(argv[i]+7);
-    if (strncmp(argv[i],"-vars=",6) == 0) variableStart=getHex(argv[i]+6);
-    if (strncmp(argv[i],"-ram=",5) == 0) processRAM(argv[i]+5);
-    if (strncmp(argv[i],"-rom=",5) == 0) processROM(argv[i]+5);
-    if (strncmp(argv[i],"-stack=",7) == 0) stack=getHex(argv[i]+7);
-    if (strncmp(argv[i],"-estack=",8) == 0) estack=getHex(argv[i]+8);
-    if (strncmp(argv[i],"-keybuf=",8) == 0) iBufferSize=getHex(argv[i]+8);
-    else strcpy(sourceFile,argv[i]);
+    processOption(argv[i]);
     i++;
     }
   if (strlen(sourceFile) == 0) {
     printf("No source file specified\n");
     exit(1);
     }
-  strcpy(outName, sourceFile);
-  if (strstr(outName,".bas") != NULL) {
-    *(strstr(outName,".bas")) = 0;
-    }
+  strcpy(outName,baseName);
   switch (outMode) {
     case 'R': strcat(outName, ".prg"); break;
     case 'I': strcat(outName, ".hex"); break;
