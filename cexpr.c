@@ -298,6 +298,26 @@ char* evaluate(char* buffer) {
       output(LDI); output(number%256); output(STR+R7); output(DEC+R7);
       }
 
+    else if (*buffer == '$' &&
+             ((*(buffer+1) >= 'a' && *(buffer+1) <= 'f') ||
+              (*(buffer+1) >= 'A' && *(buffer+1) <= 'F') ||
+              (*(buffer+1) >= '0' && *(buffer+1) <= '9'))) {
+      buffer++;
+      number = 0;
+      while ((*buffer >= '0' && *buffer <= '9') ||
+             (*buffer >= 'a' && *buffer <= 'f') ||
+             (*buffer >= 'A' && *buffer <= 'F')) {
+        if (*buffer >= '0' && *buffer <= '9') number = (number << 4) + (*buffer - '0');
+        if (*buffer >= 'a' && *buffer <= 'f') number = (number << 4) + (*buffer - 'a') + 10;
+        if (*buffer >= 'A' && *buffer <= 'F') number = (number << 4) + (*buffer - 'A') + 10;
+        buffer++;
+        }
+      tokens[numTokens++] = 0;
+      tokens[numTokens++] = OP_NUM;
+      output(LDI); output(number/256); output(STR+R7); output(DEC+R7);
+      output(LDI); output(number%256); output(STR+R7); output(DEC+R7);
+      }
+
     else if ((*buffer >= 'a' && *buffer <= 'z') ||
              (*buffer >= 'A' && *buffer <= 'Z')) {
       p = 0;
