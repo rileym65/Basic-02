@@ -1093,6 +1093,17 @@ void library() {
   output(PHI+R5);                                                //           PHI  R5      
   output(LDI); output(lblSret % 256);                            //           LDI  sret.0
   output(PLO+R5);                                                //           PLO  R5
+  t1 = variableRAM + iBufferSize + (2 * numberOfVariables);
+  t2 = getVariable("FREE_");
+  output(LDI); output(t2/256);                                   //           LDI  free_.1
+  output(PHI+RF);                                                //           PHI  RF
+  output(LDI); output(t2%256);                                   //           LDI  free_.0
+  output(PLO+RF);                                                //           PLO  RF
+  output(LDI); output(t1/256);                                   //           LDI  freemem.1
+  output(STR+RF);                                                //           STR  RF
+  output(INC+RF);                                                //           INC  RF
+  output(LDI); output(t1%256);                                   //           LDI  freemem.0
+  output(STR+RF);                                                //           STR  RF
   if (useItoA || useAtoI) {
     output(SEP+R4);                                              //           SEP  SCALL
     output(lblF_setbd/256); output(lblF_setbd%256);              //           DW   F_SETBD
