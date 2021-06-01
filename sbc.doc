@@ -106,6 +106,7 @@ Switches:
 -ram=start-end  - set ram address range
 -rom=start-end  - set rom address range
 -start=hex      - Set start address
+-exit=hex       - Set address to jump to on exit
 -vars=hex       - Start of variable table
 -stack=hex      - set address for top of stack
 -estack=hex     - set address for top of expression stack 

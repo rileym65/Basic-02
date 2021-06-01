@@ -1228,14 +1228,16 @@ void library() {
   output(PHI+R7);                                                //           PHI  R7      
   output(LDI); output(estack % 256);                             //           LDI  estack.0
   output(PLO+R7);                                                //           PLO  R7
-  output(LDI); output(lblScall / 256);                           //           LDI  scall.1
-  output(PHI+R4);                                                //           PHI  R4      
-  output(LDI); output(lblScall % 256);                           //           LDI  scall.0
-  output(PLO+R4);                                                //           PLO  R4
-  output(LDI); output(lblSret / 256);                            //           LDI  sret.1
-  output(PHI+R5);                                                //           PHI  R5      
-  output(LDI); output(lblSret % 256);                            //           LDI  sret.0
-  output(PLO+R5);                                                //           PLO  R5
+  if (useElfos == 0) {
+    output(LDI); output(lblScall / 256);                           //           LDI  scall.1
+    output(PHI+R4);                                                //           PHI  R4      
+    output(LDI); output(lblScall % 256);                           //           LDI  scall.0
+    output(PLO+R4);                                                //           PLO  R4
+    output(LDI); output(lblSret / 256);                            //           LDI  sret.1
+    output(PHI+R5);                                                //           PHI  R5      
+    output(LDI); output(lblSret % 256);                            //           LDI  sret.0
+    output(PLO+R5);                                                //           PLO  R5
+    }
   t1 = variableRAM + iBufferSize + (2 * numberOfVariables);
   t2 = getVariable("FREE_");
   output(LDI); output(t2/256);                                   //           LDI  free_.1

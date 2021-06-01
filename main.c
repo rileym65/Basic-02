@@ -92,6 +92,7 @@ int main(int argc, char** argv, char** envp) {
   outMode = 'R';
   programStart = 0xffff;
   variableStart = 0xffff;
+  exitAddress = 0xffff;
   ramStart = 0x0000;
   ramEnd = 0xffff;
   romStart = 0xffff;

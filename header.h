@@ -120,6 +120,7 @@ LINK word   codeGenerated;
 LINK word   iBufferSize;
 LINK word   stack;
 LINK word   estack;
+LINK word   exitAddress;
 LINK word   highest;
 LINK word   lastLineNumber;
 LINK word   lblF_delay;
