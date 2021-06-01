@@ -29,7 +29,7 @@ char* cprint(char* line) {
       output(LDI); output(0x09);
       output(SEP+R4); output(lblF_type/256); output(lblF_type%256);
       line++;
-      last = ' ';
+      last = ',';
       }
     else if (*line == ';') {
       line++;
@@ -41,7 +41,7 @@ char* cprint(char* line) {
       last = ' ';
       }
     }
-  if (last != ';') {
+  if (last != ';' && last != ',') {
     output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
     output(10); output(13); output(0);
     }
