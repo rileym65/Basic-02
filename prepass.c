@@ -27,6 +27,39 @@ int prepass(char* filename) {
   useLt = 0;
   useEf = 0;
   useRnd = 0;
+  useNext = 0;
+
+  lblAtoI = 0;
+  lblAbs = 0;
+  lblAdd = 0;
+  lblAnd = 0;
+  lblCmp = 0;
+  lblDiv = 0;
+  lblEf = 0;
+  lblEq = 0;
+  lblFalse = 0;
+  lblGt = 0;
+  lblGte = 0;
+  lblItoA = 0;
+  lblToBcd = 0;
+  lblLt = 0;
+  lblLte = 0;
+  lblMdNorm = 0;
+  lblMod = 0;
+  lblMul = 0;
+  lblNe = 0;
+  lblNext = 0;
+  lblNextVar = 0;
+  lblOr = 0;
+  lblReturn = 0;
+  lblRnd = 0;
+  lblScall = 0;
+  lblSgn = 0;
+  lblSret = 0;
+  lblStart = 0;
+  lblSub = 0;
+  lblTrue = 0;
+  lblXor = 0;
 
   while (fgets(currentLine, 1023, source) != NULL) {
     while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] < 32) currentLine[strlen(currentLine)-1] = 0;
@@ -51,6 +84,7 @@ int prepass(char* filename) {
           if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
           if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
+          if (strncasecmp(currentLine+i,"next",4) == 0) useNext = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
           if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
           if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
@@ -66,6 +100,7 @@ int prepass(char* filename) {
   if (useCmp) useSub = -1;
   if (useRnd) useMod = -1;
   if (useMod) useDiv = -1;
+  if (useNext) useSub = -1;
   if (lblF_inmsg == 0xffff) {
     useAtoI = 0;
     useItoA = 0;

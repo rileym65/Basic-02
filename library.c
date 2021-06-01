@@ -13,13 +13,18 @@ void library() {
     output((highest-programStart+1)/256); output((highest-programStart+1)%256);
     output(programStart/256); output(programStart%256);
     }
-  output(SEX+R0);                                                // init:     SEX  R0
-  output(DIS); output(0x20);                                     //           DIS  20
-  output(LDI); output(lblStart / 256);                           //           LDI  start.1
-  output(PHI+R3);                                                //           PHI  R3      
-  output(LDI); output(lblStart % 256);                           //           LDI  start.0
-  output(PLO+R3);                                                //           PLO  R3
-  output(SEP+R3);                                                //           SEP  R3
+  if (useElfos) {
+    output(LBR); output(lblStart/256); output(lblStart%256);
+    }
+  else {
+    output(SEX+R0);                                              // init:     SEX  R0
+    output(DIS); output(0x20);                                   //           DIS  20
+    output(LDI); output(lblStart / 256);                         //           LDI  start.1
+    output(PHI+R3);                                              //           PHI  R3      
+    output(LDI); output(lblStart % 256);                         //           LDI  start.0
+    output(PLO+R3);                                              //           PLO  R3
+    output(SEP+R3);                                              //           SEP  R3
+    }
   lblReturn = address;
   output(SEP+R3);                                                // return:   SEP  R3
   if (passNumber == 1) lblScall = address;
@@ -903,6 +908,113 @@ void library() {
     output(STR+R7);                                              //           str     r7
     output(DEC+R7);                                              //           dec     r7
     output(LBR); output(lblMod/256); output(lblMod%256);         //           lbr     mod16
+    }
+
+  if (useNext) {
+    if (passNumber == 1) lblNextVar = address;
+    output(IRX);                                                 // nextvar:  irx          ; move to varAddr
+    output(IRX);                                                 //           irx
+    output(IRX);                                                 //           irx
+    output(IRX);                                                 //           irx
+    output(IRX);                                                 //           irx
+    output(GLO+RC);                                              //           glo     rc   ; check for correct address
+    output(SM);                                                  //           sm           ; against stack
+    a = address + 18;
+    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    nv1  ; jump if not
+    output(IRX);                                                 //           irx          ; move to msb
+    output(GHI+RC);                                              //           ghi     rc
+    output(SM);                                                  //           sm           ; compare
+    a = address+ 13;
+    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    nv2  ; jump if not
+    output(DEC+R2);                                              //           dec     r2   ; entry found, move back
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(LBR); output(lblNext/256); output(lblNext%256);       //           lbr     next
+    output(IRX);                                                 // nv1:      inc     r2   ; move past bad entry
+    output(IRX);                                                 // nv2:      inc     r2   ; move past bad entry
+    output(IRX);                                                 //           inc     r2
+    output(IRX);                                                 //           inc     r2
+    output(IRX);                                                 //           inc     r2
+    output(LBR); output(lblNextVar/256); output(lblNextVar%256); //           lbr     nextvar
+
+    if (passNumber == 1) lblNext = address;
+    output(GLO+R2);                                              // next:     glo     r2
+    output(PLO+RA);                                              //           plo     ra
+    output(GHI+R2);                                              //           ghi     r2
+    output(PHI+RA);                                              //           phi     ra
+    output(SEX+RA);                                              //           sex     ra
+    output(IRX);                                                 //           irx          ; move past call return
+    output(IRX);                                                 //           irx          ; need a copy of return addr
+    output(IRX);                                                 //           irx          ; need a copy of return addr
+    output(IRX);                                                 //           irx          ; exec msb
+    output(IRX);                                                 //           irx          ; var addr lsb
+    output(LDXA);                                                //           ldxa         ; get it
+    output(PLO+RF);                                              //           plo     rf   ; set rf to address
+    output(LDXA);                                                //           ldxa         ; get msb
+    output(PHI+RF);                                              //           phi     rf
+    output(INC+RF);                                              //           inc     rf   ; point to variable lsb
+    output(LDN+RF);                                              //           ldn     rf   ; retrieve it
+    output(ADD);                                                 //           add          ; add in step
+    output(STR+RF);                                              //           str     rf
+    output(DEC+RF);                                              //           dec     rf   ; point to msb
+    output(IRX);                                                 //           irx          ; point to msb of step
+    output(LDN+RF);                                              //           ldn     rf   ; get msb of var value
+    output(ADC);                                                 //           adc          ; add in step
+    output(STR+RF);                                              //           str     rf   ; store back into variable
+    output(LDA+RF);                                              //           lda     rf   ; retrieve variable value
+    output(STR+R7);                                              //           str     r7   ; store on expr stack
+    output(DEC+R7);                                              //           dec     r7
+    output(LDN+RF);                                              //           ldn     rf
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(IRX);                                                 //           irx          ; retrieve loop end value
+    output(LDXA);                                                //           ldxa
+    output(PLO+RE);                                              //           plo     re
+    output(LDX);                                                 //           ldx
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7   ; exp stack ready 
+    output(GLO+RE);                                              //           glo     re
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7   ; exp stack ready 
+    output(SEX+R2);                                              //           sex     r2
+    output(SEP+R4);                                              //           sep     scall
+    output(lblSub/256); output(lblSub%256);                      //           dw      lblSub
+    output(INC+R7);                                              //           inc     r7   ; point to msb
+    output(INC+R7);                                              //           inc     r7
+    output(LDN+R7);                                              //           ldn     r7   ; get it
+    output(SHL);                                                 //           shl          ; was it negative
+    a = address + 17;
+    output(LBDF); output(a/256); output(a%256);                  //           lbdf    stay
+    output(INC+R2);                                              //           inc     r2
+    output(DEC+RA);                                              //           dec     ra
+    output(LDXA);                                                //           ldxa
+    output(STR+RA);                                              //           str     ra
+    output(INC+RA);                                              //           inc     ra
+    output(LDX);                                                 //           ldx
+    output(STR+RA);                                              //           str     ra
+    output(DEC+RA);                                              //           dec     ra
+    output(DEC+RA);                                              //           dec     ra
+    output(GLO+RA);                                              //           glo     ra
+    output(PLO+R2);                                              //           plo     r2
+    output(GHI+RA);                                              //           ghi     ra
+    output(PHI+R2);                                              //           phi     r2
+    output(SEP+R5);                                              //           sep     sret ; nothing to do so return
+
+    output(INC+R2);                                              // stay:     inc     r2   ; move back
+    output(INC+R2);                                              //           inc     r2
+    output(INC+R2);                                              //           inc     r2
+    output(LDXA);                                                //           ldxa
+    output(PLO+R6);                                              //           plo     r6
+    output(LDX);                                                 //           ldx
+    output(PHI+R6);                                              //           phi     r6   ; into r6
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(DEC+R2);                                              //           dec     r2
+    output(SEP+R5);                                              //           sep     sret  ; return
     }
 
   if (useAtoI) {

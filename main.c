@@ -226,6 +226,7 @@ int main(int argc, char** argv, char** envp) {
   if (lblRnd != 0)  printf("  Rnd16         : %04x\n",lblRnd);
   if (lblItoA != 0)  printf("  ItoA          : %04x\n",lblItoA);
   if (lblAtoI != 0)  printf("  AtoI          : %04x\n",lblAtoI);
+  if (lblNext != 0)  printf("  next          : %04x\n",lblNext);
   if (lblF_inmsg != 0)  printf("  f_inmsg       : %04x\n",lblF_inmsg);
   if (lblF_msg != 0)  printf("  f_msg         : %04x\n",lblF_msg);
   if (lblF_type != 0)  printf("  f_type        : %04x\n",lblF_type);

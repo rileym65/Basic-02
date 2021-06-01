@@ -9,6 +9,7 @@ OBJS = \
 	cdma.o \
 	cdpoke.o \
 	cend.o \
+	cfor.o \
 	cexpr.o \
 	cgosub.o \
 	cgoto.o \
@@ -19,6 +20,7 @@ OBJS = \
 	cioff.o \
 	cion.o \
 	clet.o \
+	cnext.o \
 	compileline.o \
 	congoto.o \
 	cout.o \
@@ -54,6 +56,7 @@ cdma.o:          header.h cdma.c
 cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c
 cexpr.o:         header.h cexpr.c
+cfor.o:          header.h cfor.c
 cgosub.o:        header.h cgosub.c
 cgoto.o:         header.h cgoto.c
 cidle.o:         header.h cidle.c
@@ -63,6 +66,7 @@ cintr.o:         header.h cintr.c
 cioff.o:         header.h cioff.c
 cion.o:          header.h cion.c
 clet.o:          header.h clet.c
+cnext.o:         header.h cnext.c
 compileline.o:   header.h compileline.c
 congoto.o:       header.h congoto.c
 cout.o:          header.h cout.c

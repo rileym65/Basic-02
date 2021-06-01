@@ -399,7 +399,9 @@ char* cexpr(char* line) {
       }
     if (neg) num = (num ^0xffff) + 1;
     temp=trim(temp);
-    if (*temp == ',' || *temp == ';' || *temp == 0) {
+    if (*temp == ',' || *temp == ';' || *temp == 0 ||
+        (*temp >= 'a' && *temp <= 'z') ||
+        (*temp >= 'A' && *temp <= 'Z')) {
       output(LDI); output(num/256); output(PHI+RC);
       output(LDI); output(num%256); output(PLO+RC);
       return temp;
