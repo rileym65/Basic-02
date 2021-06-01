@@ -91,4 +91,13 @@ Switches:
 -term=bios      - use BIOS terminal i/o (default)
      =self      - use internal serial i/o
      =none      - no terminal
+-elfos          - produce an Elf/OS executable
+-melf           - -ram=0000-7fff -rom=8000-ffff -nq -ef2
+-pev            - -ram=0000-7fff -rom=8000-ffff -nq -ef2
+-pev2           - -ram=0000-7fff -rom=8000-ffff -rq -ref2
+-elf2k          - -ram=0000-7fff -rom=8000-ffff -nq -ef3
+-mclo           - -ram=0000-7fff -rom=8000-ffff -nq -ef3
+-mchi           - -ram=8000-ffff -rom=0000-7fff -nq -ef3
+-mchip          - -ram=8000-ffff -rom=0000-7fff -rq -ref3
+
 

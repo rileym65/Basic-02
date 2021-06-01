@@ -53,6 +53,9 @@ void output(byte value) {
     showError("Address exceeded available ROM");
     exit(1);
     }
+  if (passNumber == 1) {
+    if (address > highest) highest = address;
+    }
   if (passNumber == 2) {
     if (showCompiler) {
       printf(" %02x",value);
@@ -121,6 +124,7 @@ int main(int argc, char** argv) {
   stack = 0;
   estack = 0;
   useSelfTerm = 0;
+  useElfos = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;
@@ -140,6 +144,10 @@ int main(int argc, char** argv) {
     if (strcmp(argv[i],"-l") == 0) showList = -1;
     if (strcmp(argv[i],"-c") == 0) showCompiler = -1;
     if (strcmp(argv[i],"-v") == 0) showVariables = -1;
+    if (strcmp(argv[i],"-elfos") == 0) {
+      useElfos = -1;
+      programStart = 0x2000;
+      }
     if (strcmp(argv[i],"-rq") == 0) {
       SERSEQ = REQ;
       SERREQ = SEQ;
@@ -211,6 +219,82 @@ int main(int argc, char** argv) {
       lblF_msg = 0xffff;
       lblF_setbd = 0xffff;
       }
+    if (strcmp(argv[i],"-melf") == 0) {
+      ramStart = 0x0000;
+      ramEnd = 0x7fff;
+      romStart = 0x8000;
+      romEnd = 0xffff;
+      SERN = BN2;
+      SERP = B2;
+      SERSEQ = SEQ;
+      SERREQ = REQ;
+      }
+    if (strcmp(argv[i],"-pev") == 0) {
+      ramStart = 0x0000;
+      ramEnd = 0x7fff;
+      romStart = 0x8000;
+      romEnd = 0xffff;
+      SERN = BN2;
+      SERP = B2;
+      SERSEQ = SEQ;
+      SERREQ = REQ;
+      }
+    if (strcmp(argv[i],"-pev2") == 0) {
+      ramStart = 0x0000;
+      ramEnd = 0x7fff;
+      romStart = 0x8000;
+      romEnd = 0xffff;
+      SERN = B2;
+      SERP = BN2;
+      SERSEQ = REQ;
+      SERREQ = SEQ;
+      }
+    if (strcmp(argv[i],"-elf2k") == 0) {
+      ramStart = 0x0000;
+      ramEnd = 0x7fff;
+      romStart = 0x8000;
+      romEnd = 0xffff;
+      SERN = BN3;
+      SERP = B3;
+      SERSEQ = SEQ;
+      SERREQ = REQ;
+      }
+    if (strcmp(argv[i],"-mclo") == 0) {
+      ramStart = 0x0000;
+      ramEnd = 0x7fff;
+      romStart = 0x8000;
+      romEnd = 0xffff;
+      SERN = BN3;
+      SERP = B3;
+      SERSEQ = SEQ;
+      SERREQ = REQ;
+      }
+    if (strcmp(argv[i],"-mchi") == 0) {
+      ramStart = 0x8000;
+      ramEnd = 0xffff;
+      romStart = 0x0000;
+      romEnd = 0x7fff;
+      SERN = BN3;
+      SERP = B3;
+      SERSEQ = SEQ;
+      SERREQ = REQ;
+      }
+    if (strcmp(argv[i],"-mchip") == 0) {
+      ramStart = 0x8000;
+      ramEnd = 0xffff;
+      romStart = 0x0000;
+      romEnd = 0x7fff;
+      SERN = B3;
+      SERP = BN3;
+      SERSEQ = REQ;
+      SERREQ = SEQ;
+      lblF_inmsg = 0x0f66;
+      lblF_type = 0x0f03;
+      lblF_read = 0x0f06;
+      lblF_input = 0x0f0f;
+      lblF_msg = 0x0f09;
+      lblF_setbd = 0x0f2d;
+      }
     if (strncmp(argv[i],"-start=",7) == 0) programStart=getHex(argv[i]+7);
     if (strncmp(argv[i],"-vars=",6) == 0) variableStart=getHex(argv[i]+6);
     if (strncmp(argv[i],"-ram=",5) == 0) processRAM(argv[i]+5);
@@ -260,6 +344,7 @@ int main(int argc, char** argv) {
   numberOfLines = 0;
   numberOfVariables = 0;
   codeGenerated = 0;
+  highest = 0;
   prepass(sourceFile);
   passNumber = 1;
   pass(sourceFile);

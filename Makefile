@@ -20,7 +20,7 @@ OBJS = \
 	cion.o \
 	clet.o \
 	compileline.o \
-	con.o \
+	congoto.o \
 	cout.o \
 	cpoke.o \
 	cprint.o \
@@ -62,7 +62,7 @@ cioff.o:       header.h cioff.c
 cion.o:        header.h cion.c
 clet.o:        header.h clet.c
 compileline.o: header.h compileline.c
-con.o:         header.h con.c
+congoto.o:     header.h congoto.c
 cout.o:        header.h cout.c
 cpoke.o:       header.h cpoke.c
 cprint.o:      header.h cprint.c

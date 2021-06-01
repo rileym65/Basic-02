@@ -8,6 +8,7 @@ int pass(char* filename) {
     exit(1);
     }
   address = programStart;
+  if (useElfos) address -= 6;
   outAddress = address;
   lastLineNumber = 0;
   lineCount = 0;

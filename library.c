@@ -8,6 +8,11 @@ void library() {
   word t1,t2,t3;
   ctmp = showCompiler;
   showCompiler = 0;
+  if (useElfos) {
+    output(programStart/256); output(programStart%256);
+    output((highest-programStart+1)/256); output((highest-programStart+1)%256);
+    output(programStart/256); output(programStart%256);
+    }
   output(SEX+R0);                                                // init:     SEX  R0
   output(DIS); output(0x20);                                     //           DIS  20
   output(LDI); output(lblStart / 256);                           //           LDI  start.1
