@@ -114,6 +114,7 @@ typedef unsigned char byte;
 typedef unsigned short word;
 
 LINK word   address;
+LINK char   baseName[1024];
 LINK char   compMode;
 LINK word   codeGenerated;
 LINK word   iBufferSize;
@@ -181,6 +182,7 @@ LINK byte   SERN;
 LINK char   showCompiler;
 LINK char   showList;
 LINK char   showVariables;
+LINK char   sourceFile[1024];
 LINK char   useAdd;
 LINK char   useAnd;
 LINK byte   useAtoI;
@@ -232,9 +234,11 @@ extern word  getHex(char* line);
 extern char* getNumber(char* line, word* number);
 extern word  getVariable(char* name);
 extern void  library();
+extern void  optionFile(char* filename);
 extern void  output(byte value);
 extern int   pass(char* filename);
 extern int   prepass(char* filename);
+extern void  processOption(char* option);
 extern void  showError(char* msg);
 extern char* trim(char* line);
 

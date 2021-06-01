@@ -33,8 +33,10 @@ OBJS = \
 	getvariable.o \
 	library.o \
 	main.o \
+	optionfile.o \
 	pass.o \
 	prepass.o \
+	processoption.o \
 	showerror.o \
 	trim.o
 
@@ -48,34 +50,36 @@ clean:
 	-rm *.o
 	-rm $(PROJECT)
 
-cdma.o:        header.h cdma.c
-cdpoke.o:      header.h cdpoke.c
-cend.o:        header.h cend.c
-cexpr.o:       header.h cexpr.c
-cgosub.o:      header.h cgosub.c
-cgoto.o:       header.h cgoto.c
-cidle.o:       header.h cidle.c
-cif.o:         header.h cif.c
-cinput.o:      header.h cinput.c
-cintr.o:       header.h cintr.c
-cioff.o:       header.h cioff.c
-cion.o:        header.h cion.c
-clet.o:        header.h clet.c
-compileline.o: header.h compileline.c
-congoto.o:     header.h congoto.c
-cout.o:        header.h cout.c
-cpoke.o:       header.h cpoke.c
-cprint.o:      header.h cprint.c
-cq.o:          header.h cq.c
-crem.o:        header.h crem.c
-creturn.o:     header.h creturn.c
-findline.o:    header.h findline.c
-gethex.o:      header.h gethex.c
-getnumber.o:   header.h getnumber.c
-getvariable.o: header.h getvariable.c
-library.o:     header.h library.c
-main.o:        header.h main.c
-pass.o:        header.h pass.c
-prepass.o:     header.h prepass.c
-showerror.o:   header.h showerror.c
+cdma.o:          header.h cdma.c
+cdpoke.o:        header.h cdpoke.c
+cend.o:          header.h cend.c
+cexpr.o:         header.h cexpr.c
+cgosub.o:        header.h cgosub.c
+cgoto.o:         header.h cgoto.c
+cidle.o:         header.h cidle.c
+cif.o:           header.h cif.c
+cinput.o:        header.h cinput.c
+cintr.o:         header.h cintr.c
+cioff.o:         header.h cioff.c
+cion.o:          header.h cion.c
+clet.o:          header.h clet.c
+compileline.o:   header.h compileline.c
+congoto.o:       header.h congoto.c
+cout.o:          header.h cout.c
+cpoke.o:         header.h cpoke.c
+cprint.o:        header.h cprint.c
+cq.o:            header.h cq.c
+crem.o:          header.h crem.c
+creturn.o:       header.h creturn.c
+findline.o:      header.h findline.c
+gethex.o:        header.h gethex.c
+getnumber.o:     header.h getnumber.c
+getvariable.o:   header.h getvariable.c
+library.o:       header.h library.c
+main.o:          header.h main.c
+optionfile.o:    header.h optionfile.c
+pass.o:          header.h pass.c
+prepass.o:       header.h prepass.c
+processoption.o: header.h processoption.c
+showerror.o:     header.h showerror.c
 trim.o:        header.h trim.c
