@@ -1,5 +1,6 @@
 #include "header.h"
 
+#define OP_ABS    0x56
 #define OP_INP    0x55
 #define OP_DPEEK  0x54
 #define OP_FRE    0x53
@@ -62,6 +63,9 @@ int reduce(char last) {
     return 0;
     }
   switch (op) {
+    case OP_ABS:
+         output(SEP+R4); output(lblAbs/256); output(lblAbs%256);
+         break;
     case OP_MUL:
          output(SEP+R4); output(lblMul/256); output(lblMul%256);
          break;
@@ -237,6 +241,13 @@ char* evaluate(char* buffer) {
          }
       if (strncasecmp(buffer,"inp(",4) == 0) {
          tokens[numTokens++] = OP_INP;
+         tokens[numTokens++] = OP_OP;
+         buffer+=4;
+         parens++;
+         func = -1;
+         }
+      if (strncasecmp(buffer,"abs(",4) == 0) {
+         tokens[numTokens++] = OP_ABS;
          tokens[numTokens++] = OP_OP;
          buffer+=4;
          parens++;

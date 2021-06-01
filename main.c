@@ -201,6 +201,7 @@ int main(int argc, char** argv, char** envp) {
   printf("Include in runtime:\n");
   if (lblScall != 0)  printf("  Scall         : %04x\n",lblScall);
   if (lblSret != 0)  printf("  Sret          : %04x\n",lblSret);
+  if (lblAbs != 0)  printf("  Abs16         : %04x\n",lblAbs);
   if (lblAdd != 0)  printf("  Add16         : %04x\n",lblAdd);
   if (lblSub != 0)  printf("  Sub16         : %04x\n",lblSub);
   if (lblMul != 0)  printf("  Mul16         : %04x\n",lblMul);

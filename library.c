@@ -736,6 +736,29 @@ void library() {
     output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
     }
 
+  if (useAbs) {
+    if (passNumber == 1) lblAbs = address;
+    output(INC+R7);                                              //           inc     r7
+    output(INC+R7);                                              //           inc     r7
+    output(LDN+R7);                                              //           ldn     r7
+    output(SHL);                                                 //           shl
+    a = address + 17;
+    output(LBNF); output(a/256); output(a%256);                  //           lbnf    absrt
+    output(DEC+R7);                                              //           dec     r7
+    output(LDN+R7);                                              //           ldn     r7
+    output(XRI); output(0xff);                                   //           xri     0ffh
+    output(ADI); output(1);                                      //           adi     1
+    output(STR+R7);                                              //           str     r7
+    output(INC+R7);                                              //           inc     r7
+    output(LDN+R7);                                              //           ldn     r7
+    output(XRI); output(0xff);                                   //           xri     0ffh
+    output(ADCI); output(0);                                     //           adci    0
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(SEP+R5);                                              //           sep     sret
+    }
+
   if (useAtoI) {
     /* **************************************** */
     /* ***** Convert ASCII to integer     ***** */

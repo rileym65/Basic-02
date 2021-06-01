@@ -49,6 +49,7 @@ int prepass(char* filename) {
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
           if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
+          if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
           }
         }
       }

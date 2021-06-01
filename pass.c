@@ -1,6 +1,7 @@
 #include "header.h"
 
 int pass(char* filename) {
+  word  target;
   FILE *source;
   source = fopen(filename,"r");
   if (source == NULL) {
@@ -22,5 +23,14 @@ int pass(char* filename) {
       }
     }
   fclose(source);
+  if (useElfos) {
+    target = 0x303;
+    output(LBR); output(target / 256); output(target % 256);
+    }
+  else {
+    target = address;
+    output(IDL);
+    output(LBR); output(target / 256); output(target % 256);
+    }
   }
 
