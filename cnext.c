@@ -3,8 +3,10 @@
 char* cnext(char* line) {
   int  pos;
   word addr;
+  char hasVar;
   char varname[256];
   line = trim(line);
+  hasVar = 0;
   if (*line == ':' || *line == 0) {
     addr = 0;
     }
@@ -23,8 +25,9 @@ char* cnext(char* line) {
     varname[pos] = 0;
     line = trim(line);
     addr = getVariable(varname);
+    hasVar = -1;
     }
-  if (addr == 0) {
+  if (hasVar) {
     output(SEP+R4); output(lblNext/256); output(lblNext%256);
     }
   else {

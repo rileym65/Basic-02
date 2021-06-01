@@ -933,11 +933,11 @@ void library() {
     output(DEC+R2);                                              //           dec     r2
     output(DEC+R2);                                              //           dec     r2
     output(LBR); output(lblNext/256); output(lblNext%256);       //           lbr     next
-    output(IRX);                                                 // nv1:      inc     r2   ; move past bad entry
-    output(IRX);                                                 // nv2:      inc     r2   ; move past bad entry
-    output(IRX);                                                 //           inc     r2
-    output(IRX);                                                 //           inc     r2
-    output(IRX);                                                 //           inc     r2
+    output(IRX);                                                 // nv1:      irx          ; move past bad entry
+    output(IRX);                                                 // nv2:      irx          ; move past bad entry
+    output(IRX);                                                 //           irx       
+    output(IRX);                                                 //           irx       
+    output(IRX);                                                 //           irx       
     output(LBR); output(lblNextVar/256); output(lblNextVar%256); //           lbr     nextvar
 
     if (passNumber == 1) lblNext = address;

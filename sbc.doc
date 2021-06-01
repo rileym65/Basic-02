@@ -1,6 +1,7 @@
 DMA expr
 DPOKE addr,value
 END
+FOR var=expr TO expr [STEP expr]
 GOSUB line
 GOTO line
 IDLE
@@ -10,6 +11,7 @@ INTR line
 IOFF
 ION
 [LET] var=expr
+NEXT [var]
 ON expr GOSUB line,line,...
 ON expr GOTO line,line,...
 OUT port,value
@@ -50,8 +52,6 @@ System variables:
   LFSR__       - LSW of 32-bit LFSR RND seed
 
 
-*FOR var=expr TO expr [STEP expr]
-*NEXT [var]
 *ISTART
 *IRETURN
 
