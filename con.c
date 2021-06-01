@@ -46,10 +46,10 @@ char* con(char* line) {
       output(LBZ); output(addr/256); output(addr%256);
       }
     if (mode == 'S') {
-      nxt = 6;
+      nxt = address + 9;
       output(LBNZ); output(nxt/256); output(nxt%256);
       output(SEP+R4); output(addr/256); output(addr%256);
-      addr = address + ((lineCount-i-1) * 11);
+      addr = address + 3 + ((lineCount-i-1) * 11);
       output(LBR); output(addr/256); output(addr%256);
       }
     }
