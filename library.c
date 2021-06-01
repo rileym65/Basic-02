@@ -1135,7 +1135,7 @@ void library() {
   output(INC+RF);                                                //           INC  RF
   output(LDI); output(t1%256);                                   //           LDI  freemem.0
   output(STR+RF);                                                //           STR  RF
-  if (useItoA || useAtoI) {
+  if ((useItoA || useAtoI) && useElfos == 0) {
     output(SEP+R4);                                              //           SEP  SCALL
     output(lblF_setbd/256); output(lblF_setbd%256);              //           DW   F_SETBD
     }
