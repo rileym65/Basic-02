@@ -5,10 +5,10 @@ char* cq(char* line) {
   line = trim(line);
   line = cexpr(line);
   output(GLO+RC);
-  addr = address + 4;
+  addr = address + 7;
   output(LBZ); output(addr/256); output(addr%256);
   output(REQ);
-  addr = address + 1;
+  addr = address + 4;
   output(LBR); output(addr/256); output(addr%256);
   output(SEQ);
   return line;
