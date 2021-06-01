@@ -19,13 +19,28 @@ Q expr
 REM text
 RETURN
 
-Functions in expressions:
+Expressions:
+  +
+  -
+  *
+  /
+  %
+  &
+  |
+  ^
+  =
+  <>
+  <
+  >
+  <=
+  >=
   ABS(expr)
   DPEEK(addr)
   FLG(expr)
   FRE(addr)
   INP(port)
   PEEK(addr)
+
 
 
 *FOR var=expr TO expr [STEP expr]

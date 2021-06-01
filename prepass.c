@@ -9,10 +9,12 @@ int prepass(char* filename) {
     printf("Could not open %s\n",filename);
     exit(1);
     }
+  useAbs = 0;
   useAdd = 0;
   useSub = 0;
   useMul = 0;
   useDiv = 0;
+  useMod = 0;
   useAnd = 0;
   useOr = 0;
   useXor = 0;
@@ -36,6 +38,7 @@ int prepass(char* filename) {
           if (currentLine[i] == '-') useSub = -1;
           if (currentLine[i] == '*') useMul = -1;
           if (currentLine[i] == '/') useDiv = -1;
+          if (currentLine[i] == '%') useMod = -1;
           if (currentLine[i] == '&') useAnd = -1;
           if (currentLine[i] == '|') useOr = -1;
           if (currentLine[i] == '^') useXor = -1;
@@ -58,6 +61,7 @@ int prepass(char* filename) {
 
   if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
   if (useCmp) useSub = -1;
+  if (useMod) useDiv = -1;
   if (lblF_inmsg == 0xffff) {
     useAtoI = 0;
     useItoA = 0;

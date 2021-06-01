@@ -6,6 +6,7 @@
 #define OP_FRE    0x53
 #define OP_FLG    0x52
 #define OP_PEEK   0x51
+#define OP_MOD    0x43
 #define OP_MUL    0x42
 #define OP_DIV    0x41
 #define OP_ADD    0x32
@@ -71,6 +72,9 @@ int reduce(char last) {
          break;
     case OP_DIV:
          output(SEP+R4); output(lblDiv/256); output(lblDiv%256);
+         break;
+    case OP_MOD:
+         output(SEP+R4); output(lblMod/256); output(lblMod%256);
          break;
     case OP_ADD:
          output(SEP+R4); output(lblAdd/256); output(lblAdd%256);
@@ -306,6 +310,7 @@ char* evaluate(char* buffer) {
     else if (*buffer == '-') { add(OP_SUB); buffer++; }
     else if (*buffer == '*') { add(OP_MUL); buffer++; }
     else if (*buffer == '/') { add(OP_DIV); buffer++; }
+    else if (*buffer == '%') { add(OP_MOD); buffer++; }
     else if (*buffer == '&') { add(OP_AND); buffer++; }
     else if (*buffer == '|') { add(OP_OR); buffer++; }
     else if (*buffer == '^') { add(OP_XOR); buffer++; }

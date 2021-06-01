@@ -349,6 +349,7 @@ void library() {
     output(GLO+RE);                                              // mdnorm3:  glo     re
     output(SEP+R5);                                              //           sep     sret
     }
+
   if (useMul) {
     if (passNumber == 1) lblMul = address;
     output(SEX+R7);                                              // mul15:    sex     r7
@@ -419,6 +420,7 @@ void library() {
     output(PHI+RC);                                              //           phi     rc
     output(LBR); output(t1/256); output(t1%256);                 //           lbr     mulloop
     }
+
   if (useDiv) {
     if (passNumber == 1) lblDiv = address;
     output(SEX+R7);                                              // div15:    sex     r7
@@ -489,6 +491,7 @@ void library() {
     output(XRI); output(0xff);                                   //           xri     0ffh
     output(PLO+RF);                                              //           plo     rf
     output(INC+RF);                                              //           inc     rf
+    t3 = address;
     output(SEX+R7);                                              // divret:   sex     r7
     output(GHI+RF);                                              //           ghi     rf
     output(STXD);                                                //           stxd
@@ -540,7 +543,22 @@ void library() {
     output(GLO+R8);                                              //           glo     r8
     output(SHRC);                                                //           shrc
     output(PLO+R8);                                              //           plo     r8
+    output(LBDF); output(t3/256); output(t3%256);                //           lbdf    divret
     output(LBR); output(t2/256); output(t2%256);                 //           lbr     divst
+    }
+
+  if (useMod) {
+    if (passNumber == 1) lblMod = address;
+    output(SEP+R4); output(lblDiv/256); output(lblDiv%256);      // mod16:    call    div16
+    output(INC+R7);                                              //           inc     r7
+    output(INC+R7);                                              //           inc     r7
+    output(GHI+RC);                                              //           ghi     rc
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(GLO+RC);                                              //           glo     rc
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(SEP+R5);                                              //           sep     sret
     }
 
   if (useAdd) {
