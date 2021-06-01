@@ -777,6 +777,103 @@ void library() {
     output(SEP+R5);                                              //           sep     sret
     }
 
+  if (useRnd) {
+    if (passNumber == 1) lblRnd = address;
+    output(LDI); output(16);                                     // rnd16:    ldi     16
+    output(PLO+RC);                                              //           plo     rc
+    t1 = address;
+    a = getVariable("_LFSR");
+    output(LDI); output(a/256);                                  // lfsr_lp:  ldi     high lfsr
+    output(PHI+R9);                                              //           phi     r9
+    output(LDI); output(a%256);                                  //           ldi     low lfsr
+    output(PLO+R9);                                              //           plo     r9
+    output(INC+R9);                                              //           inc     r9
+    output(INC+R9);                                              //           inc     r9
+    output(INC+R9);                                              //           inc     r9
+    output(LDN+R9);                                              //           ldn     r9
+    output(PLO+RE);                                              //           plo     re
+    output(SHR);                                                 //           shr
+    output(STR+R2);                                              //           str     r2
+    output(GLO+RE);                                              //           glo     re
+    output(XOR);                                                 //           xor
+    output(PLO+RE);                                              //           plo     re
+    output(LDN+R2);                                              //           ldn     r2
+    output(SHR);                                                 //           shr
+    output(STR+R2);                                              //           str     r2
+    output(GLO+RE);                                              //           glo     re
+    output(XOR);                                                 //           xor
+    output(PLO+RE);                                              //           plo     re
+    output(LDN+R2);                                              //           ldn     r2
+    output(SHR);                                                 //           shr
+    output(SHR);                                                 //           shr
+    output(STR+R2);                                              //           str     r2
+    output(GLO+RE);                                              //           glo     re
+    output(XOR);                                                 //           xor
+    output(PLO+RE);                                              //           plo     re
+    output(LDN+R2);                                              //           ldn     r2
+    output(SHR);                                                 //           shr
+    output(SHR);                                                 //           shr
+    output(STR+R2);                                              //           str     r2
+    output(GLO+RE);                                              //           glo     re
+    output(XOR);                                                 //           xor
+    output(PLO+RE);                                              //           plo     re
+    output(DEC+R9);                                              //           dec     r9
+    output(DEC+R9);                                              //           dec     r9
+    output(DEC+R9);                                              //           dec     r9
+    output(LDN+R9);                                              //           ldn     r9
+    output(SHL);                                                 //           shl
+    output(SHLC);                                                //           shlc
+    output(STR+R2);                                              //           str     r2
+    output(GLO+RE);                                              //           glo     re
+    output(XOR);                                                 //           xor
+    output(XRI); output(1);                                      //           xri     1
+    output(SHR);                                                 //           shr
+    output(LDN+R9);                                              //           ldn     r9
+    output(SHRC);                                                //           shrc
+    output(STR+R9);                                              //           str     r9
+    output(INC+R9);                                              //           inc     r9
+    output(LDN+R9);                                              //           ldn     r9
+    output(SHRC);                                                //           shrc
+    output(STR+R9);                                              //           str     r9
+    output(INC+R9);                                              //           inc     r9
+    output(LDN+R9);                                              //           ldn     r9
+    output(SHRC);                                                //           shrc
+    output(STR+R9);                                              //           str     r9
+    output(INC+R9);                                              //           inc     r9
+    output(LDN+R9);                                              //           ldn     r9
+    output(SHRC);                                                //           shrc
+    output(STR+R9);                                              //           str     r9
+    output(DEC+RC);                                              //           dec     rc
+    output(GLO+RC);                                              //           glo     rc
+    output(LBNZ); output(t1/256); output(t1%256);                //           lbnz    lfsr_lp
+    output(LDI); output(a/256);                                  //           ldi     high lfsr
+    output(PHI+R9);                                              //           phi     r9
+    output(LDI); output(a%256);                                  //           ldi     low lfsr
+    output(PLO+R9);                                              //           plo     r9
+    output(LDA+R9);                                              //           lda     r9
+    output(PLO+RF);                                              //           plo     rf
+    output(LDN+R9);                                              //           ldn     r9
+    output(PHI+RF);                                              //           phi     rf
+    output(INC+R7);                                              //           inc     r7
+    output(LDA+R7);                                              //           lda     r7
+    output(PLO+R9);                                              //           plo     r9
+    output(LDN+R7);                                              //           ldn     r7
+    output(PHI+R9);                                              //           phi     r9
+    output(GHI+RF);                                              //           ghi     rf
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(GLO+RF);                                              //           glo     rf
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(GHI+R9);                                              //           ghi     r9
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(GLO+R9);                                              //           glo     r9
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(LBR); output(lblMod/256); output(lblMod%256);         //           lbr     mod16
+    }
+
   if (useAtoI) {
     /* **************************************** */
     /* ***** Convert ASCII to integer     ***** */

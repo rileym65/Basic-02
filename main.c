@@ -180,6 +180,10 @@ int main(int argc, char** argv, char** envp) {
   pass(sourceFile);
   variableRAM = (variableStart == 0xffff) ? address : variableStart;
   passNumber = 2;
+  if (useRnd) {
+    getVariable("_LFSR");
+    getVariable("__LFSR");
+    }
   outCount = 0;
   outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY,0666);
   if (outFile < 0) {
@@ -217,6 +221,7 @@ int main(int argc, char** argv, char** envp) {
   if (lblLt != 0)  printf("  Lt16          : %04x\n",lblLt);
   if (lblGte != 0)  printf("  Gte16         : %04x\n",lblGte);
   if (lblLte != 0)  printf("  Lte16         : %04x\n",lblLte);
+  if (lblRnd != 0)  printf("  Rnd16         : %04x\n",lblRnd);
   if (lblItoA != 0)  printf("  ItoA          : %04x\n",lblItoA);
   if (lblAtoI != 0)  printf("  AtoI          : %04x\n",lblAtoI);
   if (lblF_inmsg != 0)  printf("  f_inmsg       : %04x\n",lblF_inmsg);

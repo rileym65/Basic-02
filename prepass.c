@@ -26,6 +26,7 @@ int prepass(char* filename) {
   useGt = 0;
   useLt = 0;
   useEf = 0;
+  useRnd = 0;
 
   while (fgets(currentLine, 1023, source) != NULL) {
     while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] < 32) currentLine[strlen(currentLine)-1] = 0;
@@ -53,6 +54,7 @@ int prepass(char* filename) {
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
           if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
           if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
+          if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
           }
         }
       }
@@ -61,6 +63,7 @@ int prepass(char* filename) {
 
   if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
   if (useCmp) useSub = -1;
+  if (useRnd) useMod = -1;
   if (useMod) useDiv = -1;
   if (lblF_inmsg == 0xffff) {
     useAtoI = 0;

@@ -40,6 +40,7 @@ Expressions:
   FRE(addr)
   INP(port)
   PEEK(addr)
+  RND(range)
 
 
 
@@ -48,7 +49,6 @@ Expressions:
 *ISTART
 *IRETURN
 
-*RND(range)
 
 Variables:
   Variable names can be more than 1 character, but must start with a letter
