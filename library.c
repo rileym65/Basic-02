@@ -777,6 +777,37 @@ void library() {
     output(SEP+R5);                                              //           sep     sret
     }
 
+  if (useSgn) {
+    if (passNumber == 1) lblSgn = address;
+    output(INC+R7);                                              // sgn16:    inc     r7
+    output(LDA+R7);                                              //           lda     r7
+    output(STR+R2);                                              //           str     r2
+    output(LDN+R7);                                              //           ldn     r7
+    output(SHL);                                                 //           shl
+    a = address + 17;
+    output(LBDF); output(a/256); output(a%256);                  //           lbdf    sgnm
+    output(LDN+R7);                                              //           ldn     r7
+    output(OR);                                                  //           or
+    a = address + 19;
+    output(LBZ); output(a/256); output(a%256);                   //           lbz     sgn0
+    output(LDI); output(0);                                      //           ldi     0
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(LDI); output(1);                                      //           ldi     1
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(SEP+R5);                                              //           sep     sret
+    output(LDI); output(0xff);                                   // sgnm:     ldi     0ffh
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(STR+R7);                                              //           str     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(SEP+R5);                                              //           sep     sret
+    output(DEC+R7);                                              // sgn0:     dec     r7
+    output(DEC+R7);                                              //           dec     r7
+    output(SEP+R5);                                              //           sep     sret
+    }
+
   if (useRnd) {
     if (passNumber == 1) lblRnd = address;
     output(LDI); output(16);                                     // rnd16:    ldi     16

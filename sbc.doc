@@ -41,7 +41,12 @@ Expressions:
   INP(port)
   PEEK(addr)
   RND(range)
+  SGN(expr)
 
+System variables:
+  FREE_        - Address of free RAM
+  LFSR_        - MSW of 32-bit LFSR RND seed
+  LFSR__       - LSW of 32-bit LFSR RND seed
 
 
 *FOR var=expr TO expr [STEP expr]

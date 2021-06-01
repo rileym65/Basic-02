@@ -211,6 +211,7 @@ int main(int argc, char** argv, char** envp) {
   if (lblSub != 0)  printf("  Sub16         : %04x\n",lblSub);
   if (lblMul != 0)  printf("  Mul16         : %04x\n",lblMul);
   if (lblDiv != 0)  printf("  Div16         : %04x\n",lblDiv);
+  if (lblSgn != 0)  printf("  Sgn16         : %04x\n",lblSgn);
   if (lblMod != 0)  printf("  Mod16         : %04x\n",lblMod);
   if (lblAnd != 0)  printf("  And16         : %04x\n",lblAnd);
   if (lblOr != 0)  printf("  Or16          : %04x\n",lblOr);
