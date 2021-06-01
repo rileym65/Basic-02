@@ -181,8 +181,8 @@ int main(int argc, char** argv, char** envp) {
   variableRAM = (variableStart == 0xffff) ? address : variableStart;
   passNumber = 2;
   if (useRnd) {
-    getVariable("_LFSR");
-    getVariable("__LFSR");
+    getVariable("LFSR_");
+    getVariable("LFSR__");
     }
   outCount = 0;
   outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY,0666);

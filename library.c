@@ -782,7 +782,7 @@ void library() {
     output(LDI); output(16);                                     // rnd16:    ldi     16
     output(PLO+RC);                                              //           plo     rc
     t1 = address;
-    a = getVariable("_LFSR");
+    a = getVariable("LFSR_");
     output(LDI); output(a/256);                                  // lfsr_lp:  ldi     high lfsr
     output(PHI+R9);                                              //           phi     r9
     output(LDI); output(a%256);                                  //           ldi     low lfsr
