@@ -115,6 +115,7 @@ Switches:
      =self      - use internal serial i/o
      =none      - no terminal
 -elfos          - produce an Elf/OS executable
+-stg            - produce STG compatible image (sets -exit=8003)
 -melf           - -ram=0000-7fff -rom=8000-ffff -nq -ef2
 -pev            - -ram=0000-7fff -rom=8000-ffff -nq -ef2
 -pev2           - -ram=0000-7fff -rom=8000-ffff -rq -ref2
