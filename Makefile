@@ -21,6 +21,7 @@ OBJS = \
 	cioff.o \
 	cion.o \
 	clet.o \
+	clocate.o \
 	cnext.o \
 	compileline.o \
 	congoto.o \
@@ -69,6 +70,7 @@ cintr.o:         header.h cintr.c
 cioff.o:         header.h cioff.c
 cion.o:          header.h cion.c
 clet.o:          header.h clet.c
+clocate.o:       header.h clocate.c
 cnext.o:         header.h cnext.c
 compileline.o:   header.h compileline.c
 congoto.o:       header.h congoto.c

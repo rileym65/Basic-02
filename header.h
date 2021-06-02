@@ -251,6 +251,7 @@ extern char* cion(char* line);
 extern char* cinput(char* line);
 extern char* cintr(char* line);
 extern char* clet(char* line);
+extern char* clocate(char* line);
 extern char* cnext(char* line);
 extern int   compileLine(char* line);
 extern char* con(char* line);

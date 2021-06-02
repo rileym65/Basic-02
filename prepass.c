@@ -83,6 +83,7 @@ int prepass(char* filename) {
           if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt = -1;
           if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
           if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
+          if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
           if (strncasecmp(currentLine+i,"next",4) == 0) useNext = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;

@@ -12,6 +12,7 @@ INTR line
 IOFF
 ION
 [LET] var=expr
+LOCATE y,x
 NEXT [var]
 ON expr GOSUB line,line,...
 ON expr GOTO line,line,...
