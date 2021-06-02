@@ -104,6 +104,7 @@ int main(int argc, char** argv, char** envp) {
   estack = 0;
   useSelfTerm = 0;
   useElfos = 0;
+  useStg = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;

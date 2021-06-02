@@ -3,6 +3,12 @@
 char* cq(char* line) {
   word addr;
   line = trim(line);
+  if (match(line,"#")) {
+    if (atoi(line) > 0) output(SEQ);
+      else output(REQ);
+    while (*line != ':' && *line != 0) line++;
+    return line;
+    }
   line = cexpr(line);
   output(GLO+RC);
   addr = address + 7;

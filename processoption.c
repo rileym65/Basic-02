@@ -33,6 +33,11 @@ void processOption(char* option) {
       useElfos = -1;
       programStart = 0x2000;
       }
+    if (strcmp(option,"-stg") == 0) {
+      useStg = -1;
+      exitAddress = 0x8003;
+      ramEnd = 0x7eff;
+      }
     if (strcmp(option,"-rq") == 0) {
       SERSEQ = REQ;
       SERREQ = SEQ;

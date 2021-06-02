@@ -35,6 +35,7 @@ OBJS = \
 	getvariable.o \
 	library.o \
 	main.o \
+	match.o \
 	optionfile.o \
 	pass.o \
 	prepass.o \
@@ -81,6 +82,7 @@ getnumber.o:     header.h getnumber.c
 getvariable.o:   header.h getvariable.c
 library.o:       header.h library.c
 main.o:          header.h main.c
+match.o:         header.h match.c
 optionfile.o:    header.h optionfile.c
 pass.o:          header.h pass.c
 prepass.o:       header.h prepass.c

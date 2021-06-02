@@ -13,7 +13,7 @@ void library() {
     output((highest-programStart+1)/256); output((highest-programStart+1)%256);
     output(programStart/256); output(programStart%256);
     }
-  if (useElfos) {
+  if (useElfos || useStg) {
     output(LBR); output(lblStart/256); output(lblStart%256);
     }
   else {
@@ -1234,7 +1234,7 @@ void library() {
   output(PHI+R7);                                                //           PHI  R7      
   output(LDI); output(estack % 256);                             //           LDI  estack.0
   output(PLO+R7);                                                //           PLO  R7
-  if (useElfos == 0) {
+  if (useElfos == 0 && useStg == 0) {
     output(LDI); output(lblScall / 256);                           //           LDI  scall.1
     output(PHI+R4);                                                //           PHI  R4      
     output(LDI); output(lblScall % 256);                           //           LDI  scall.0
