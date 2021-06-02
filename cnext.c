@@ -27,7 +27,7 @@ char* cnext(char* line) {
     addr = getVariable(varname);
     hasVar = -1;
     }
-  if (hasVar) {
+  if (hasVar == 0) {
     output(SEP+R4); output(lblNext/256); output(lblNext%256);
     }
   else {
