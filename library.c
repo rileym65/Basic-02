@@ -761,7 +761,7 @@ void library() {
 
   if (useAbs) {
     if (passNumber == 1) lblAbs = address;
-    output(INC+R7);                                              //           inc     r7
+    output(INC+R7);                                              // abs16:    inc     r7
     output(INC+R7);                                              //           inc     r7
     output(LDN+R7);                                              //           ldn     r7
     output(SHL);                                                 //           shl

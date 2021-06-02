@@ -41,7 +41,9 @@ int match(char* line, char* pattern) {
            matchCount++;
            break;
       default :
-           if (*line != *pattern) { printf("Failed ?\n"); return 0; }
+           if (*line != *pattern) {
+             return 0;
+             }
            matches[matchCount][pos++] = *line;
            matches[matchCount][pos] = 0;
            matchCount++;

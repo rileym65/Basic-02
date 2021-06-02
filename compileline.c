@@ -4,13 +4,18 @@ int compileLine(char* line) {
   word l;
   listCount = 0;
   if (showCompiler && passNumber == 2) printf("%04x:",address);
-
+  if (passNumber == 2 && useAsm) {
+    sprintf(buffer,"; %s",line); writeAsm(buffer,"");
+    }
   line = trim(line);
   if (*line < '0' || *line > '9') {
     showError("Error: Line does not start with a line number");
     return -1;
     }
   line = getNumber(line, &l);
+  if (passNumber == 2 && useAsm) {
+    sprintf(buffer,"l%d:",l); writeAsm(buffer,"");
+    }
   if (l == 0 || l > 65535) {
     showError("Error: Invalid line number");
     return -1;

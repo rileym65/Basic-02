@@ -68,54 +68,122 @@ int reduce(char last) {
   switch (op) {
     case OP_SGN:
          output(SEP+R4); output(lblSgn/256); output(lblSgn%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform SGN()");
+           sprintf(buffer,"          dw    sgn16"); writeAsm(buffer,"");
+           }
          break;
     case OP_RND:
          output(SEP+R4); output(lblRnd/256); output(lblRnd%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform RND()");
+           sprintf(buffer,"          dw    rnd16"); writeAsm(buffer,"");
+           }
          break;
     case OP_ABS:
          output(SEP+R4); output(lblAbs/256); output(lblAbs%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform ABS()");
+           sprintf(buffer,"          dw    abs16"); writeAsm(buffer,"");
+           }
          break;
     case OP_MUL:
          output(SEP+R4); output(lblMul/256); output(lblMul%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform multiplication");
+           sprintf(buffer,"          dw    mul16"); writeAsm(buffer,"");
+           }
          break;
     case OP_DIV:
          output(SEP+R4); output(lblDiv/256); output(lblDiv%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform division");
+           sprintf(buffer,"          dw    div16"); writeAsm(buffer,"");
+           }
          break;
     case OP_MOD:
          output(SEP+R4); output(lblMod/256); output(lblMod%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform modulo");
+           sprintf(buffer,"          dw    mod16"); writeAsm(buffer,"");
+           }
          break;
     case OP_ADD:
          output(SEP+R4); output(lblAdd/256); output(lblAdd%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform addition");
+           sprintf(buffer,"          dw    add16"); writeAsm(buffer,"");
+           }
          break;
     case OP_SUB:
          output(SEP+R4); output(lblSub/256); output(lblSub%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform subtraction");
+           sprintf(buffer,"          dw    sub16"); writeAsm(buffer,"");
+           }
          break;
     case OP_GT :
          output(SEP+R4); output(lblGt/256); output(lblGt%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform greater than");
+           sprintf(buffer,"          dw    gt16"); writeAsm(buffer,"");
+           }
          break;
     case OP_LT :
          output(SEP+R4); output(lblLt/256); output(lblLt%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform less than");
+           sprintf(buffer,"          dw    lt16"); writeAsm(buffer,"");
+           }
          break;
     case OP_GTE:
          output(SEP+R4); output(lblGte/256); output(lblGte%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform greater or equal");
+           sprintf(buffer,"          dw    gte16"); writeAsm(buffer,"");
+           }
          break;
     case OP_LTE:
          output(SEP+R4); output(lblLte/256); output(lblLte%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform less or equal");
+           sprintf(buffer,"          dw    lte16"); writeAsm(buffer,"");
+           }
          break;
     case OP_EQ :
          output(SEP+R4); output(lblEq/256); output(lblEq%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform equal");
+           sprintf(buffer,"          dw    eq16"); writeAsm(buffer,"");
+           }
          break;
     case OP_NE :
          output(SEP+R4); output(lblNe/256); output(lblNe%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform not equal");
+           sprintf(buffer,"          dw    ne16"); writeAsm(buffer,"");
+           }
          break;
     case OP_AND:
          output(SEP+R4); output(lblAnd/256); output(lblAnd%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform AND");
+           sprintf(buffer,"          dw    and16"); writeAsm(buffer,"");
+           }
          break;
     case OP_OR :
          output(SEP+R4); output(lblOr/256); output(lblOr%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform OR");
+           sprintf(buffer,"          dw    or16"); writeAsm(buffer,"");
+           }
          break;
     case OP_XOR:
          output(SEP+R4); output(lblXor/256); output(lblXor%256);
+         if (useAsm) {
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform XOR");
+           sprintf(buffer,"          dw    xor16"); writeAsm(buffer,"");
+           }
          break;
     case OP_PEEK:
          output(INC+R7);
@@ -129,6 +197,19 @@ int reduce(char last) {
          output(LDN+RF);
          output(STR+R7);
          output(DEC+R7);
+         if (useAsm) {
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"Retrieve address for peek");
+           sprintf(buffer,"          lda   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldn   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldi   0"); writeAsm(buffer,"Result is a byte, so MSB=0");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldn   rf"); writeAsm(buffer,"Retrieve byte from memory");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"And store on expr stack");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           }
          break;
     case OP_DPEEK:
          output(INC+R7);
@@ -142,6 +223,19 @@ int reduce(char last) {
          output(LDN+RF);
          output(STR+R7);
          output(DEC+R7);
+         if (useAsm) {
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"Retrieve address for dpeek");
+           sprintf(buffer,"          lda   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldn   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          lda   rf"); writeAsm(buffer,"Retrieve word from memory");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldn   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"And store on expr stack");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           }
          break;
     case OP_FLG:
          output(INC+R7);
@@ -149,6 +243,17 @@ int reduce(char last) {
          output(LDI); output(0); output(STR+R7); output(DEC+R7);
          output(SEP+R4); output(lblEf/256); output(lblEf%256);
          output(STR+R7); output(DEC+R7);
+         if (useAsm) {
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"FLG needs no args, so remove dummy");
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldi   0"); writeAsm(buffer,"Result is a byte, so MSB=0");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Read EF flags");
+           sprintf(buffer,"          dw    readef"); writeAsm(buffer,"");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"And push result onto expr stack");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           }
          break;
     case OP_FRE:
          addr = variableRAM + iBufferSize + (2 * numberOfVariables);
@@ -159,6 +264,24 @@ int reduce(char last) {
          output(LDI); output(addr/256); output(STR+R7); output(DEC+R7);
          output(LDI); output(addr%256); output(STR+R7); output(DEC+R7);
          output(SEP+R4); output(lblSub/256); output(lblSub%256);
+         if (useAsm) {
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"FRE needs no args, so remove dummy");
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ghi   r7"); writeAsm(buffer,"Write expr stack pointer to expr stack");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          glo   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldi   %d",addr/256); writeAsm(buffer,"Push address of variable end");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldi   %d",addr%256); writeAsm(buffer,"");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform subtraction");
+           sprintf(buffer,"          dw    sub16"); writeAsm(buffer,"");
+           }
          break;
     case OP_INP:
          output(LDI); output(SEP+R3);
@@ -176,6 +299,27 @@ int reduce(char last) {
          output(STR+R7); output(DEC+R7);
          output(LDX);
          output(STR+R7); output(DEC+R7);
+         if (useAsm) {
+           sprintf(buffer,"          ldi   0d3h"); writeAsm(buffer,"Push 'SEP R3' onto stack");
+           sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+           sprintf(buffer,"          inc   r7"); writeAsm(buffer,"Retrieve port");
+           sprintf(buffer,"          lda   r7"); writeAsm(buffer,"Leave pointer at MSB");
+           sprintf(buffer,"          ani   7"); writeAsm(buffer,"Strip all bits but bottom 3");
+           sprintf(buffer,"          adi   068h"); writeAsm(buffer,"Form INP command");
+           sprintf(buffer,"          stxd"); writeAsm(buffer,"And store ont stack");
+           sprintf(buffer,"          glo   r2"); writeAsm(buffer,"Copy stack address to RF");
+           sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          ghi   r2"); writeAsm(buffer,"");
+           sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
+           sprintf(buffer,"          inc   rf"); writeAsm(buffer,"RF now points to INP command");
+           sprintf(buffer,"          sep   rf"); writeAsm(buffer,"Execute code on stack");
+           sprintf(buffer,"          ldi   0"); writeAsm(buffer,"MSB of result is 0");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"Write to expr stack");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           sprintf(buffer,"          ldx"); writeAsm(buffer, "Retrieve input value");
+           sprintf(buffer,"          str   r7"); writeAsm(buffer,"Write to expr stack");
+           sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
+           }
          break;
     }
   tokens[numTokens++] = 0;
@@ -193,6 +337,7 @@ void add(int op) {
   }
 
 char* evaluate(char* buffer) {
+  char abuffer[128];
   int p;
   char token[64];
   int neg;
@@ -296,6 +441,14 @@ char* evaluate(char* buffer) {
       tokens[numTokens++] = OP_NUM;
       output(LDI); output(number/256); output(STR+R7); output(DEC+R7);
       output(LDI); output(number%256); output(STR+R7); output(DEC+R7);
+      if (useAsm) {
+        sprintf(abuffer,"          ldi   %d",number/256); writeAsm(abuffer,"Push constant onto expr stack");
+        sprintf(abuffer,"          str   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          dec   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          ldi   %d",number%256); writeAsm(abuffer,"");
+        sprintf(abuffer,"          str   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          dec   r7"); writeAsm(abuffer,"");
+        }
       }
 
     else if (*buffer == '$' &&
@@ -316,6 +469,14 @@ char* evaluate(char* buffer) {
       tokens[numTokens++] = OP_NUM;
       output(LDI); output(number/256); output(STR+R7); output(DEC+R7);
       output(LDI); output(number%256); output(STR+R7); output(DEC+R7);
+      if (useAsm) {
+        sprintf(abuffer,"          ldi   %d",number/256); writeAsm(abuffer,"Push constant onto expr stack");
+        sprintf(abuffer,"          str   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          dec   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          ldi   %d",number%256); writeAsm(abuffer,"");
+        sprintf(abuffer,"          str   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          dec   r7"); writeAsm(abuffer,"");
+        }
       }
 
     else if ((*buffer >= 'a' && *buffer <= 'z') ||
@@ -335,6 +496,18 @@ char* evaluate(char* buffer) {
       output(LDI); output(number%256); output(PLO+RF);
       output(LDA+RF); output(STR+R7); output(DEC+R7);
       output(LDA+RF); output(STR+R7); output(DEC+R7);
+      if (useAsm) {
+        sprintf(abuffer,"          ldi   %s.1",token); writeAsm(abuffer,"Get address of variable");
+        sprintf(abuffer,"          phi   rf"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          ldi   %s.0",token); writeAsm(abuffer,"");
+        sprintf(abuffer,"          plo   rf"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          lda   rf"); writeAsm(abuffer,"Retrieve its value");
+        sprintf(abuffer,"          str   r7"); writeAsm(abuffer,"And store onto expr stack");
+        sprintf(abuffer,"          dec   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          lda   rf"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          str   r7"); writeAsm(abuffer,"");
+        sprintf(abuffer,"          dec   r7"); writeAsm(abuffer,"");
+        }
       }
     else {
       printf("Expression error: %s\n",buffer);
@@ -368,6 +541,13 @@ char* evaluate(char* buffer) {
   if (numTokens != 2) printf("Expression error\n");
   output(INC+R7); output(LDA+R7); output(PLO+RC);
   output(LDN+R7); output(PHI+RC);
+  if (useAsm) {
+    sprintf(abuffer,"          inc   r7"); writeAsm(abuffer,"Retrieve expression result");
+    sprintf(abuffer,"          lda   r7"); writeAsm(abuffer,"");
+    sprintf(abuffer,"          plo   rc"); writeAsm(abuffer,"");
+    sprintf(abuffer,"          ldn   r7"); writeAsm(abuffer,"");
+    sprintf(abuffer,"          phi   rc"); writeAsm(abuffer,"");
+    }
   return buffer;
   }
 
@@ -404,6 +584,12 @@ char* cexpr(char* line) {
         (*temp >= 'A' && *temp <= 'Z')) {
       output(LDI); output(num/256); output(PHI+RC);
       output(LDI); output(num%256); output(PLO+RC);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %d",num/256); writeAsm(buffer,"Set expression result to constant");
+        sprintf(buffer,"          phi   rc"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",num%256); writeAsm(buffer,"");
+        sprintf(buffer,"          plo   rc"); writeAsm(buffer,"");
+        }
       return temp;
       }
     }
@@ -430,6 +616,16 @@ char* cexpr(char* line) {
       output(LDI); output(num%256); output(PLO+RF);
       output(LDA+RF); output(PHI+RC);
       output(LDA+RF); output(PLO+RC);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %s.1",token); writeAsm(buffer,"Set expression result to variable"); 
+        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.0",token); writeAsm(buffer,"");
+        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          lda   rf"); writeAsm(buffer,"Retrieve variable value");
+        sprintf(buffer,"          phi   rc"); writeAsm(buffer,"");
+        sprintf(buffer,"          lda   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          plo   rc"); writeAsm(buffer,"");
+        }
       return temp;
       }
     }

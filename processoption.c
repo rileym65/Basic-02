@@ -23,6 +23,8 @@ void processROM(char* buffer) {
   }
 
 void processOption(char* option) {
+    if (strcmp(option,"-a") == 0) useAsm = -1;
+    if (strcmp(option,"-A") == 0) showAsm = -1;
     if (strcmp(option,"-b") == 0) outMode = 'B';
     if (strcmp(option,"-i") == 0) outMode = 'I';
     if (strcmp(option,"-r") == 0) outMode = 'R';

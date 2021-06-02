@@ -5,6 +5,22 @@
 #include <string.h>
 #include "header.h"
 
+void writeAsm(char* line,char* rem) {
+  char buffer[256];
+  if (passNumber == 1) return;
+  if (strlen(rem) > 0) {
+    while (strlen(line) < 40) strcat(line," ");
+    sprintf(buffer,"%s; %s\n",line,rem);
+    if (showAsm) printf("%s",buffer);
+    if (useAsm) write(asmFile, buffer, strlen(buffer));
+    }
+  else {
+    sprintf(buffer,"%s\n",line);
+    if (showAsm) printf("%s",buffer);
+    if (useAsm) write(asmFile, buffer, strlen(buffer));
+    }
+  }
+
 void writeOutput() {
   int i;
   byte checksum;
@@ -97,6 +113,7 @@ int main(int argc, char** argv, char** envp) {
   ramEnd = 0xffff;
   romStart = 0xffff;
   romEnd = 0xffff;
+  showAsm = 0;
   showCompiler = 0;
   showList = 0;
   showVariables = 0;
@@ -105,6 +122,7 @@ int main(int argc, char** argv, char** envp) {
   useSelfTerm = 0;
   useElfos = 0;
   useStg = 0;
+  useAsm = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;
@@ -150,6 +168,8 @@ int main(int argc, char** argv, char** envp) {
     case 'I': strcat(outName, ".hex"); break;
     case 'B': strcat(outName, ".bin"); break;
     }
+  strcpy(asmName,baseName);
+  strcat(asmName,".asm");
   printf("out: %s\n",outName);
   if (programStart == 0xffff) programStart = 0x0000;
   if (programStart >= ramStart && programStart <= ramEnd) compMode = 'A';
@@ -193,9 +213,21 @@ int main(int argc, char** argv, char** envp) {
     printf("Could not open output file: %s\n",outName);
     exit(1);
     }
+  if (useAsm) asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
   pass(sourceFile);
   if (outCount > 0) writeOutput();
   close(outFile);
+  if (useAsm) {
+    for (i=0; i<numberOfVariables; i++) {
+      if (useAsm) {
+        sprintf(buffer,"%s: ",variableNames[i]);
+        while (strlen(buffer) < 10) strcat(buffer," ");
+        strcat(buffer,"dw    0");
+        writeAsm(buffer,"");
+        }
+      }
+    close(asmFile);
+    }
   printf("\n");
   printf("Lines compiled: %d\n",lineCount);
   printf("Code generated: %d\n",codeGenerated);

@@ -89,6 +89,8 @@ producing a fully self-contained program that has no external dependencies.
 line is currently limited to 2048 character.
 
 Switches:
+-a              - produce assembly file
+-A              - display assembly
 -b              - output as binary
 -c              - show compiler output
 -i              - output as Intel hex

@@ -13,6 +13,10 @@ char* cend(char* line) {
   else {
     output(IDL);
     output(LBR); output(target / 256); output(target % 256);
+    if (useAsm) {
+      sprintf(buffer,"lend:     idl"); writeAsm(buffer,"Idle the CPU");
+      sprintf(buffer,"          lbr   lend",matches[0]); writeAsm(buffer,"");
+      }
     }
   return line;
   }
