@@ -6,8 +6,129 @@ char* cfor(char* line) {
   int  pos;
   word vaddr;
   word addr;
+  word value;
   char varname[256];
   line = trim(line);
+  if (match(line,"A=#A#A#")) {
+    if (strcasecmp(matches[3],"to") == 0 && strcasecmp(matches[5],"step") == 0) {
+      vaddr = getVariable(matches[0]);
+      value = atoi(matches[2]);
+      output(LDI); output(vaddr/256);
+      output(PHI+RF);
+      output(LDI); output(vaddr%256);
+      output(PLO+RF);
+      output(LDI); output(value/256);
+      output(STR+RF); output(INC+RF);
+      output(LDI); output(value%256);
+      output(STR+RF);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Get variable address");
+        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
+        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write value to variable");
+        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
+        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
+        }
+      value = atoi(matches[4])+1;
+      output(LDI); output(value/256); output(STXD);
+      output(LDI); output(value%256); output(STXD);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write end value to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        }
+      value = atoi(matches[6]);
+      output(LDI); output(value/256); output(STXD);
+      output(LDI); output(value%256); output(STXD);
+      output(LDI); output(vaddr/256); output(STXD);
+      output(LDI); output(vaddr%256); output(STXD);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write step value to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Write variable address to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        }
+      addr = address + 6;
+      output(LDI); output(addr/256); output(STXD);
+      output(LDI); output(addr%256); output(STXD);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   $+6"); writeAsm(buffer,"Write execution address to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   $+3"); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        }
+      while (*line != ':' && *line != 0) line++;
+      return line;
+      }
+    }
+  if (match(line,"A=#A#")) {
+    if (strcasecmp(matches[3],"to") == 0) {
+      vaddr = getVariable(matches[0]);
+      value = atoi(matches[2]);
+      output(LDI); output(vaddr/256);
+      output(PHI+RF);
+      output(LDI); output(vaddr%256);
+      output(PLO+RF);
+      output(LDI); output(value/256);
+      output(STR+RF); output(INC+RF);
+      output(LDI); output(value%256);
+      output(STR+RF);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Get variable address");
+        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
+        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write value to variable");
+        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
+        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
+        }
+      value = atoi(matches[4])+1;
+      output(LDI); output(value/256); output(STXD);
+      output(LDI); output(value%256); output(STXD);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write end value to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        }
+      value = 1;
+      output(LDI); output(value/256); output(STXD);
+      output(LDI); output(value%256); output(STXD);
+      output(LDI); output(vaddr/256); output(STXD);
+      output(LDI); output(vaddr%256); output(STXD);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write step value to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Write variable address to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        }
+      addr = address + 6;
+      output(LDI); output(addr/256); output(STXD);
+      output(LDI); output(addr%256); output(STXD);
+      if (useAsm) {
+        sprintf(buffer,"          ldi   $+6"); writeAsm(buffer,"Write execution address to stack");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        sprintf(buffer,"          ldi   $+3"); writeAsm(buffer,"");
+        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
+        }
+      while (*line != ':' && *line != 0) line++;
+      return line;
+      }
+    }
   if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {
     showError("Invalid variable name");
     exit(1);
