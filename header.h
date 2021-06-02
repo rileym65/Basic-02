@@ -115,6 +115,7 @@ typedef unsigned short word;
 
 LINK word   address;
 LINK char   baseName[1024];
+LINK char   buffer[2048];
 LINK char   compMode;
 LINK word   codeGenerated;
 LINK word   iBufferSize;
@@ -168,6 +169,8 @@ LINK word   lineNumber;
 LINK word   lineNumbers[16384];
 LINK word   lineAddresses[16384];
 LINK word   listCount;
+LINK char   matches[10][64];
+LINK int    matchCount;
 LINK word   numberOfLines;
 LINK word   numberOfVariables;
 LINK word   outAddress;
@@ -212,8 +215,10 @@ LINK char   useRnd;
 LINK byte   useSelfTerm;
 LINK char   useSgn;
 LINK byte   useSub;
+LINK byte   useStg;
 LINK char   useXor;
 LINK byte   useElfos;
+LINK byte   useAsm;
 LINK char **variableNames;
 LINK word  *variableAddresses;
 LINK word   variableRAM;
@@ -248,6 +253,7 @@ extern word  getHex(char* line);
 extern char* getNumber(char* line, word* number);
 extern word  getVariable(char* name);
 extern void  library();
+extern int   match(char* line, char* pattern);
 extern void  optionFile(char* filename);
 extern void  output(byte value);
 extern int   pass(char* filename);
@@ -255,6 +261,7 @@ extern int   prepass(char* filename);
 extern void  processOption(char* option);
 extern void  showError(char* msg);
 extern char* trim(char* line);
+extern void  writeAsm(char* line,char* rem);
 
 #endif
 
