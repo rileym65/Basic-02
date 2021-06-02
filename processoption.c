@@ -181,7 +181,7 @@ void processOption(char* option) {
       lblF_setbd = 0x0f2d;
       }
     if (strncmp(option,"-start=",7) == 0) programStart=getHex(option+7);
-    if (strncmp(option,"-exit=",6) == 0) programStart=getHex(option+6);
+    if (strncmp(option,"-exit=",6) == 0) exitAddress=getHex(option+6);
     if (strncmp(option,"-vars=",6) == 0) variableStart=getHex(option+6);
     if (strncmp(option,"-ram=",5) == 0) processRAM(option+5);
     if (strncmp(option,"-rom=",5) == 0) processROM(option+5);
