@@ -913,8 +913,10 @@ void library() {
   if (useNext) {
     if (passNumber == 1) lblNextVar = address;
     output(IRX);                                                 // nextvar:  irx          ; move to varAddr
-    output(IRX);                                                 //           irx
-    output(IRX);                                                 //           irx
+    output(LDXA);                                                //           ldxa
+    output(PLO+RD);                                              //           plo     rd
+    output(LDXA);                                                //           ldxa
+    output(PHI+RD);                                              //           phi     rd
     output(IRX);                                                 //           irx
     output(IRX);                                                 //           irx
     output(GLO+RC);                                              //           glo     rc   ; check for correct address
@@ -938,6 +940,10 @@ void library() {
     output(IRX);                                                 //           irx       
     output(IRX);                                                 //           irx       
     output(IRX);                                                 //           irx       
+    output(GHI+RD);                                              //           ghi     rd
+    output(STXD);                                                //           stxd
+    output(GLO+RD);                                              //           glo     rd
+    output(STXD);                                                //           stxd
     output(LBR); output(lblNextVar/256); output(lblNextVar%256); //           lbr     nextvar
 
     if (passNumber == 1) lblNext = address;
