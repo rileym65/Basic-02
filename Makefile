@@ -6,6 +6,7 @@ INCDIR =
 LIBS =
 LIBDIR =
 OBJS = \
+	ccls.o \
 	cdma.o \
 	cdpoke.o \
 	cend.o \
@@ -53,6 +54,7 @@ clean:
 	-rm *.o
 	-rm $(PROJECT)
 
+ccls.o:          header.h ccls.c
 cdma.o:          header.h cdma.c
 cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c

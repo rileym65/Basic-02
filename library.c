@@ -1038,10 +1038,10 @@ void library() {
     output(PLO+RE);                                              //           plo     re
     output(SMI); output('0');                                    //           smi     '0'
     a = address + 8;
-    output(LBNF); output(a/256); output(a%256);            //           lbnf    atoi_no
+    output(LBNF); output(a/256); output(a%256);                  //           lbnf    atoi_no
     output(SMI); output(10);                                     //           smi     10
     a = address + 4;
-    output(LBNF); output(a/256); output(a%256);            //           lbnf    atoi_0_2
+    output(LBNF); output(a/256); output(a%256);                  //           lbnf    atoi_0_2
     output(SEP+R5);                                              // atoi_no:  sep     sret
     output(GLO+RE);                                              // atoi_0_2: glo     re
     output(SMI); output('0');                                    //           smi     '0'

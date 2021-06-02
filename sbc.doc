@@ -1,3 +1,4 @@
+CLS
 DMA expr
 DPOKE addr,value
 END

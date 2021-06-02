@@ -236,6 +236,7 @@ LINK word  *variableAddresses;
 LINK word   variableRAM;
 LINK word   variableStart;
 
+extern char* ccls(char* line);
 extern char* cdma(char* line);
 extern char* cdpoke(char* line);
 extern char* cend(char* line);
