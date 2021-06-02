@@ -208,7 +208,7 @@ int main(int argc, char** argv, char** envp) {
     }
   getVariable("FREE_");
   outCount = 0;
-  outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY,0666);
+  outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
   if (outFile < 0) {
     printf("Could not open output file: %s\n",outName);
     exit(1);
