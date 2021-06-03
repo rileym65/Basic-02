@@ -197,6 +197,7 @@ int main(int argc, char** argv, char** envp) {
   numberOfLines = 0;
   numberOfVariables = 0;
   numData = 0;
+  numDataLines = 0;
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);

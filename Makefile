@@ -32,6 +32,7 @@ OBJS = \
 	cq.o \
 	cread.o \
 	crem.o \
+	crestore.o \
 	creturn.o \
 	findline.o \
 	gethex.o \
@@ -83,6 +84,7 @@ cprint.o:        header.h cprint.c
 cq.o:            header.h cq.c
 cread.o:         header.h cread.c
 crem.o:          header.h crem.c
+crestore.o:      header.h crestore.c
 creturn.o:       header.h creturn.c
 findline.o:      header.h findline.c
 gethex.o:        header.h gethex.c

@@ -23,6 +23,7 @@ PRINT expr[,;]expr[,;]...
 Q expr
 READ var,var,...
 REM text
+RESTORE [line]
 RETURN
 
 Expressions:
@@ -51,6 +52,7 @@ Expressions:
   SGN(expr)
 
 System variables:
+  DATA_        - Address of DATA pointer
   FREE_        - Address of free RAM
   LFSR_        - MSW of 32-bit LFSR RND seed
   LFSR__       - LSW of 32-bit LFSR RND seed

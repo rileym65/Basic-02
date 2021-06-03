@@ -5,6 +5,19 @@ char* cdata(char* line) {
   word addr;
   word num;
   char neg;
+  if (passNumber == 1) {
+    numDataLines++;
+    if (numDataLines == 1) {
+      dataLines = (word*)malloc(sizeof(word));
+      dataPositions = (word*)malloc(sizeof(word));
+      }
+    else {
+      dataLines = (word*)realloc(dataLines, sizeof(word) * numDataLines);
+      dataPositions = (word*)realloc(dataPositions, sizeof(word) * numDataLines);
+      }
+    dataLines[numDataLines-1] = lastLineNumber;
+    dataPositions[numDataLines-1] = numData;
+    }
   line = trim(line);
   while (*line != ':' && *line != 0) {
     if ((*line < '0' || *line > '9') && *line != '-') {
