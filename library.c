@@ -1257,8 +1257,6 @@ void library() {
   output(STR+RF);                                                //           STR  RF
   if (useData) {
     a = getVariable("DATA_");
-printf("\nDATA_ = %04x\n",a);
-printf("data address = %04x\n",dataAddress);
     output(LDI); output(a/256); output(PHI+RF);
     output(LDI); output(a%256); output(PLO+RF);
     output(LDI); output(dataAddress/256); output(STR+RF); output(INC+RF);

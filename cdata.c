@@ -35,7 +35,6 @@ char* cdata(char* line) {
         data = (word*)malloc(sizeof(word));
       else
         data = (word*)realloc(data, sizeof(word) * numData);
-printf("Data: %d\n",num);
       data[numData-1] = num;
       }
     if (*line == ',') {

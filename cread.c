@@ -30,7 +30,9 @@ char* cread(char* line) {
       line++;
       }
     addr = getVariable(token);
-    output(LDI); output(addr/256); output(PHI+RC);
+    if (last == 0xffff || ((addr & 0xff00) != (addr & 0xff00))) {
+      output(LDI); output(addr/256); output(PHI+RC);
+      }
     output(LDI); output(addr%256); output(PLO+RC);
     output(LDA+RD); output(STR+RC); output(INC+RC);
     output(LDA+RD); output(STR+RC);
