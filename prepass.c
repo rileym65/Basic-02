@@ -29,6 +29,7 @@ int prepass(char* filename) {
   useRnd = 0;
   useNext = 0;
   useData = 0;
+  useHeap = 0;
 
   lblAtoI = 0;
   lblAbs = 0;

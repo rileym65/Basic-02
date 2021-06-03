@@ -201,6 +201,7 @@ int main(int argc, char** argv, char** envp) {
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);
+  addLabel("f_type",lblF_type);
   passNumber = 1;
   pass(sourceFile);
   variableRAM = (variableStart == 0xffff) ? address : variableStart;
@@ -211,6 +212,9 @@ int main(int argc, char** argv, char** envp) {
     }
   if (useData) {
     getVariable("DATA_");
+    }
+  if (useHeap) {
+    getVariable("HEAP_");
     }
   getVariable("FREE_");
   outCount = 0;
