@@ -1,6 +1,7 @@
 #include "header.h"
 
 int pass(char* filename) {
+  int   i;
   word  target;
   FILE *source;
   source = fopen(filename,"r");
@@ -23,6 +24,7 @@ int pass(char* filename) {
       }
     }
   fclose(source);
+  if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (exitAddress != 0xffff) {
     output(LBR); output(exitAddress / 256); output(exitAddress % 256);
     }
@@ -34,6 +36,17 @@ int pass(char* filename) {
     target = address;
     output(IDL);
     output(LBR); output(target / 256); output(target % 256);
+    }
+  if (passNumber == 2 && showCompiler) printf("\n");
+  if (useData) {
+    if (passNumber == 1) { 
+      dataAddress = address;
+      }
+    if (showCompiler && passNumber == 2) printf("%04x:",address);
+    for (i=0; i<numData; i++) {
+      output(data[i]/256); output(data[i]%256);
+      }
+    if (passNumber == 2 && showCompiler) printf("\n");
     }
   }
 

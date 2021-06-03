@@ -1255,6 +1255,15 @@ void library() {
   output(INC+RF);                                                //           INC  RF
   output(LDI); output(t1%256);                                   //           LDI  freemem.0
   output(STR+RF);                                                //           STR  RF
+  if (useData) {
+    a = getVariable("DATA_");
+printf("\nDATA_ = %04x\n",a);
+printf("data address = %04x\n",dataAddress);
+    output(LDI); output(a/256); output(PHI+RF);
+    output(LDI); output(a%256); output(PLO+RF);
+    output(LDI); output(dataAddress/256); output(STR+RF); output(INC+RF);
+    output(LDI); output(dataAddress%256); output(STR+RF);
+    }
   if ((useItoA || useAtoI) && useElfos == 0) {
     output(SEP+R4);                                              //           SEP  SCALL
     output(lblF_setbd/256); output(lblF_setbd%256);              //           DW   F_SETBD

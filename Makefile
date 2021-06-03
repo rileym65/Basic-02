@@ -7,6 +7,7 @@ LIBS =
 LIBDIR =
 OBJS = \
 	ccls.o \
+	cdata.o \
 	cdma.o \
 	cdpoke.o \
 	cend.o \
@@ -29,6 +30,7 @@ OBJS = \
 	cpoke.o \
 	cprint.o \
 	cq.o \
+	cread.o \
 	crem.o \
 	creturn.o \
 	findline.o \
@@ -56,6 +58,7 @@ clean:
 	-rm $(PROJECT)
 
 ccls.o:          header.h ccls.c
+cdata.o:         header.h cdata.c
 cdma.o:          header.h cdma.c
 cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c
@@ -78,6 +81,7 @@ cout.o:          header.h cout.c
 cpoke.o:         header.h cpoke.c
 cprint.o:        header.h cprint.c
 cq.o:            header.h cq.c
+cread.o:         header.h cread.c
 crem.o:          header.h crem.c
 creturn.o:       header.h creturn.c
 findline.o:      header.h findline.c

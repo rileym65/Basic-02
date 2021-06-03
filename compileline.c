@@ -55,6 +55,8 @@ int compileLine(char* line) {
     else if (strncasecmp(line,"next",4) == 0) line=cnext(line+4);
     else if (strncasecmp(line,"cls",3) == 0) line=ccls(line+3);
     else if (strncasecmp(line,"locate",6) == 0) line=clocate(line+6);
+    else if (strncasecmp(line,"data",4) == 0) line=cdata(line+4);
+    else if (strncasecmp(line,"read",4) == 0) line=cread(line+4);
     else line = clet(line);
   
     line = trim(line);

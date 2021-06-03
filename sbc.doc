@@ -1,4 +1,5 @@
 CLS
+DATA number,number,...
 DMA expr
 DPOKE addr,value
 END
@@ -20,6 +21,7 @@ OUT port,value
 POKE addr,value
 PRINT expr[,;]expr[,;]...
 Q expr
+READ var,var,...
 REM text
 RETURN
 

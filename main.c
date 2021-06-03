@@ -121,6 +121,7 @@ int main(int argc, char** argv, char** envp) {
   estack = 0;
   useSelfTerm = 0;
   useElfos = 0;
+  useData = 0;
   useStg = 0;
   useAsm = 0;
   lblF_inmsg = 0xff66;
@@ -195,6 +196,7 @@ int main(int argc, char** argv, char** envp) {
   lblSret  = 0x0000;
   numberOfLines = 0;
   numberOfVariables = 0;
+  numData = 0;
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);
@@ -205,6 +207,9 @@ int main(int argc, char** argv, char** envp) {
   if (useRnd) {
     getVariable("LFSR_");
     getVariable("LFSR__");
+    }
+  if (useData) {
+    getVariable("DATA_");
     }
   getVariable("FREE_");
   outCount = 0;
