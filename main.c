@@ -202,6 +202,7 @@ int main(int argc, char** argv, char** envp) {
   highest = 0;
   prepass(sourceFile);
   addLabel("f_type",lblF_type);
+  addLabel("f_setbd",lblF_setbd);
   passNumber = 1;
   pass(sourceFile);
   variableRAM = (variableStart == 0xffff) ? address : variableStart;

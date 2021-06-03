@@ -5,1022 +5,985 @@
 void library() {
   char ctmp;
   word a;
-  word t1,t2,t3;
+  word t1,t2,t3,t4;
   ctmp = showCompiler;
   showCompiler = 0;
+  Asm("scall:      equ  r4");
+  Asm("sret:       equ  r5");
   if (useElfos) {
     output(programStart/256); output(programStart%256);
     output((highest-programStart+1)/256); output((highest-programStart+1)%256);
     output(programStart/256); output(programStart%256);
     }
   if (useElfos || useStg) {
-    output(LBR); output(lblStart/256); output(lblStart%256);
+    Asm("init:       lbr  start");
     }
   else {
-    output(SEX+R0);                                              // init:     SEX  R0
-    output(DIS); output(0x20);                                   //           DIS  20
-    output(LDI); output(lblStart / 256);                         //           LDI  start.1
-    output(PHI+R3);                                              //           PHI  R3      
-    output(LDI); output(lblStart % 256);                         //           LDI  start.0
-    output(PLO+R3);                                              //           PLO  R3
-    output(SEP+R3);                                              //           SEP  R3
+    Asm("init:       sex  r0");
+    Asm("            dis");
+    Asm("            db   020h");
+    Asm("            ldi  start.1");
+    Asm("            phi  r3");
+    Asm("            ldi  start.0");
+    Asm("            plo  r3");
     }
   lblReturn = address;
-  output(SEP+R3);                                                // return:   SEP  R3
+  Asm("return:     sep  r3");
   if (passNumber == 1) lblScall = address;
-  output(PLO+RE);                                                // scall:    PLO  RE
-  output(GHI+R6);                                                //           ghi     r6
-  output(STXD);                                                  //           stxd
-  output(GLO+R6);                                                //           glo     r6
-  output(STXD);                                                  //           stxd
-  output(GHI+R3);                                                //           ghi     r3
-  output(PHI+R6);                                                //           phi     r6
-  output(GLO+R3);                                                //           glo     r3
-  output(PLO+R6);                                                //           plo     r6
-  output(LDA+R6);                                                //           lda     r6
-  output(PHI+R3);                                                //           phi     r3
-  output(LDA+R6);                                                //           lda     r6
-  output(PLO+R3);                                                //           plo     r3
-  output(GLO+RE);                                                //           glo     re
-  output(BR); output((lblScall-1)%256);                          //           br      call-1
-  output(SEP+R3);                                                //           sep     r3
+  Asm("call:       plo     re");
+  Asm("            ghi     r6");
+  Asm("            stxd");
+  Asm("            glo     r6");
+  Asm("            stxd");
+  Asm("            ghi     r3");
+  Asm("            phi     r6");
+  Asm("            glo     r3");
+  Asm("            plo     r6");
+  Asm("            lda     r6");
+  Asm("            phi     r3");
+  Asm("            lda     r6");
+  Asm("            plo     r3");
+  Asm("            glo     re");
+  Asm("            br      call-1");
+  Asm("            sep     r3");
   if (passNumber == 1) lblSret = address;
-  output(PLO+RE);                                                // ret:      plo     re
-  output(GHI+R6);                                                //           ghi     r6
-  output(PHI+R3);                                                //           phi     r3
-  output(GLO+R6);                                                //           glo     r6
-  output(PLO+R3);                                                //           plo     r3
-  output(IRX);                                                   //           irx
-  output(LDXA);                                                  //           ldxa
-  output(PLO+R6);                                                //           plo     r6
-  output(LDX);                                                   //           ldx
-  output(PHI+R6);                                                //           phi     r6
-  output(GLO+RE);                                                //           glo     re
-  output(BR); output((lblSret-1)%256);                           //           br      ret-1
+  Asm("ret:        plo     re");
+  Asm("            ghi     r6");
+  Asm("            phi     r3");
+  Asm("            glo     r6");
+  Asm("            plo     r3");
+  Asm("            irx");
+  Asm("            ldxa");
+  Asm("            plo     r6");
+  Asm("            ldx");
+  Asm("            phi     r6");
+  Asm("            glo     re");
+  Asm("            br      ret-1");
 
   if (useEf) {
     if (passNumber == 1) lblEf = address;
-    output(LDI); output(0);                                      // readef:   ldi     0
-    a = address + 4;
-    output(BN1); output(a%256);                                  //           bn1     ef1
-    output(ORI); output(1);                                      //           ori     1
-    a = address + 4;
-    output(BN2); output(a%256);                                  // ef1:      bn2     ef2
-    output(ORI); output(2);                                      //           ori     2
-    a = address + 4;
-    output(BN3); output(a%256);                                  // ef2:      bn3     ef3
-    output(ORI); output(4);                                      //           ori     4
-    a = address + 4;
-    output(BN4); output(a%256);                                  // ef3:      bn4     ef4
-    output(ORI); output(8);                                      //           ori     8
-    output(SEP+R5);                                              // ef4:      sep     sret
+    Asm(" readef:    ldi     0");
+    Asm("            bn1     ef1");
+    Asm("            ori     1");
+    Asm(" ef1:       bn2     ef2");
+    Asm("            ori     2");
+    Asm(" ef2:       bn3     ef3");
+    Asm("            ori     4");
+    Asm(" ef3:       bn4     ef4");
+    Asm("            ori     8");
+    Asm(" ef4:       sep     sret");
     }
 
   if (useSelfTerm) {
     t1 = address;
-    output(SEP+R3);                                              //           sep     r3
+    Asm("          sep     r3");
     if (passNumber == 1) lblF_delay = address;
-    output(GHI+RE);                                              // delay:    ghi     re
-    output(SHR);                                                 //           shr
-    output(PLO+RE);                                              //           plo     re
-    output(SEX+R2);                                              //           sex     r2
-    t2 = address;
-    output(DEC+RE);                                              // delay1:   dec     re
-    output(GLO+RE);                                              //           glo     re
-    output(BZ); output(t1%256);                                  //           bz      delay-1
-    output(BR); output(t2%256);                                  //           br      delay1
+    Asm("delay:    ghi     re");
+    Asm("          shr");
+    Asm("          plo     re");
+    Asm("          sex     r2");
+    Asm("delay1:   dec     re");
+    Asm("          glo     re");
+    Asm("          bz      delay-1");
+    Asm("          br      delay1");
 
     if (passNumber == 1) lblF_type = address;
-    output(PLO+RE);                                              // type:     plo     re
-    output(GHI+RF); output(STXD);                                //           push    rf
-    output(GLO+RF); output(STXD);
-    output(GHI+RD); output(STXD);                                //           push    rf
-    output(GLO+RD); output(STXD);
-    output(GLO+RE);                                              //           glo     re
-    output(PHI+RF);                                              //           phi     rf
-    output(LDI); output(9);                                      //           ldi     9
-    output(PLO+RF);                                              //           plo     rf
-    output(LDI); output(lblF_delay/256); output(PHI+RD);         //           mov     rd,delay
-    output(LDI); output(lblF_delay%256); output(PLO+RD);
-    output(ADI); output(0);                                      //           adi     0
-    t1 = address;
-    a = address + 5;
-    output(BDF); output(a%256);                                  // sendlp:   bdf     sendnb              ; jump if no bit
-    output(SERSEQ);                                              //           SERSEQ
-    a = address + 4;
-    output(BR); output(a%256);                                   //           br      sendct
-    output(SERREQ);                                              // sendnb:   SERREQ
-    a = address + 2;
-    output(BR); output(a%256);                                   //           br      sendct
-    output(SEP+RD);                                              // sendct:   sep     rd                  ; perform bit delay
-    output(SEX+R2);                                              //           sex r2
-    output(SEX+R2);                                              //           sex r2
-    output(GHI+RF);                                              //           ghi     rf
-    output(SHRC);                                                //           shrc
-    output(PHI+RF);                                              //           phi     rf
-    output(DEC+RF);                                              //           dec     rf
-    output(GLO+RF);                                              //           glo     rf
-    output(BNZ); output(t1%256);                                 //           bnz     sendlp
-    output(SERREQ);                                              //           SERREQ
-    output(SEP+RD);                                              //           sep     rd
-    output(SEP+RD);                                              //           sep     rd
-    output(IRX); output(LDXA); output(PLO+RD);                   //           pop     rd
-    output(LDXA); output(PHI+RD);
-    output(LDXA); output(PLO+RF);                                //           pop     rf
-    output(LDX); output(PHI+RF);
-    output(SEP+R5);                                              //           sep     sret
+    Asm("f_type:   plo     re");
+    Asm("          ghi     rf");
+    Asm("          stxd");
+    Asm("          glo     rf");
+    Asm("          stxd");
+    Asm("          ghi     rd");
+    Asm("          stxd");
+    Asm("          glo     rd");
+    Asm("          stxd");
+    Asm("          glo     re");
+    Asm("          phi     rf");
+    Asm("          ldi     9");
+    Asm("          plo     rf");
+    Asm("          ldi     delay.1");
+    Asm("          phi     rd");
+    Asm("          ldi     delay.0");
+    Asm("          plo     rd");
+    Asm("          adi     0");
+    Asm("sendlp:   bdf     sendnb              ; jump if no bit");
+    Asm("          SERSEQ");
+    Asm("          br      sendct");
+    Asm("sendnb:   SERREQ");
+    Asm("          br      sendct");
+    Asm("sendct:   sep     rd                  ; perform bit delay");
+    Asm("          sex r2");
+    Asm("          sex r2");
+    Asm("          ghi     rf");
+    Asm("          shrc");
+    Asm("          phi     rf");
+    Asm("          dec     rf");
+    Asm("          glo     rf");
+    Asm("          bnz     sendlp");
+    Asm("          SERREQ");
+    Asm("          sep     rd");
+    Asm("          sep     rd");
+    Asm("          irx");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldxa");
+    Asm("          phi     rd");
+    Asm("          ldxa");
+    Asm("          plo     rf");
+    Asm("          ldx");
+    Asm("          phi     rf");
+    Asm("          sep     sret");
 
     if (passNumber == 1) lblF_read = address;
-    output(GHI+RF); output(STXD);                                // read:     push    rf
-    output(GLO+RF); output(STXD);
-    output(GHI+RD); output(STXD);                                //           push    rf
-    output(GLO+RD); output(STXD);
-    output(LDI); output(9);                                      //           ldi     9
-    output(PLO+RF);                                              //           plo     rf
-    output(LDI); output(lblF_delay/256); output(PHI+RD);         //           mov     rd,delay
-    output(LDI); output(lblF_delay%256); output(PLO+RD);
-    output(GHI+RE);                                              //           ghi     re
-    output(PHI+RF);                                              //           phi     rf
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(PHI+RE);                                              //           phi     re
-    a = address;
-    output(SERP); output(a%256);                                 //           SERP    $
-    output(SEP+RD);                                              //           sep     rd
-    output(GHI+RF);                                              //           ghi     rf
-    output(PHI+RE);                                              //           phi     re
-    output(GHI+RF);                                              //           ghi     rf
-    output(SHR);                                                 //           shr
-    a = address + 32;
-    output(BDF); output(a%256);                                  //           bdf     recvlpe
-    t1 = address;
-    output(GHI+RF);                                              // recvlp:   ghi     rf
-    output(SHR);                                                 //           shr
-    a = address + 26;
-    output(SERN); output(a%256);                                 //           SERN    recvlp0
-    output(ORI); output(128);                                    //           ori     128
-    t2 = address;
-    output(PHI+RF);                                              // recvlp1:  phi     rf
-    output(SEP+RD);                                              //           sep     rd
-    output(DEC+RD);                                              //           dec     rf
-    output(NOP);                                                 //           nop
-    output(NOP);                                                 //           nop
-    output(GLO+RF);                                              //           glo     rf
-    output(BNZ); output(t1%256);                                 //           bnz     recvlp
-    t3 = address;
-    output(SERREQ);                                              // recvdone: SERREQ
-    output(GHI+RF);                                              //           ghi     rf
-    output(PLO+RE);                                              //           plo     re
-    output(IRX); output(LDXA); output(PLO+RD);                   //           pop     rd
-    output(LDXA); output(PHI+RD);
-    output(LDXA); output(PLO+RF);                                //           pop     rf
-    output(LDX); output(PHI+RF);
-    output(GLO+RE);                                              //           glo     re
-    output(SEP+R5);                                              //           sep     sret
-    output(BR); output(t2%256);                                  // recvlp0:  br      recvlp1
-
-    t1 = address;
-    output(GHI+RF);                                              // recvlpe:  ghi     rf
-    output(SHR);                                                 //           shr
-    a = address + 15;
-    output(SERN); output(a%256);                                 //           SERN    recvlpe0
-    output(ORI); output(128);                                    //           ori     128
-    output(SERREQ);                                              //           SERREQ
-    t2 = address;
-    output(PHI+RF);                                              // recvlpe1: phi     rf
-    output(SEP+RD);                                              //           sep     rd
-    output(DEC+RF);                                              //           dec     rf
-    output(SEX+R2);                                              //           sex     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(GLO+RF);                                              //           glo     rf
-    output(BNZ); output(t1%256);                                 //           bnz     recvlpe
-    output(BR); output(t3%256);                                  //           br      recvdone
-    output(SERSEQ);                                              // recvlpe0: SERSEQ
-    output(BR); output(t2%256);                                  //           br      recvlpe1
+    Asm("f_read:   ghi     rf");
+    Asm("          stxd");
+    Asm("          glo     rf");
+    Asm("          stxd");
+    Asm("          ghi     rd");
+    Asm("          stxd");
+    Asm("          glo     rd");
+    Asm("          stxd");
+    Asm("          ldi     9");
+    Asm("          plo     rf");
+    Asm("          ldi     delay.1");
+    Asm("          phi     rd");
+    Asm("          ldi     delay.0");
+    Asm("          plo     rd");
+    Asm("          ghi     re");
+    Asm("          phi     rf");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          phi     re");
+    Asm("          SERP    $");
+    Asm("          sep     rd");
+    Asm("          ghi     rf");
+    Asm("          phi     re");
+    Asm("          ghi     rf");
+    Asm("          shr");
+    Asm("          bdf     recvlpe");
+    Asm("recvlp:   ghi     rf");
+    Asm("          shr");
+    Asm("          SERN    recvlp0");
+    Asm("          ori     128");
+    Asm("recvlp1:  phi     rf");
+    Asm("          sep     rd");
+    Asm("          dec     rf");
+    Asm("          nop");
+    Asm("          nop");
+    Asm("          glo     rf");
+    Asm("          bnz     recvlp");
+    Asm("recvdone: SERREQ");
+    Asm("          ghi     rf");
+    Asm("          plo     re");
+    Asm("          irx");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldxa");
+    Asm("          phi     rd");
+    Asm("          ldxa ");
+    Asm("          plo     rf");
+    Asm("          ldx");
+    Asm("          phi     rf");
+    Asm("          glo     re");
+    Asm("          sep     sret");
+    Asm("recvlp0:  br      recvlp1");
+    Asm("recvlpe:  ghi     rf");
+    Asm("          shr");
+    Asm("          SERN    recvlpe0");
+    Asm("          ori     128");
+    Asm("          SERREQ");
+    Asm("recvlpe1: phi     rf");
+    Asm("          sep     rd");
+    Asm("          dec     rf");
+    Asm("          sex     r2");
+    Asm("          sex     r2");
+    Asm("          glo     rf");
+    Asm("          bnz     recvlpe");
+    Asm("          br      recvdone");
+    Asm("recvlpe0: SERSEQ");
+    Asm("          br      recvlpe1");
 
     if (passNumber == 1) lblF_setbd = address;
-    output(SERREQ);                                              // setbaud:  SERREQ
-    output(LDI); output(0);                                      //           ldi     0
-    output(PHI+RC);                                              //           phi     rc
-    output(PLO+RC);                                              //           plo     rc
-    output(PHI+RB);                                              //           phi     rb
-    output(PLO+RB);                                              //           plo     rb
-    a = address;
-    output(SERP); output(a%256);                                 // timalc_o: SERP    $
-    a = address;
-    output(SERN); output(a%256);                                 // end_sb:   SERN    $
-    a = address;
-    output(SERP); output(a%256);                                 //           SERP    $
-    t1 = address;
-    output(INC+RC);                                              // setbd1:   inc     rc
-    output(SEX+R2);                                              //           sex     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SERN); output(t1%256);                                //           SERN    setbd1
-    t2 = address;
-    output(INC+RB);                                              // setbd2:   inc     rb
-    output(SEX+R2);                                              //           sex     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SERP); output(t2%256);                                //           SERP    setbd2
-    output(GLO+RB);                                              // setbd4:   glo     rb
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RC);                                              //           glo     rc
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(SM);                                                  //           sm
-    a = address + 5;
-    output(LBZ); output(a/256); output(a%256);                   //           lbz     setbd3
-    output(LDI); output(1);                                      //           ldi     1
-    output(LSKP);                                                //           lskp
-    output(LDI); output(0);                                      // setbd3:   ldi     0
-    output(PHI+RB);                                              //           phi     rb
-    output(GLO+RC);                                              //           glo     rc
-    output(SMI); output(4);                                      //           smi     4
-    output(PHI+RE);                                              //           phi     re
-    output(GHI+RB);                                              //           ghi     rb
-    output(SHR);                                                 //           shr
-    output(GHI+RE);                                              //           ghi     re
-    output(SHLC);                                                //           shlc
-    output(PHI+RE);                                              //           phi     re
-    output(SEP+R5);                                              // timalc_rt: sep     sret
+    Asm("f_setbd:  SERREQ");
+    Asm("          ldi     0");
+    Asm("          phi     rc");
+    Asm("          plo     rc");
+    Asm("          phi     rb");
+    Asm("          plo     rb");
+    Asm("timalc_o: SERP    $");
+    Asm("end_sb:   SERN    $");
+    Asm("          SERP    $");
+    Asm("setbd1:   inc     rc");
+    Asm("          sex     r2");
+    Asm("          sex     r2");
+    Asm("          SERN    setbd1");
+    Asm("setbd2:   inc     rb");
+    Asm("          sex     r2");
+    Asm("          sex     r2");
+    Asm("          SERP    setbd2");
+    Asm("setbd4:   glo     rb");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          str     r2");
+    Asm("          glo     rc");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          sm");
+    Asm("          lbz     setbd3");
+    Asm("          ldi     1");
+    Asm("          lskp");
+    Asm("setbd3:   ldi     0");
+    Asm("          phi     rb");
+    Asm("          glo     rc");
+    Asm("          smi     4");
+    Asm("          phi     re");
+    Asm("          ghi     rb");
+    Asm("          shr");
+    Asm("          ghi     re");
+    Asm("          shlc");
+    Asm("          phi     re");
+    Asm("timalc_rt: sep     sret");
 
     if (passNumber == 1) lblF_inmsg = address;
-    output(LDA+R6);                                              // inmsg:    lda     r6
-    output(LBZ); output(lblReturn/256); output(lblReturn%256);   //           lbz     return
-    output(SEP+R4);                                              //           sep     scall
-    output(lblF_type/256); output(lblF_type%256);                //           dw      type
-    output(LBR); output(lblF_inmsg/256); output(lblF_inmsg%256); //           lbr     inmsg
+    Asm("f_inmsg:  lda     r6");
+    Asm("          lbz     return");
+    Asm("          sep     scall");
+    Asm("          dw      f_type");
+    Asm("          lbr     f_inmsg");
 
     if (passNumber == 1) lblF_msg = address;
-    output(LDA+RF);                                              // msg:      lda     rf
-    output(LBZ); output(lblReturn/256); output(lblReturn%256);   //           lbz     return
-    output(SEP+R4);                                              //           sep     scall
-    output(lblF_type/256); output(lblF_type%256);                //           dw      type
-    output(LBR); output(lblF_msg/256); output(lblF_msg%256);     //           lbr     msg
+    Asm("f_msg:    lda     rf");
+    Asm("          lbz     return");
+    Asm("          sep     scall");
+    Asm("          dw      f_type");
+    Asm("          lbr     f_msg");
 
     if (passNumber == 1) lblF_inmsg = address;
-    output(LDI); output(0);                                      // input:    ldi     0
-    output(PLO+RA);                                              //           plo     ra
-    t1 = address;
-    output(SEP+R4);                                              // inplp:    sep     scall
-    output(lblF_read/256); output(lblF_read%256);                //           dw      f_read
-    output(PLO+RE);                                              //           plo     re
-    output(SMI); output(3);                                      //           smi     3
-    a = address + 15;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    inpgo
-    output(SMI); output(0);                                      // inpterm:  smi     0
-    output(LDI); output(0);                                      //           ldi     0
-    a = address + 6;
-    output(LBR); output(a/256); output(a%256);                   //           lbr     inpdone2
-    t2 = address;
-    output(LDI); output(0);                                      // inpdone:  ldi     0
-    output(SHR);                                                 //           shr
-    output(STR+RF);                                              // inpdone2: str     rf
-    output(SEP+R5);                                              //           sep     sret
-    output(SMI); output(5);                                      // inpgo:    smi     5
-    a = address + 32;
-    output(LBZ); output(a/256); output(a%256);                   //           lbz     isbs
-    output(SMI); output(5);                                      //           smi     5
-    output(LBZ); output(t2/256); output(t2%256);                 //           lbz     inpdone
-    output(GLO+RC);                                              //           glo     rc
-    a = address + 15;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    inpcnt
-    output(GHI+RC);                                              //           ghi     rc
-    a = address + 11;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    inpcnt
-    output(LDI); output(8);                                      //           ldi     8
-    output(SEP+R4);                                              //           sep     scall
-    output(lblF_type/256); output(lblF_type%256);                //           dw      f_tty
-    a = address + 18;
-    output(LBR); output(a/256); output(a%256);                   //           lbr     bs2
-    output(GLO+RE);                                              // inpcnt:   glo     re
-    output(STR+RF);                                              //           str     rf
-    output(INC+RF);                                              //           inc     rf
-    output(SMI); output(8);                                      //           smi     08
-    a = address + 22;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    nobs
-    output(GLO+RA);                                              // isbs:     glo     ra
-    output(LBZ); output(t1/256); output(t1%256);                 //           lbz     inplp
-    output(DEC+RA);                                              //           dec     ra
-    output(DEC+RF);                                              //           dec     rf
-    output(INC+RC);                                              //           inc     rc
-    output(LDI); output(32);                                     // bs2:      ldi     32
-    output(SEP+R4);                                              //           sep     scall
-    output(lblF_type/256); output(lblF_type%256);                //           dw      f_tty
-    output(LDI); output(8);                                      //           ldi     8
-    output(SEP+R4);                                              //           sep     scall
-    output(lblF_type/256); output(lblF_type%256);                //           dw      f_tty
-    output(LBR); output(t1/256); output(t1%256);                 //           lbr     inplp
-    output(INC+RA);                                              // nobs:     inc     ra
-    output(DEC+RC);                                              //           dec     rc
-    output(LBR); output(t1/256); output(t1%256);                 //           lbr     inplp
+    Asm("f_input:  ldi     0");
+    Asm("          plo     ra");
+    Asm("inplp:    sep     scall");
+    Asm("          dw      f_read");
+    Asm("          plo     re");
+    Asm("          smi     3");
+    Asm("          lbnz    inpgo");
+    Asm("inpterm:  smi     0");
+    Asm("          ldi     0");
+    Asm("          lbr     inpdone2");
+    Asm("inpdone:  ldi     0");
+    Asm("          shr");
+    Asm("inpdone2: str     rf");
+    Asm("          sep     sret");
+    Asm("inpgo:    smi     5");
+    Asm("          lbz     isbs");
+    Asm("          smi     5");
+    Asm("          lbz     inpdone");
+    Asm("          glo     rc");
+    Asm("          lbnz    inpcnt");
+    Asm("          ghi     rc");
+    Asm("          lbnz    inpcnt");
+    Asm("          ldi     8");
+    Asm("          sep     scall");
+    Asm("          dw      f_tty");
+    Asm("          lbr     bs2");
+    Asm("inpcnt:   glo     re");
+    Asm("          str     rf");
+    Asm("          inc     rf");
+    Asm("          smi     08");
+    Asm("          lbnz    nobs");
+    Asm("isbs:     glo     ra");
+    Asm("          lbz     inplp");
+    Asm("          dec     ra");
+    Asm("          dec     rf");
+    Asm("          inc     rc");
+    Asm("bs2:      ldi     32");
+    Asm("          sep     scall");
+    Asm("          dw      f_tty");
+    Asm("          ldi     8");
+    Asm("          sep     scall");
+    Asm("          dw      f_tty");
+    Asm("          lbr     inplp");
+    Asm("nobs:     inc     ra");
+    Asm("          dec     rc");
+    Asm("          lbr     inplp");
     }
 
 
 
   if (useMul || useDiv) {
     if (passNumber == 1) lblMdNorm = address;
-    output(GHI+RC);                                              // mdnorm:   ghi     rc
-    output(STR+R2);                                              //           str     r2
-    output(GHI+RD);                                              //           ghi     rd
-    output(XOR);                                                 //           xor
-    output(SHL);                                                 //           shl
-    output(LDI); output(0x00);                                   //           ldi     0
-    output(SHLC);                                                //           shlc
-    output(PLO+RE);                                              //           plo     re
-    output(GHI+RC);                                              //           ghi     rc
-    output(SHL);                                                 //           shl
-    a = address;
-    output(LBNF); output((a+12)/256); output((a+12)%256);        //           lbnf    mdnorm2
-    output(GHI+RC);                                              //           ghi     rc
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PHI+RC);                                              //           phi     rc
-    output(GLO+RC);                                              //           glo     rc
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PLO+RC);                                              //           plo     rc
-    output(INC+RC);                                              //           inc     rc
-    output(GHI+RD);                                              // mdnorm2:  ghi     rd
-    output(SHL);                                                 //           shl
-    a = address;
-    output(LBNF); output((a+12)/256); output((a+12)%256);        //           lbnf    mdnorm3
-    output(GHI+RD);                                              //           ghi     rd
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PHI+RD);                                              //           phi     rd
-    output(GLO+RD);                                              //           glo     rd
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PLO+RD);                                              //           plo     rd
-    output(INC+RD);                                              //           inc     rd
-    output(GLO+RE);                                              // mdnorm3:  glo     re
-    output(SEP+R5);                                              //           sep     sret
+    Asm("mdnorm:     ghi     rc");
+    Asm("            str     r2");
+    Asm("            ghi     rd");
+    Asm("            xor");
+    Asm("            shl");
+    Asm("            ldi     0");
+    Asm("            shlc");
+    Asm("            plo     re");
+    Asm("            ghi     rc");
+    Asm("            shl");
+    Asm("            lbnf    mdnorm2");
+    Asm("            ghi     rc");
+    Asm("            xri     0ffh");
+    Asm("            phi     rc");
+    Asm("            glo     rc");
+    Asm("            xri     0ffh");
+    Asm("            plo     rc");
+    Asm("            inc     rc");
+    Asm("mdnorm2:    ghi     rd");
+    Asm("            shl");
+    Asm("            lbnf    mdnorm3");
+    Asm("            ghi     rd");
+    Asm("            xri     0ffh");
+    Asm("            phi     rd");
+    Asm("            glo     rd");
+    Asm("            xri     0ffh");
+    Asm("            plo     rd");
+    Asm("            inc     rd");
+    Asm("mdnorm3:    glo     re");
+    Asm("            sep     sret");
     }
 
   if (useMul) {
     if (passNumber == 1) lblMul = address;
-    output(SEX+R7);                                              // mul15:    sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(PLO+RD);                                              //           plo     rd
-    output(LDXA);                                                //           ldxa
-    output(PHI+RD);                                              //           phi     rd
-    output(LDXA);                                                //           ldxa
-    output(PLO+RC);                                              //           plo     rc
-    output(LDX);                                                 //           ldx
-    output(PHI+RC);                                              //           phi     rc
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R4);                                              //           sep     scall
-    output(lblMdNorm/256); output(lblMdNorm%256);                //           dw      mdnorm
-    output(PLO+RE);                                              //           plo     re
-    output(LDI); output(0x00);                                   //           ldi     0
-    output(PHI+RF);                                              //           phi     rf
-    output(PLO+RF);                                              //           plo     rf
-    t1 = address;
-    output(GLO+RD);                                              // mulloop:  glo     rd
-    a = address + 28;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    mulcont
-    output(GHI+RD);                                              //           ghi     rd
-    a = address + 24;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    mulcont
-    output(GLO+RE);                                              //           glo     re
-    output(SHR);                                                 //           shr
-    a = address + 12;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    mulexit
-    output(GLO+RF);                                              //           glo     rf
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PLO+RF);                                              //           plo     rf
-    output(GHI+RF);                                              //           ghi     rf
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PHI+RF);                                              //           phi     rf
-    output(INC+RF);                                              //           inc     rf
-    output(SEX+R7);                                              // mulexit:  sex     r7
-    output(GHI+RF);                                              //           ghi     rf
-    output(STXD);                                                //           stxd
-    output(GLO+RF);                                              //           glo     rf
-    output(STXD);                                                //           stxd
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
-    output(GHI+RD);                                              // mulcont:  ghi     rd
-    output(SHR);                                                 //           shr
-    output(PHI+RD);                                              //           phi     rd
-    output(GLO+RD);                                              //           glo     rd
-    output(SHRC);                                                //           shrc
-    output(PLO+RD);                                              //           plo     rd
-    a = address + 13;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    mulcont2
-    output(GLO+RC);                                              //           glo     rc
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RF);                                              //           glo     rf
-    output(ADD);                                                 //           add
-    output(PLO+RF);                                              //           plo     rf
-    output(GHI+RC);                                              //           ghi     rc
-    output(STR+R2);                                              //           str     r2
-    output(GHI+RF);                                              //           ghi     rf
-    output(ADC);                                                 //           adc
-    output(PHI+RF);                                              //           phi     rf
-    output(GLO+RC);                                              // mulcont2: glo     rc
-    output(SHL);                                                 //           shl
-    output(PLO+RC);                                              //           plo     rc
-    output(GHI+RC);                                              //           ghi     rc
-    output(SHLC);                                                //           shlc
-    output(PHI+RC);                                              //           phi     rc
-    output(LBR); output(t1/256); output(t1%256);                 //           lbr     mulloop
+    Asm("mul16:    sex     r7");
+    Asm("          irx");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldxa");
+    Asm("          phi     rd");
+    Asm("          ldxa");
+    Asm("          plo     rc");
+    Asm("          ldx");
+    Asm("          phi     rc");
+    Asm("          sex     r2");
+    Asm("          sep     scall");
+    Asm("          dw      mdnorm");
+    Asm("          plo     re");
+    Asm("          ldi     0");
+    Asm("          phi     rf");
+    Asm("          plo     rf");
+    Asm("mulloop:  glo     rd");
+    Asm("          lbnz    mulcont");
+    Asm("          ghi     rd");
+    Asm("          lbnz    mulcont");
+    Asm("          glo     re");
+    Asm("          shr");
+    Asm("          lbnf    mulexit");
+    Asm("          glo     rf");
+    Asm("          xri     0ffh");
+    Asm("          plo     rf");
+    Asm("          ghi     rf");
+    Asm("          xri     0ffh");
+    Asm("          phi     rf");
+    Asm("          inc     rf");
+    Asm("mulexit:  sex     r7");
+    Asm("          ghi     rf");
+    Asm("          stxd");
+    Asm("          glo     rf");
+    Asm("          stxd");
+    Asm("          sex     r2");
+    Asm("          sep     sret");
+    Asm("mulcont:  ghi     rd");
+    Asm("          shr");
+    Asm("          phi     rd");
+    Asm("          glo     rd");
+    Asm("          shrc");
+    Asm("          plo     rd");
+    Asm("          lbnf    mulcont2");
+    Asm("          glo     rc");
+    Asm("          str     r2");
+    Asm("          glo     rf");
+    Asm("          add");
+    Asm("          plo     rf");
+    Asm("          ghi     rc");
+    Asm("          str     r2");
+    Asm("          ghi     rf");
+    Asm("          adc");
+    Asm("          phi     rf");
+    Asm("mulcont2: glo     rc");
+    Asm("          shl");
+    Asm("          plo     rc");
+    Asm("          ghi     rc");
+    Asm("          shlc");
+    Asm("          phi     rc");
+    Asm("          lbr     mulloop");
     }
 
   if (useDiv) {
     if (passNumber == 1) lblDiv = address;
-    output(SEX+R7);                                              // div15:    sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(PLO+RD);                                              //           plo     rd
-    output(LDXA);                                                //           ldxa
-    output(PHI+RD);                                              //           phi     rd
-    output(LDXA);                                                //           ldxa
-    output(PLO+RC);                                              //           plo     rc
-    output(LDX);                                                 //           ldx
-    output(PHI+RC);                                              //           phi     rc
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R4);                                              //           sep     scall
-    output(lblMdNorm/256); output(lblMdNorm%256);                //           dw      mdnorm
-    output(PLO+RE);                                              //           plo     re
-    output(GLO+RD);                                              //           glo     rd
-    a = address + 14;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    div16_1
-    output(GHI+RD);                                              //           ghi     rd
-    a = address + 10;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    div16_1
-    output(SEX+R7);                                              //           sex     r7
-    output(LDI); output(0x00);                                   //           ldi     0
-    output(STXD);                                                //           stxd
-    output(STXD);                                                //           stxd
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
-    output(LDI); output(0x00);                                   // div16_1:  ldi     0
-    output(PHI+RF);                                              //           phi     rf
-    output(PLO+RF);                                              //           plo     rf
-    output(PHI+R8);                                              //           phi     r8
-    output(PLO+R8);                                              //           plo     r8
-    output(INC+R8);                                              //           inc     r8
-    t1 = address;
-    output(GHI+RD);                                              // d16lp1:   ghi     rd
-    output(ANI); output(128);                                    //           ani     128
-    a = address + 18;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    divst
-    output(GLO+RD);                                              //           glo     rd
-    output(SHL);                                                 //           shl
-    output(PLO+RD);                                              //           plo     rd
-    output(GHI+RD);                                              //           ghi     rd
-    output(SHLC);                                                //           shlc
-    output(PHI+RD);                                              //           phi     rd
-    output(GLO+R8);                                              //           glo     r8
-    output(SHL);                                                 //           shl
-    output(PLO+R8);                                              //           plo     r8
-    output(GHI+R8);                                              //           ghi     r8
-    output(SHLC);                                                //           shlc
-    output(PHI+R8);                                              //           phi     r8
-    output(LBR); output(t1/256); output(t1%256);                 //           lbr     d16lp1
-    t2 = address;
-    output(GLO+RD);                                              // divst:    glo     rd
-    a = address + 28;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    divgo
-    output(GHI+RD);                                              //           ghi     rd
-    a = address + 24;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    divgo
-    output(GLO+RE);                                              //           glo     re
-    output(SHR);                                                 //           shr
-    a = address + 12;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    divret
-    output(GHI+RF);                                              //           ghi     rf
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PHI+RF);                                              //           phi     rf
-    output(GLO+RF);                                              //           glo     rf
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(PLO+RF);                                              //           plo     rf
-    output(INC+RF);                                              //           inc     rf
-    t3 = address;
-    output(SEX+R7);                                              // divret:   sex     r7
-    output(GHI+RF);                                              //           ghi     rf
-    output(STXD);                                                //           stxd
-    output(GLO+RF);                                              //           glo     rf
-    output(STXD);                                                //           stxd
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
-    output(GLO+RC);                                              // divgo:    glo     rc
-    output(PLO+R9);                                              //           plo     r9
-    output(GHI+RC);                                              //           ghi     rc
-    output(PHI+R9);                                              //           phi     r9
-    output(GLO+RD);                                              //           glo     rd
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RC);                                              //           glo     rc
-    output(SM);                                                  //           sm
-    output(PLO+RC);                                              //           plo     rc
-    output(GHI+RD);                                              //           ghi     rd
-    output(STR+R2);                                              //           str     r2
-    output(GHI+RC);                                              //           ghi     rc
-    output(SMB);                                                 //           smb
-    output(PHI+RC);                                              //           phi     rc
-    a = address + 10;
-    output(LBDF); output(a/256); output(a%256);                  //           lbdf    divyes
-    output(GLO+R9);                                              //           glo     r9
-    output(PLO+RC);                                              //           plo     rc
-    output(GHI+R9);                                              //           ghi     r9
-    output(PHI+RC);                                              //           phi     rc
-    a = address + 13;
-    output(LBR); output(a/256); output(a%256);                   //           lbr     divno
-    output(GLO+R8);                                              // divyes:   glo     r8
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RF);                                              //           glo     rf
-    output(ADD);                                                 //           add
-    output(PLO+RF);                                              //           plo     rf
-    output(GHI+R8);                                              //           ghi     r8
-    output(STR+R2);                                              //           str     r2
-    output(GHI+RF);                                              //           ghi     rf
-    output(ADC);                                                 //           adc
-    output(PHI+RF);                                              //           phi     rf
-    output(GHI+RD);                                              //divno:     ghi     rd
-    output(SHR);                                                 //           shr
-    output(PHI+RD);                                              //           phi     rd
-    output(GLO+RD);                                              //           glo     rd
-    output(SHRC);                                                //           shrc
-    output(PLO+RD);                                              //           plo     rd
-    output(GHI+R8);                                              //           ghi     r8
-    output(SHR);                                                 //           shr
-    output(PHI+R8);                                              //           phi     r8
-    output(GLO+R8);                                              //           glo     r8
-    output(SHRC);                                                //           shrc
-    output(PLO+R8);                                              //           plo     r8
-    output(LBDF); output(t3/256); output(t3%256);                //           lbdf    divret
-    output(LBR); output(t2/256); output(t2%256);                 //           lbr     divst
+    Asm("div16:      sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            plo     rd");
+    Asm("            ldxa");
+    Asm("            phi     rd");
+    Asm("            ldxa");
+    Asm("            plo     rc");
+    Asm("            ldx");
+    Asm("            phi     rc");
+    Asm("            sex     r2");
+    Asm("            sep     scall");
+    Asm("            dw      mdnorm");
+    Asm("            plo     re");
+    Asm("            glo     rd");
+    Asm("            lbnz    div16_1");
+    Asm("            ghi     rd");
+    Asm("            lbnz    div16_1");
+    Asm("            sex     r7");
+    Asm("            ldi     0");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
+    Asm("div16_1:    ldi     0");
+    Asm("            phi     rf");
+    Asm("            plo     rf");
+    Asm("            phi     r8");
+    Asm("            plo     r8");
+    Asm("            inc     r8");
+    Asm("d16lp1:     ghi     rd");
+    Asm("            ani     128");
+    Asm("            lbnz    divst");
+    Asm("            glo     rd");
+    Asm("            shl");
+    Asm("            plo     rd");
+    Asm("            ghi     rd");
+    Asm("            shlc");
+    Asm("            phi     rd");
+    Asm("            glo     r8");
+    Asm("            shl");
+    Asm("            plo     r8");
+    Asm("            ghi     r8");
+    Asm("            shlc");
+    Asm("            phi     r8");
+    Asm("            lbr     d16lp1");
+    Asm("divst:      glo     rd");
+    Asm("            lbnz    divgo");
+    Asm("            ghi     rd");
+    Asm("            lbnz    divgo");
+    Asm("            glo     re");
+    Asm("            shr");
+    Asm("            lbnf    divret");
+    Asm("            ghi     rf");
+    Asm("            xri     0ffh");
+    Asm("            phi     rf");
+    Asm("            glo     rf");
+    Asm("            xri     0ffh");
+    Asm("            plo     rf");
+    Asm("            inc     rf");
+    Asm("divret:     sex     r7");
+    Asm("            ghi     rf");
+    Asm("            stxd");
+    Asm("            glo     rf");
+    Asm("            stxd");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
+    Asm("divgo:      glo     rc");
+    Asm("            plo     r9");
+    Asm("            ghi     rc");
+    Asm("            phi     r9");
+    Asm("            glo     rd");
+    Asm("            str     r2");
+    Asm("            glo     rc");
+    Asm("            sm");
+    Asm("            plo     rc");
+    Asm("            ghi     rd");
+    Asm("            str     r2");
+    Asm("            ghi     rc");
+    Asm("            smb");
+    Asm("            phi     rc");
+    Asm("            lbdf    divyes");
+    Asm("            glo     r9");
+    Asm("            plo     rc");
+    Asm("            ghi     r9");
+    Asm("            phi     rc");
+    Asm("            lbr     divno");
+    Asm("divyes:     glo     r8");
+    Asm("            str     r2");
+    Asm("            glo     rf");
+    Asm("            add");
+    Asm("            plo     rf");
+    Asm("            ghi     r8");
+    Asm("            str     r2");
+    Asm("            ghi     rf");
+    Asm("            adc");
+    Asm("            phi     rf");
+    Asm("divno:      ghi     rd");
+    Asm("            shr");
+    Asm("            phi     rd");
+    Asm("            glo     rd");
+    Asm("            shrc");
+    Asm("            plo     rd");
+    Asm("            ghi     r8");
+    Asm("            shr");
+    Asm("            phi     r8");
+    Asm("            glo     r8");
+    Asm("            shrc");
+    Asm("            plo     r8");
+    Asm("            lbdf    divret");
+    Asm("            lbr     divst");
     }
 
   if (useMod) {
     if (passNumber == 1) lblMod = address;
-    output(SEP+R4); output(lblDiv/256); output(lblDiv%256);      // mod16:    call    div16
-    output(INC+R7);                                              //           inc     r7
-    output(INC+R7);                                              //           inc     r7
-    output(GHI+RC);                                              //           ghi     rc
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(GLO+RC);                                              //           glo     rc
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(SEP+R5);                                              //           sep     sret
+    Asm("mod16:      sep     scall");
+    Asm("            dw      div16");
+    Asm("            inc     r7");
+    Asm("            inc     r7");
+    Asm("            ghi     rc");
+    Asm("            str     r7");
+    Asm("            dec     r7");
+    Asm("            glo     rc");
+    Asm("            str     r7");
+    Asm("            dec     r7");
+    Asm("            sep     sret");
     }
 
   if (useAdd) {
     if (passNumber == 1) lblAdd = address;
-    output(SEX+R7);                                              // add16:    sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx
-    output(ADD);                                                 //           add
-    output(STXD);                                                //           stxd
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx           
-    output(ADC);                                                 //           adc
-    output(STXD);                                                //           stxd
-    output(DEC+R7);                                              //           dec     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("add16:      sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            add");
+    Asm("            stxd");
+    Asm("            ldxa");
+    Asm("            irx           ");
+    Asm("            adc");
+    Asm("            stxd");
+    Asm("            dec     r7");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
     }
 
   if (useSub) {
     if (passNumber == 1) lblSub = address;
-    output(SEX+R7);                                              // sub16:    sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx
-    output(SD);                                                  //           sd
-    output(STXD);                                                //           stxd
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx           
-    output(SDB);                                                 //           sdb
-    output(STXD);                                                //           stxd
-    output(DEC+R7);                                              //           dec     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("sub16:      sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            sd");
+    Asm("            stxd");
+    Asm("            ldxa");
+    Asm("            irx           ");
+    Asm("            sdb");
+    Asm("            stxd");
+    Asm("            dec     r7");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
     }
 
   if (useAnd) {
     if (passNumber == 1) lblAnd = address;
-    output(SEX+R7);                                              // and16:    sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx
-    output(AND);                                                 //           and
-    output(STR+R7);                                              //           str     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(LDXA);                                                //           ldxa
-    output(INC+R7);                                              //           inc     r2
-    output(AND);                                                 //           and
-    output(STR+R7);                                              //           str     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("and16:      sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            and");
+    Asm("            stxd");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            and");
+    Asm("            stxd");
+    Asm("            dec     r7");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
     }
 
   if (useOr) {
     if (passNumber == 1) lblOr = address;
-    output(SEX+R7);                                              // or16:     sex     r7
-    output(IRX);                                                 // or16:     irx
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx
-    output(OR);                                                  //           or
-    output(STR+R7);                                              //           str     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(LDXA);                                                //           ldxa
-    output(INC+R7);                                              //           inc     r2
-    output(OR);                                                  //           or
-    output(STR+R7);                                              //           str     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("or16:       sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            or");
+    Asm("            stxd");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            or");
+    Asm("            stxd");
+    Asm("            dec     r7");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
     }
 
   if (useXor) {
     if (passNumber == 1) lblXor = address;
-    output(SEX+R7);                                              // xor16:    sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(IRX);                                                 //           irx
-    output(XOR);                                                 //           xor
-    output(STR+R7);                                              //           str     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(LDXA);                                                //           ldxa
-    output(INC+R7);                                              //           inc     r2
-    output(XOR);                                                 //           xor
-    output(STR+R7);                                              //           str     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(DEC+R7);                                              //           dec     r2
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("xor16:      sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            xor");
+    Asm("            stxd");
+    Asm("            ldxa");
+    Asm("            irx");
+    Asm("            xor");
+    Asm("            stxd");
+    Asm("            dec     r7");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
     }
 
   if (useCmp) {
     if (passNumber == 1) lblTrue = address;
-    output(LDI); output(0xff);                                   // true;     ldi     0ffh
-    output(SEX+R7);                                              //           sex     r7
-    output(STXD);                                                //           stxd
-    output(STXD);                                                //           stxd
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("true:       ldi     0ffh");
+    Asm("            sex     r7");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
 
     if (passNumber == 1) lblFalse = address;
-    output(LDI); output(0x00);                                   // false:    ldi     000h
-    output(SEX+R7);                                              //           sex     r7
-    output(STXD);                                                //           stxd
-    output(STXD);                                                //           stxd
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("false:      ldi     000h");
+    Asm("            sex     r7");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
     }
 
   if (useEq) {
     if (passNumber == 1) lblEq = address;
-    output(SEP+R4); output(lblSub/256); output(lblSub%256);      // eq16:     call    sub16
-    output(SEX+R7);                                              //           sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(OR);                                                  //           or
-    output(SEX+R2);                                              //           sex     r2
-    output(LBZ); output(lblTrue/256); output(lblTrue%256);       //           lbz     true
-    output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
+    Asm("eq16:       sep     scall");
+    Asm("            dw      sub16");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     true");
+    Asm("            lbz     false");
     }
 
   if (useNe) {
     if (passNumber == 1) lblNe = address;
-    output(SEP+R4); output(lblSub/256); output(lblSub%256);      // ne16:     call    sub16
-    output(SEX+R7);                                              //           sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(OR);                                                  //           or
-    output(SEX+R2);                                              //           sex     r2
-    output(LBNZ); output(lblTrue/256); output(lblTrue%256);      //           lbnz    true
-    output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
+    Asm("ne16:       sep     scall");
+    Asm("            dw      sub16");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbnz    true");
+    Asm("            lbz     false");
     }
 
   if (useGt) {
     if (passNumber == 1) lblGt = address;
-    output(SEP+R4); output(lblSub/256); output(lblSub%256);      // gt16:     call    sub16
-    output(SEX+R7);                                              //           sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(OR);                                                  //           or
-    output(SEX+R2);                                              //           sex     r2
-    output(LBZ); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
-    output(LDN+R7);                                              //           ldn     r7
-    output(SHL);                                                 //           shl
-    output(LBNF); output(lblTrue/256); output(lblTrue%256);      //           lbnf    true
-    output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
+    Asm("gt16:       sep     scall");
+    Asm("            dw      sub16");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     false");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbnf    true");
+    Asm("            lbz     false");
     }
 
   if (useLt) {
     if (passNumber == 1) lblLt = address;
-    output(SEP+R4); output(lblSub/256); output(lblSub%256);      // lt16:     call    sub16
-    output(SEX+R7);                                              //           sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(OR);                                                  //           or
-    output(SEX+R2);                                              //           sex     r2
-    output(LBZ); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
-    output(LDN+R7);                                              //           ldn     r7
-    output(SHL);                                                 //           shl
-    output(LBDF); output(lblTrue/256); output(lblTrue%256);      //           lbdf    true
-    output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
+    Asm("lt16:       sep     scall");
+    Asm("            dw      sub16");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     false");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbdf    true");
+    Asm("            lbz     false");
     }
 
   if (useGte) {
     if (passNumber == 1) lblGte = address;
-    output(SEP+R4); output(lblSub/256); output(lblSub%256);      // gte16:    call    sub16
-    output(SEX+R7);                                              //           sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(OR);                                                  //           or
-    output(SEX+R2);                                              //           sex     r2
-    output(LBZ); output(lblTrue/256); output(lblTrue%256);       //           lbz     true
-    output(LDN+R7);                                              //           ldn     r7
-    output(SHL);                                                 //           shl
-    output(LBNF); output(lblTrue/256); output(lblTrue%256);      //           lbnf    true
-    output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
+    Asm("gte16:      sep     scall");
+    Asm("            dw      sub16");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     true");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbnf    true");
+    Asm("            lbz     false");
     }
 
   if (useLte) {
     if (passNumber == 1) lblLte = address;
-    output(SEP+R4); output(lblSub/256); output(lblSub%256);      // lte16:    call    sub16
-    output(SEX+R7);                                              //           sex     r7
-    output(IRX);                                                 //           irx
-    output(LDXA);                                                //           ldxa
-    output(OR);                                                  //           or
-    output(SEX+R2);                                              //           sex     r2
-    output(LBZ); output(lblTrue/256); output(lblTrue%256);       //           lbz     true
-    output(LDN+R7);                                              //           ldn     r7
-    output(SHL);                                                 //           shl
-    output(LBDF); output(lblTrue/256); output(lblTrue%256);      //           lbdf    true
-    output(LBR); output(lblFalse/256); output(lblFalse%256);     //           lbz     false
+    Asm("lte16:      sep     scall");
+    Asm("            dw      sub16");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     true");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbdf    true");
+    Asm("            lbz     false");
     }
 
   if (useAbs) {
     if (passNumber == 1) lblAbs = address;
-    output(INC+R7);                                              // abs16:    inc     r7
-    output(INC+R7);                                              //           inc     r7
-    output(LDN+R7);                                              //           ldn     r7
-    output(SHL);                                                 //           shl
-    a = address + 17;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    absrt
-    output(DEC+R7);                                              //           dec     r7
-    output(LDN+R7);                                              //           ldn     r7
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(ADI); output(1);                                      //           adi     1
-    output(STR+R7);                                              //           str     r7
-    output(INC+R7);                                              //           inc     r7
-    output(LDN+R7);                                              //           ldn     r7
-    output(XRI); output(0xff);                                   //           xri     0ffh
-    output(ADCI); output(0);                                     //           adci    0
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(SEP+R5);                                              //           sep     sret
+    Asm("abs16:    inc     r7");
+    Asm("          inc     r7");
+    Asm("          ldn     r7");
+    Asm("          shl");
+    Asm("          lbnf    absrt");
+    Asm("          dec     r7");
+    Asm("          ldn     r7");
+    Asm("          xri     0ffh");
+    Asm("          adi     1");
+    Asm("          str     r7");
+    Asm("          inc     r7");
+    Asm("          ldn     r7");
+    Asm("          xri     0ffh");
+    Asm("          adci    0");
+    Asm("          str     r7");
+    Asm("absrt:    dec     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
     }
 
   if (useSgn) {
     if (passNumber == 1) lblSgn = address;
-    output(INC+R7);                                              // sgn16:    inc     r7
-    output(LDA+R7);                                              //           lda     r7
-    output(STR+R2);                                              //           str     r2
-    output(LDN+R7);                                              //           ldn     r7
-    output(SHL);                                                 //           shl
-    a = address + 17;
-    output(LBDF); output(a/256); output(a%256);                  //           lbdf    sgnm
-    output(LDN+R7);                                              //           ldn     r7
-    output(OR);                                                  //           or
-    a = address + 19;
-    output(LBZ); output(a/256); output(a%256);                   //           lbz     sgn0
-    output(LDI); output(0);                                      //           ldi     0
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(LDI); output(1);                                      //           ldi     1
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(SEP+R5);                                              //           sep     sret
-    output(LDI); output(0xff);                                   // sgnm:     ldi     0ffh
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(SEP+R5);                                              //           sep     sret
-    output(DEC+R7);                                              // sgn0:     dec     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(SEP+R5);                                              //           sep     sret
+    Asm("sgn16:    inc     r7");
+    Asm("          lda     r7");
+    Asm("          str     r2");
+    Asm("          ldn     r7");
+    Asm("          shl");
+    Asm("          lbdf    sgnm");
+    Asm("          ldn     r7");
+    Asm("          or");
+    Asm("          lbz     sgn0");
+    Asm("          ldi     0");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          ldi     1");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    Asm("sgnm:     ldi     0ffh");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    Asm("sgn0:     dec     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
     }
 
   if (useRnd) {
     if (passNumber == 1) lblRnd = address;
-    output(LDI); output(16);                                     // rnd16:    ldi     16
-    output(PLO+RC);                                              //           plo     rc
-    t1 = address;
-    a = getVariable("LFSR_");
-    output(LDI); output(a/256);                                  // lfsr_lp:  ldi     high lfsr
-    output(PHI+R9);                                              //           phi     r9
-    output(LDI); output(a%256);                                  //           ldi     low lfsr
-    output(PLO+R9);                                              //           plo     r9
-    output(INC+R9);                                              //           inc     r9
-    output(INC+R9);                                              //           inc     r9
-    output(INC+R9);                                              //           inc     r9
-    output(LDN+R9);                                              //           ldn     r9
-    output(PLO+RE);                                              //           plo     re
-    output(SHR);                                                 //           shr
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RE);                                              //           glo     re
-    output(XOR);                                                 //           xor
-    output(PLO+RE);                                              //           plo     re
-    output(LDN+R2);                                              //           ldn     r2
-    output(SHR);                                                 //           shr
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RE);                                              //           glo     re
-    output(XOR);                                                 //           xor
-    output(PLO+RE);                                              //           plo     re
-    output(LDN+R2);                                              //           ldn     r2
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RE);                                              //           glo     re
-    output(XOR);                                                 //           xor
-    output(PLO+RE);                                              //           plo     re
-    output(LDN+R2);                                              //           ldn     r2
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RE);                                              //           glo     re
-    output(XOR);                                                 //           xor
-    output(PLO+RE);                                              //           plo     re
-    output(DEC+R9);                                              //           dec     r9
-    output(DEC+R9);                                              //           dec     r9
-    output(DEC+R9);                                              //           dec     r9
-    output(LDN+R9);                                              //           ldn     r9
-    output(SHL);                                                 //           shl
-    output(SHLC);                                                //           shlc
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RE);                                              //           glo     re
-    output(XOR);                                                 //           xor
-    output(XRI); output(1);                                      //           xri     1
-    output(SHR);                                                 //           shr
-    output(LDN+R9);                                              //           ldn     r9
-    output(SHRC);                                                //           shrc
-    output(STR+R9);                                              //           str     r9
-    output(INC+R9);                                              //           inc     r9
-    output(LDN+R9);                                              //           ldn     r9
-    output(SHRC);                                                //           shrc
-    output(STR+R9);                                              //           str     r9
-    output(INC+R9);                                              //           inc     r9
-    output(LDN+R9);                                              //           ldn     r9
-    output(SHRC);                                                //           shrc
-    output(STR+R9);                                              //           str     r9
-    output(INC+R9);                                              //           inc     r9
-    output(LDN+R9);                                              //           ldn     r9
-    output(SHRC);                                                //           shrc
-    output(STR+R9);                                              //           str     r9
-    output(DEC+RC);                                              //           dec     rc
-    output(GLO+RC);                                              //           glo     rc
-    output(LBNZ); output(t1/256); output(t1%256);                //           lbnz    lfsr_lp
-    output(LDI); output(a/256);                                  //           ldi     high lfsr
-    output(PHI+R9);                                              //           phi     r9
-    output(LDI); output(a%256);                                  //           ldi     low lfsr
-    output(PLO+R9);                                              //           plo     r9
-    output(LDA+R9);                                              //           lda     r9
-    output(PLO+RF);                                              //           plo     rf
-    output(LDN+R9);                                              //           ldn     r9
-    output(PHI+RF);                                              //           phi     rf
-    output(INC+R7);                                              //           inc     r7
-    output(LDA+R7);                                              //           lda     r7
-    output(PLO+R9);                                              //           plo     r9
-    output(LDN+R7);                                              //           ldn     r7
-    output(PHI+R9);                                              //           phi     r9
-    output(GHI+RF);                                              //           ghi     rf
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(GLO+RF);                                              //           glo     rf
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(GHI+R9);                                              //           ghi     r9
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(GLO+R9);                                              //           glo     r9
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(LBR); output(lblMod/256); output(lblMod%256);         //           lbr     mod16
+    Asm("rnd16:    ldi     16");
+    Asm("          plo     rc");
+    Asm("lfsr_lp:  ldi     [LFSR_].1");
+    Asm("          phi     r9");
+    Asm("          ldi     [LFSR_].0");
+    Asm("          plo     r9");
+    Asm("          inc     r9");
+    Asm("          inc     r9");
+    Asm("          inc     r9");
+    Asm("          ldn     r9");
+    Asm("          plo     re");
+    Asm("          shr");
+    Asm("          str     r2");
+    Asm("          glo     re");
+    Asm("          xor");
+    Asm("          plo     re");
+    Asm("          ldn     r2");
+    Asm("          shr");
+    Asm("          str     r2");
+    Asm("          glo     re");
+    Asm("          xor");
+    Asm("          plo     re");
+    Asm("          ldn     r2");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          str     r2");
+    Asm("          glo     re");
+    Asm("          xor");
+    Asm("          plo     re");
+    Asm("          ldn     r2");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          str     r2");
+    Asm("          glo     re");
+    Asm("          xor");
+    Asm("          plo     re");
+    Asm("          dec     r9");
+    Asm("          dec     r9");
+    Asm("          dec     r9");
+    Asm("          ldn     r9");
+    Asm("          shl");
+    Asm("          shlc");
+    Asm("          str     r2");
+    Asm("          glo     re");
+    Asm("          xor");
+    Asm("          xri     1");
+    Asm("          shr");
+    Asm("          ldn     r9");
+    Asm("          shrc");
+    Asm("          str     r9");
+    Asm("          inc     r9");
+    Asm("          ldn     r9");
+    Asm("          shrc");
+    Asm("          str     r9");
+    Asm("          inc     r9");
+    Asm("          ldn     r9");
+    Asm("          shrc");
+    Asm("          str     r9");
+    Asm("          inc     r9");
+    Asm("          ldn     r9");
+    Asm("          shrc");
+    Asm("          str     r9");
+    Asm("          dec     rc");
+    Asm("          glo     rc");
+    Asm("          lbnz    lfsr_lp");
+    Asm("          ldi     [LFSR_].1");
+    Asm("          phi     r9");
+    Asm("          ldi     [LFSR_].0");
+    Asm("          plo     r9");
+    Asm("          lda     r9");
+    Asm("          plo     rf");
+    Asm("          ldn     r9");
+    Asm("          phi     rf");
+    Asm("          inc     r7");
+    Asm("          lda     r7");
+    Asm("          plo     r9");
+    Asm("          ldn     r7");
+    Asm("          phi     r9");
+    Asm("          ghi     rf");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          glo     rf");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          ghi     r9");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          glo     r9");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          lbr     mod16");
     }
 
   if (useNext) {
     if (passNumber == 1) lblNextVar = address;
-    output(IRX);                                                 // nextvar:  irx          ; move to varAddr
-    output(LDXA);                                                //           ldxa
-    output(PLO+RD);                                              //           plo     rd
-    output(LDXA);                                                //           ldxa
-    output(PHI+RD);                                              //           phi     rd
-    output(IRX);                                                 //           irx
-    output(IRX);                                                 //           irx
-    output(GLO+RC);                                              //           glo     rc   ; check for correct address
-    output(SM);                                                  //           sm           ; against stack
-    a = address + 18;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    nv1  ; jump if not
-    output(IRX);                                                 //           irx          ; move to msb
-    output(GHI+RC);                                              //           ghi     rc
-    output(SM);                                                  //           sm           ; compare
-    a = address+ 13;
-    output(LBNZ); output(a/256); output(a%256);                  //           lbnz    nv2  ; jump if not
-    output(DEC+R2);                                              //           dec     r2   ; entry found, move back
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(LBR); output(lblNext/256); output(lblNext%256);       //           lbr     next
-    output(IRX);                                                 // nv1:      irx          ; move past bad entry
-    output(IRX);                                                 // nv2:      irx          ; move past bad entry
-    output(IRX);                                                 //           irx       
-    output(IRX);                                                 //           irx       
-    output(IRX);                                                 //           irx       
-    output(GHI+RD);                                              //           ghi     rd
-    output(STXD);                                                //           stxd
-    output(GLO+RD);                                              //           glo     rd
-    output(STXD);                                                //           stxd
-    output(LBR); output(lblNextVar/256); output(lblNextVar%256); //           lbr     nextvar
-
+    Asm("nextvar:  irx          ; move to varAddr");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldxa");
+    Asm("          phi     rd");
+    Asm("          irx");
+    Asm("          irx");
+    Asm("          glo     rc   ; check for correct address");
+    Asm("          sm           ; against stack");
+    Asm("          lbnz    nv1  ; jump if not");
+    Asm("          irx          ; move to msb");
+    Asm("          ghi     rc");
+    Asm("          sm           ; compare");
+    Asm("          lbnz    nv2  ; jump if not");
+    Asm("          dec     r2   ; entry found, move back");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          lbr     next");
+    Asm("nv1:      irx          ; move past bad entry");
+    Asm("nv2:      irx          ; move past bad entry");
+    Asm("          irx       ");
+    Asm("          irx       ");
+    Asm("          irx       ");
+    Asm("          ghi     rd");
+    Asm("          stxd");
+    Asm("          glo     rd");
+    Asm("          stxd");
+    Asm("          lbr     nextvar");
     if (passNumber == 1) lblNext = address;
-    output(GLO+R2);                                              // next:     glo     r2
-    output(PLO+RA);                                              //           plo     ra
-    output(GHI+R2);                                              //           ghi     r2
-    output(PHI+RA);                                              //           phi     ra
-    output(SEX+RA);                                              //           sex     ra
-    output(IRX);                                                 //           irx          ; move past call return
-    output(IRX);                                                 //           irx          ; need a copy of return addr
-    output(IRX);                                                 //           irx          ; need a copy of return addr
-    output(IRX);                                                 //           irx          ; exec msb
-    output(IRX);                                                 //           irx          ; var addr lsb
-    output(LDXA);                                                //           ldxa         ; get it
-    output(PLO+RF);                                              //           plo     rf   ; set rf to address
-    output(LDXA);                                                //           ldxa         ; get msb
-    output(PHI+RF);                                              //           phi     rf
-    output(INC+RF);                                              //           inc     rf   ; point to variable lsb
-    output(LDN+RF);                                              //           ldn     rf   ; retrieve it
-    output(ADD);                                                 //           add          ; add in step
-    output(STR+RF);                                              //           str     rf
-    output(DEC+RF);                                              //           dec     rf   ; point to msb
-    output(IRX);                                                 //           irx          ; point to msb of step
-    output(LDN+RF);                                              //           ldn     rf   ; get msb of var value
-    output(ADC);                                                 //           adc          ; add in step
-    output(STR+RF);                                              //           str     rf   ; store back into variable
-    output(LDA+RF);                                              //           lda     rf   ; retrieve variable value
-    output(STR+R7);                                              //           str     r7   ; store on expr stack
-    output(DEC+R7);                                              //           dec     r7
-    output(LDN+RF);                                              //           ldn     rf
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7
-    output(IRX);                                                 //           irx          ; retrieve loop end value
-    output(LDXA);                                                //           ldxa
-    output(PLO+RE);                                              //           plo     re
-    output(LDX);                                                 //           ldx
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7   ; exp stack ready 
-    output(GLO+RE);                                              //           glo     re
-    output(STR+R7);                                              //           str     r7
-    output(DEC+R7);                                              //           dec     r7   ; exp stack ready 
-    output(SEX+R2);                                              //           sex     r2
-    output(SEP+R4);                                              //           sep     scall
-    output(lblSub/256); output(lblSub%256);                      //           dw      lblSub
-    output(INC+R7);                                              //           inc     r7   ; point to msb
-    output(INC+R7);                                              //           inc     r7
-    output(LDN+R7);                                              //           ldn     r7   ; get it
-    output(SHL);                                                 //           shl          ; was it negative
-    a = address + 17;
-    output(LBDF); output(a/256); output(a%256);                  //           lbdf    stay
-    output(INC+R2);                                              //           inc     r2
-    output(DEC+RA);                                              //           dec     ra
-    output(LDXA);                                                //           ldxa
-    output(STR+RA);                                              //           str     ra
-    output(INC+RA);                                              //           inc     ra
-    output(LDX);                                                 //           ldx
-    output(STR+RA);                                              //           str     ra
-    output(DEC+RA);                                              //           dec     ra
-    output(DEC+RA);                                              //           dec     ra
-    output(GLO+RA);                                              //           glo     ra
-    output(PLO+R2);                                              //           plo     r2
-    output(GHI+RA);                                              //           ghi     ra
-    output(PHI+R2);                                              //           phi     r2
-    output(SEP+R5);                                              //           sep     sret ; nothing to do so return
-
-    output(INC+R2);                                              // stay:     inc     r2   ; move back
-    output(INC+R2);                                              //           inc     r2
-    output(INC+R2);                                              //           inc     r2
-    output(LDXA);                                                //           ldxa
-    output(PLO+R6);                                              //           plo     r6
-    output(LDX);                                                 //           ldx
-    output(PHI+R6);                                              //           phi     r6   ; into r6
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(DEC+R2);                                              //           dec     r2
-    output(SEP+R5);                                              //           sep     sret  ; return
+    Asm("next:     glo     r2");
+    Asm("          plo     ra");
+    Asm("          ghi     r2");
+    Asm("          phi     ra");
+    Asm("          sex     ra");
+    Asm("          irx          ; move past call return");
+    Asm("          irx          ; need a copy of return addr");
+    Asm("          irx          ; need a copy of return addr");
+    Asm("          irx          ; exec msb");
+    Asm("          irx          ; var addr lsb");
+    Asm("          ldxa         ; get it");
+    Asm("          plo     rf   ; set rf to address");
+    Asm("          ldxa         ; get msb");
+    Asm("          phi     rf");
+    Asm("          inc     rf   ; point to variable lsb");
+    Asm("          ldn     rf   ; retrieve it");
+    Asm("          add          ; add in step");
+    Asm("          str     rf");
+    Asm("          dec     rf   ; point to msb");
+    Asm("          irx          ; point to msb of step");
+    Asm("          ldn     rf   ; get msb of var value");
+    Asm("          adc          ; add in step");
+    Asm("          str     rf   ; store back into variable");
+    Asm("          lda     rf   ; retrieve variable value");
+    Asm("          str     r7   ; store on expr stack");
+    Asm("          dec     r7");
+    Asm("          ldn     rf");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          irx          ; retrieve loop end value");
+    Asm("          ldxa");
+    Asm("          plo     re");
+    Asm("          ldx");
+    Asm("          str     r7");
+    Asm("          dec     r7   ; exp stack ready ");
+    Asm("          glo     re");
+    Asm("          str     r7");
+    Asm("          dec     r7   ; exp stack ready ");
+    Asm("          sex     r2");
+    Asm("          sep     scall");
+    Asm("          dw      sub16");
+    Asm("          inc     r7   ; point to msb");
+    Asm("          inc     r7");
+    Asm("          ldn     r7   ; get it");
+    Asm("          shl          ; was it negative");
+    Asm("          lbdf    stay");
+    Asm("          inc     r2");
+    Asm("          dec     ra");
+    Asm("          ldxa");
+    Asm("          str     ra");
+    Asm("          inc     ra");
+    Asm("          ldx");
+    Asm("          str     ra");
+    Asm("          dec     ra");
+    Asm("          dec     ra");
+    Asm("          glo     ra");
+    Asm("          plo     r2");
+    Asm("          ghi     ra");
+    Asm("          phi     r2");
+    Asm("          sep     sret ; nothing to do so return");
+    Asm("stay:     inc     r2   ; move back");
+    Asm("          inc     r2");
+    Asm("          inc     r2");
+    Asm("          ldxa");
+    Asm("          plo     r6");
+    Asm("          ldx");
+    Asm("          phi     r6   ; into r6");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          dec     r2");
+    Asm("          sep     sret  ; return");
     }
 
   if (useAtoI) {
@@ -1030,226 +993,246 @@ void library() {
     /* ***** Returns: RC - 16-bit integer ***** */
     /* **************************************** */
     if (passNumber == 1) lblAtoI = address;
-    output(LDI); output(0x00);                                   // atoi:     ldi     0
-    output(PLO+RC);                                              //           plo     rc
-    output(PHI+RC);                                              //           phi     rc
-    t1 = address;
-    output(LDA+RF);                                              // atoi_0_1: lda     rf
-    output(PLO+RE);                                              //           plo     re
-    output(SMI); output('0');                                    //           smi     '0'
-    a = address + 8;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    atoi_no
-    output(SMI); output(10);                                     //           smi     10
-    a = address + 4;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    atoi_0_2
-    output(SEP+R5);                                              // atoi_no:  sep     sret
-    output(GLO+RE);                                              // atoi_0_2: glo     re
-    output(SMI); output('0');                                    //           smi     '0'
-    output(PLO+RE);                                              //           plo     re
-    output(GLO+RC);                                              //           glo     rc
-    output(SHL);                                                 //           shl
-    output(PLO+RC);                                              //           plo     rc
-    output(PLO+R8);                                              //           plo     r8
-    output(GHI+RC);                                              //           ghi     rc
-    output(SHLC);                                                //           shlc
-    output(PHI+RC);                                              //           phi     rc
-    output(PHI+R8);                                              //           phi     r8
-    output(GLO+R8);                                              //           glo     r8
-    output(SHL);                                                 //           shl
-    output(PLO+R8);                                              //           plo     r8
-    output(GHI+R8);                                              //           ghi     r8
-    output(SHLC);                                                //           shlc
-    output(PHI+R8);                                              //           phi     r8
-    output(GLO+R8);                                              //           glo     r8
-    output(SHL);                                                 //           shl
-    output(PLO+R8);                                              //           plo     r8
-    output(GHI+R8);                                              //           ghi     r8
-    output(SHLC);                                                //           shlc
-    output(PHI+R8);                                              //           phi     r8
-    output(GLO+R8);                                              //           glo     r8
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RC);                                              //           glo     rc
-    output(ADD);                                                 //           add
-    output(PLO+RC);                                              //           plo     rc
-    output(GHI+R8);                                              //           ghi     r8
-    output(STR+R2);                                              //           str     r2
-    output(GHI+RC);                                              //           ghi     rc
-    output(ADC);                                                 //           adc
-    output(PHI+RC);                                              //           phi     rc
-    output(GLO+RE);                                              //           glo     re
-    output(STR+R2);                                              //           str     r2
-    output(GLO+RC);                                              //           glo     rc
-    output(ADD);                                                 //           add
-    output(PLO+RC);                                              //           plo     rc
-    output(GHI+RC);                                              //           ghi     rc
-    output(ADCI); output(0);                                     //           adci    0
-    output(PHI+RC);                                              //           phi     rc
-    output(LBR); output(t1/256); output(t1%256);                 //           lbr     atoi_0_1
+    Asm("atoi:     ldi     0");
+    Asm("          plo     rc");
+    Asm("          phi     rc");
+    Asm("atoi_0_1: lda     rf");
+    Asm("          plo     re");
+    Asm("          smi     '0'");
+    Asm("          lbnf    atoi_no");
+    Asm("          smi     10");
+    Asm("          lbnf    atoi_0_2");
+    Asm("atoi_no:  sep     sret");
+    Asm("atoi_0_2: glo     re");
+    Asm("          smi     '0'");
+    Asm("          plo     re");
+    Asm("          glo     rc");
+    Asm("          shl");
+    Asm("          plo     rc");
+    Asm("          plo     r8");
+    Asm("          ghi     rc");
+    Asm("          shlc");
+    Asm("          phi     rc");
+    Asm("          phi     r8");
+    Asm("          glo     r8");
+    Asm("          shl");
+    Asm("          plo     r8");
+    Asm("          ghi     r8");
+    Asm("          shlc");
+    Asm("          phi     r8");
+    Asm("          glo     r8");
+    Asm("          shl");
+    Asm("          plo     r8");
+    Asm("          ghi     r8");
+    Asm("          shlc");
+    Asm("          phi     r8");
+    Asm("          glo     r8");
+    Asm("          str     r2");
+    Asm("          glo     rc");
+    Asm("          add");
+    Asm("          plo     rc");
+    Asm("          ghi     r8");
+    Asm("          str     r2");
+    Asm("          ghi     rc");
+    Asm("          adc");
+    Asm("          phi     rc");
+    Asm("          glo     re");
+    Asm("          str     r2");
+    Asm("          glo     rc");
+    Asm("          add");
+    Asm("          plo     rc");
+    Asm("          ghi     rc");
+    Asm("          adci    0");
+    Asm("          phi     rc");
+    Asm("          lbr     atoi_0_1");
     }
   if (useItoA) {
     /* ************************************** */
     /* ***** Convert RC to bcd in M[RD] ***** */
     /* ************************************** */
     if (passNumber == 1) lblToBcd = address;
-    output(GHI+RD); output(STXD);                                // tobcd:    push    rd
-    output(GLO+RD); output(STXD);
-    output(LDI); output(5);                                      //           ldi     5
-    output(PLO+RE);                                              //           plo     re
-    t1 = address;
-    output(LDI); output(0);                                      // tobcdlp1: ldi     0
-    output(STR+RD);                                              //           str     rd
-    output(INC+RD);                                              //           inc     rd
-    output(DEC+RE);                                              //           dec     re
-    output(GLO+RE);                                              //           glo     re
-    output(LBNZ); output(t1/256); output(t1%256);                //           lbnz    tobcdlp1
-    output(IRX); output(LDXA); output(PLO+RD);                   //           pop     rd
-    output(LDX); output(PHI+RD);
-    output(LDI); output(16);                                     //           ldi     16
-    output(PLO+R9);                                              //           plo     r9
-    t1 = address;
-    output(LDI); output(5);                                      // tobcdlp2: ldi     5
-    output(PLO+RE);                                              //           plo     re
-    output(GHI+RD); output(STXD);                                //           push    rd
-    output(GLO+RD); output(STXD);
-    t2 = address;
-    output(LDN+RD);                                              // tobcdlp3: ldn     rd
-    output(SMI); output(5);                                      //           smi     5
-    a = address + 6;
-    output(LBNF); output(a/256); output(a%256);                  //           lbnf    tobcdlp3a
-    output(ADI); output(8);                                      //           adi     8
-    output(STR+RD);                                              //           str     rd
-    output(INC+RD);                                              // tobcdlp3a: inc     rd
-    output(DEC+RE);                                              //           dec     re
-    output(GLO+RE);                                              //           glo     re
-    output(LBNZ); output(t2/256); output(t2%256);                //           lbnz    tobcdlp3
-    output(GLO+RC);                                              //           glo     rc
-    output(SHL);                                                 //           shl
-    output(PLO+RC);                                              //           plo     rc
-    output(GHI+RC);                                              //           ghi     rc
-    output(SHLC);                                                //           shlc
-    output(PHI+RC);                                              //           phi     rc
-    output(SHLC);                                                //           shlc
-    output(SHL);                                                 //           shl
-    output(SHL);                                                 //           shl
-    output(SHL);                                                 //           shl
-    output(STR+RD);                                              //           str     rd
-    output(IRX); output(LDXA); output(PLO+RD);                   //           pop     rd
-    output(LDX); output(PHI+RD);
-    output(GHI+RD); output(STXD);                                //           push    rd
-    output(GLO+RD); output(STXD);
-    output(LDI); output(5);                                      //           ldi     5
-    output(PLO+RE);                                              //           plo     re
-    t3 = address;
-    output(LDA+RD);                                              // tobcdlp4: lda     rd
-    output(STR+R2);                                              //           str     r2
-    output(LDN+RD);                                              //           ldn     rd
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(SHR);                                                 //           shr
-    output(LDN+R2);                                              //           ldn     r2
-    output(SHLC);                                                //           shlc
-    output(ANI); output(0x0f);                                   //           ani     0fh
-    output(DEC+RD);                                              //           dec     rd
-    output(STR+RD);                                              //           str     rd
-    output(INC+RD);                                              //           inc     rd
-    output(DEC+RE);                                              //           dec     re
-    output(GLO+RE);                                              //           glo     re
-    output(LBNZ); output(t3/256); output(t3%256);                //           lbnz    tobcdlp
-    output(IRX); output(LDXA); output(PLO+RD);                   //           pop     rd
-    output(LDX); output(PHI+RD);
-    output(DEC+R9);                                              //           dec     r9
-    output(GLO+R9);                                              //           glo     r9
-    output(LBNZ); output(t1/256); output(t1%256);                //           lbnz    tobcdlp2
-    output(SEP+R5);                                              //           sep     sret
+    Asm("tobcd:    ghi     rd");
+    Asm("          stxd");
+    Asm("          glo     rd");
+    Asm("          stxd");
+    Asm("          ldi     5");
+    Asm("          plo     re");
+    Asm("tobcdlp1: ldi     0");
+    Asm("          str     rd");
+    Asm("          inc     rd");
+    Asm("          dec     re");
+    Asm("          glo     re");
+    Asm("          lbnz    tobcdlp1");
+    Asm("          irx");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldx");
+    Asm("          phi     rd");
+    Asm("          ldi     16");
+    Asm("          plo     r9");
+    Asm("tobcdlp2: ldi     5");
+    Asm("          plo     re");
+    Asm("          ghi     rd");
+    Asm("          stxd");
+    Asm("          glo     rd");
+    Asm("          stxd");
+    Asm("tobcdlp3: ldn     rd");
+    Asm("          smi     5");
+    Asm("          lbnf    tobcdlp3a");
+    Asm("          adi     8");
+    Asm("          str     rd");
+    Asm("tobcdlp3a: inc     rd");
+    Asm("          dec     re");
+    Asm("          glo     re");
+    Asm("          lbnz    tobcdlp3");
+    Asm("          glo     rc");
+    Asm("          shl");
+    Asm("          plo     rc");
+    Asm("          ghi     rc");
+    Asm("          shlc");
+    Asm("          phi     rc");
+    Asm("          shlc");
+    Asm("          shl");
+    Asm("          shl");
+    Asm("          shl");
+    Asm("          str     rd");
+    Asm("          irx");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldx");
+    Asm("          phi     rd");
+    Asm("          ghi     rd");
+    Asm("          stxd");
+    Asm("          glo     rd");
+    Asm("          stxd");
+    Asm("          ldi     5");
+    Asm("          plo     re");
+    Asm("tobcdlp4: lda     rd");
+    Asm("          str     r2");
+    Asm("          ldn     rd");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          shr");
+    Asm("          ldn     r2");
+    Asm("          shlc");
+    Asm("          ani     0fh");
+    Asm("          dec     rd");
+    Asm("          str     rd");
+    Asm("          inc     rd");
+    Asm("          dec     re");
+    Asm("          glo     re");
+    Asm("          lbnz    tobcdlp4");
+    Asm("          irx");
+    Asm("          ldxa");
+    Asm("          plo     rd");
+    Asm("          ldx");
+    Asm("          phi     rd");
+    Asm("          dec     r9");
+    Asm("          glo     r9");
+    Asm("          lbnz    tobcdlp2");
+    Asm("          sep     sret");
+
     /* *************************************************** */
     /* ***** Output 16-bit integer                   ***** */
     /* ***** RC - 16-bit integer                     ***** */
     /* *************************************************** */
     if (passNumber == 1) lblItoA = address;
-    output(GLO+R2);                                               // itoa:     glo     r2
-    output(SMI); output(6);                                       //           smi     6
-    output(PLO+R2);                                               //           plo     r2
-    output(GHI+R2);                                               //           ghi     r2
-    output(SMBI); output(0);                                      //           smbi    0
-    output(PHI+R2);                                               //           phi     r2
-    output(GLO+R2); output(PLO+RD);                               //           mov     rd,r2
-    output(GHI+R2); output(PHI+RD);
-    output(INC+RD);                                               //           inc     rd
-    output(GHI+RC);                                               //           ghi     rc
-    output(SHL);                                                  //           shl
-    a = address  + 17;
-    output(LBNF); output(a/256); output(a%256);                   //           lbnf    itoa1
-    output(LDI); output('-');                                     //           ldi     '-'
-    output(SEP+R4); output(lblF_type/256); output(lblF_type%256); //           sep     scall f_type
-    output(GLO+RC);                                               //           glo     rc
-    output(XRI); output(0xff);                                    //           xri     0ffh
-    output(PLO+RC);                                               //           plo     rc
-    output(GHI+RC);                                               //           ghi     rc
-    output(XRI); output(0xff);                                    //           xri     0ffh
-    output(PHI+RC);                                               //           phi     rc
-    output(INC+RC);                                               //           inc     rc
-    output(SEP+R4); output(lblToBcd/256); output(lblToBcd%256);   // itoa1:    sep     scall        ; convert to bcd
-    output(GLO+R2); output(PLO+RD);                               //           mov     rd,r2
-    output(GHI+R2); output(PHI+RD);
-    output(INC+RD);                                               //           inc     rd
-    output(LDI); output(5);                                       //           ldi     5
-    output(PLO+R8);                                               //           plo     r8
-    output(LDI); output(4);                                       //           ldi     4
-    output(PHI+R8);                                               //           phi     r8
-    t1 = address;
-    output(LDA+RD);                                               // itoalp1:  lda     rd
-    a = address + 27;
-    output(LBZ); output(a/256); output(a%256);                    //           lbz     itoaz
-    output(STR+R2);                                               //           str     r2
-    output(LDI); output(0);                                       //           ldi     0
-    output(PHI+R8);                                               //           phi     r8
-    output(LDN+R2);                                               //           ldn     r2
-    t2 = address;
-    output(ADI); output(0x30);                                    // itoa2:    adi     030h
-    output(SEP+R4); output(lblF_type/256); output(lblF_type%256); //           sep     scall f_type
-    t3 = address;
-    output(DEC+R8);                                               // itoa3:    dec     r8
-    output(GLO+R8);                                               //           glo     r8
-    output(LBNZ); output(t1/256); output(t1%256);                 //           lbnz    itoalp1
-    output(GLO+R2);                                               //           glo     r2
-    output(ADI); output(6);                                       //           adi     6
-    output(PLO+R2);                                               //           plo     r2
-    output(GHI+R2);                                               //           ghi     r2
-    output(ADCI); output(0);                                      //           adci    0
-    output(PHI+R2);                                               //           phi     r2
-    output(SEP+R5);                                               //           sep     sret
-    output(GHI+R8);                                               // itoaz:    ghi     r8
-    output(LBZ); output(t2/256); output(t2%256);                  //           lbz     itoa2
-    output(SMI); output(1);                                       //           smi     1
-    output(PHI+R8);                                               //           phi     r8
-    output(LBR); output(t3/256); output(t3%256);                  //           lbr     itoa3
+    Asm("itoa:     glo     r2");
+    Asm("          smi     6");
+    Asm("          plo     r2");
+    Asm("          ghi     r2");
+    Asm("          smbi    0");
+    Asm("          phi     r2");
+    Asm("          glo     r2");
+    Asm("          plo     rd");
+    Asm("          ghi     r2");
+    Asm("          phi     rd");
+    Asm("          inc     rd");
+    Asm("          ghi     rc");
+    Asm("          shl");
+    Asm("          lbnf    itoa1");
+    Asm("          ldi     '-'");
+    Asm("          sep     scall");
+    Asm("          dw      f_type");
+    Asm("          glo     rc");
+    Asm("          xri     0ffh");
+    Asm("          plo     rc");
+    Asm("          ghi     rc");
+    Asm("          xri     0ffh");
+    Asm("          phi     rc");
+    Asm("          inc     rc");
+    Asm("itoa1:    sep     scall");
+    Asm("          dw      tobcd");
+    Asm("          glo     r2");
+    Asm("          plo     rd");
+    Asm("          ghi     r2");
+    Asm("          phi     rd");
+    Asm("          inc     rd");
+    Asm("          ldi     5");
+    Asm("          plo     r8");
+    Asm("          ldi     4");
+    Asm("          phi     r8");
+    Asm("itoalp1:  lda     rd");
+    Asm("          lbz     itoaz");
+    Asm("          str     r2");
+    Asm("          ldi     0");
+    Asm("          phi     r8");
+    Asm("          ldn     r2");
+    Asm("itoa2:    adi     030h");
+    Asm("          sep     scall");
+    Asm("          dw      f_type");
+    Asm("itoa3:    dec     r8");
+    Asm("          glo     r8");
+    Asm("          lbnz    itoalp1");
+    Asm("          glo     r2");
+    Asm("          adi     6");
+    Asm("          plo     r2");
+    Asm("          ghi     r2");
+    Asm("          adci    0");
+    Asm("          phi     r2");
+    Asm("          sep     sret");
+    Asm("itoaz:    ghi     r8");
+    Asm("          lbz     itoa2");
+    Asm("          smi     1");
+    Asm("          phi     r8");
+    Asm("          lbr     itoa3");
     }
+
+
+/*
+  if (useHeap) {
+    }
+*/
+
+
+
+
   if (passNumber == 1) lblStart = address;
-  output(LDI); output(stack / 256);                              //           LDI  stack.1
-  output(PHI+R2);                                                //           PHI  R2      
-  output(LDI); output(stack % 256);                              //           LDI  stack.0
-  output(PLO+R2);                                                //           PLO  R2
-  output(LDI); output(estack / 256);                             //           LDI  estack.1
-  output(PHI+R7);                                                //           PHI  R7      
-  output(LDI); output(estack % 256);                             //           LDI  estack.0
-  output(PLO+R7);                                                //           PLO  R7
+  Asm("start:      ldi  [stack].1");
+  Asm("            phi  r2");
+  Asm("            ldi  [stack].0");
+  Asm("            plo  r2");
+  Asm("            ldi  [estack].1");
+  Asm("            phi  r7");
+  Asm("            ldi  [estack].0");
+  Asm("            plo  r7");
   if (useElfos == 0 && useStg == 0) {
-    output(LDI); output(lblScall / 256);                           //           LDI  scall.1
-    output(PHI+R4);                                                //           PHI  R4      
-    output(LDI); output(lblScall % 256);                           //           LDI  scall.0
-    output(PLO+R4);                                                //           PLO  R4
-    output(LDI); output(lblSret / 256);                            //           LDI  sret.1
-    output(PHI+R5);                                                //           PHI  R5      
-    output(LDI); output(lblSret % 256);                            //           LDI  sret.0
-    output(PLO+R5);                                                //           PLO  R5
+    Asm("          ldi  call.1");
+    Asm("          phi  r4      ");
+    Asm("          ldi  call.0");
+    Asm("          plo  r4");
+    Asm("          ldi  ret.1");
+    Asm("          phi  r5      ");
+    Asm("          ldi  ret.0");
+    Asm("          plo  r5");
     }
   t1 = variableRAM + iBufferSize + (2 * numberOfVariables);
   t2 = getVariable("FREE_");
-  output(LDI); output(t2/256);                                   //           LDI  free_.1
-  output(PHI+RF);                                                //           PHI  RF
-  output(LDI); output(t2%256);                                   //           LDI  free_.0
-  output(PLO+RF);                                                //           PLO  RF
+  Asm("          ldi  [free_].1");
+  Asm("          phi  rf");
+  Asm("          ldi  [free_].0");
+  Asm("          plo  rf");
   output(LDI); output(t1/256);                                   //           LDI  freemem.1
   output(STR+RF);                                                //           STR  RF
   output(INC+RF);                                                //           INC  RF
@@ -1263,8 +1246,8 @@ void library() {
     output(LDI); output(dataAddress%256); output(STR+RF);
     }
   if ((useItoA || useAtoI) && useElfos == 0) {
-    output(SEP+R4);                                              //           SEP  SCALL
-    output(lblF_setbd/256); output(lblF_setbd%256);              //           DW   F_SETBD
+    Asm("          sep  scall");
+    Asm("          dw   f_setbd");
     }
   showCompiler = ctmp;
   }
