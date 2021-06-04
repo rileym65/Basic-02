@@ -1,5 +1,7 @@
+ASM
 CLS
 DATA number,number,...
+DEALLOC addr
 DMA expr
 DPOKE addr,value
 END
@@ -43,6 +45,7 @@ Expressions:
   >=
   $hexnum
   ABS(expr)
+  ALLOC(expr)
   DPEEK(addr)
   FLG(expr)
   FRE(addr)

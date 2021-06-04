@@ -59,6 +59,7 @@ int compileLine(char* line) {
     else if (strncasecmp(line,"read",4) == 0) line=cread(line+4);
     else if (strncasecmp(line,"restore",7) == 0) line=crestore(line+7);
     else if (strncasecmp(line,"asm",3) == 0) line=casm(line+3);
+    else if (strncasecmp(line,"dealloc",7) == 0) line=cdealloc(line+7);
     else line = clet(line);
   
     line = trim(line);

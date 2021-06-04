@@ -84,6 +84,7 @@ int prepass(char* filename) {
           if (currentLine[i] == '>' && currentLine[i+1] == '=') useGte = -1;
           if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt = -1;
           if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
+          if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
           if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
@@ -94,6 +95,7 @@ int prepass(char* filename) {
           if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
           if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
           if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn = -1;
+          if (strncasecmp(currentLine+i,"alloc(",6) == 0) useHeap = -1;
           }
         }
       }

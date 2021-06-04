@@ -272,6 +272,10 @@ void processDb(char* args,char typ) {
         output(num%256);
         }
       }
+    else if (token[0] == '\'') {
+      for (pos=0; pos<strlen(token); pos++)
+        if (token[pos] != '\'') output(token[pos]);
+      }
     else {
       num = getLabel(token);
       if (typ == 'B') output(num & 0xff);

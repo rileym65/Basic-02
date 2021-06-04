@@ -1,5 +1,6 @@
 #include "header.h"
 
+#define OP_ALLOC  0x59
 #define OP_SGN    0x58
 #define OP_RND    0x57
 #define OP_ABS    0x56
@@ -321,6 +322,21 @@ int reduce(char last) {
            sprintf(buffer,"          dec   r7"); writeAsm(buffer,"");
            }
          break;
+    case OP_ALLOC:
+         Asm("           inc     r7                  ; Get size from expr stack");
+         Asm("           lda     r7");
+         Asm("           plo     rc");
+         Asm("           ldn     r7");
+         Asm("           phi     rc");
+         Asm("           sep     scall               ; Call alloc function");
+         Asm("           dw      alloc");
+         Asm("           ghi     rf                  ; Push address to expr stack");
+         Asm("           str     r7");
+         Asm("           dec     r7");
+         Asm("           glo     rf");
+         Asm("           str     r7");
+         Asm("           dec     r7");
+         break;
     }
   tokens[numTokens++] = 0;
   tokens[numTokens++] = OP_NUM;
@@ -421,6 +437,13 @@ char* evaluate(char* buffer) {
          tokens[numTokens++] = OP_SGN;
          tokens[numTokens++] = OP_OP;
          buffer+=4;
+         parens++;
+         func = -1;
+         }
+      if (strncasecmp(buffer,"alloc(",6) == 0) {
+         tokens[numTokens++] = OP_ALLOC;
+         tokens[numTokens++] = OP_OP;
+         buffer+=6;
          parens++;
          func = -1;
          }

@@ -10,6 +10,7 @@ OBJS = \
 	casm.o \
 	ccls.o \
 	cdata.o \
+	cdealloc.o \
 	cdma.o \
 	cdpoke.o \
 	cend.o \
@@ -64,6 +65,7 @@ asm.o:           header.h asm.c
 casm.o:          header.h casm.c
 ccls.o:          header.h ccls.c
 cdata.o:         header.h cdata.c
+cdealloc.o:      header.h cdealloc.c
 cdma.o:          header.h cdma.c
 cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c

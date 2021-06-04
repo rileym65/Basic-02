@@ -1200,10 +1200,330 @@ void library() {
     }
 
 
-/*
   if (useHeap) {
+    /* ******************************************* */
+    /* ***** Allocate memory                 ***** */
+    /* ***** RC - requested size             ***** */
+    /* ***** Returns: RF - Address of memory ***** */
+    /* ******************************************* */
+    if (passNumber == 1) lblAlloc = address;
+    Asm("alloc:     ldi     [HEAP_].0           ; get heap address");
+    Asm("           plo     r9");
+    Asm("           ldi     [HEAP_].1");
+    Asm("           phi     r9");
+    Asm("           lda     r9");
+    Asm("           phi     rd");
+    Asm("           ldn     r9");
+    Asm("           plo     rd");
+    Asm("           dec     r9                  ; leave pointer at heap address");
+    Asm("alloc_1:   lda     rd                  ; get flags byte");
+    Asm("           lbz     alloc_new           ; need new if end of table");
+    Asm("           plo     re                  ; save flags");
+    Asm("           lda     rd                  ; get block size");
+    Asm("           phi     rf");
+    Asm("           lda     rd");
+    Asm("           plo     rf");
+    Asm("           glo     re                  ; is block allocated?");
+    Asm("           smi     2");
+    Asm("           lbz     alloc_nxt           ; jump if so");
+    Asm("           glo     rc                  ; subtract size from block size");
+    Asm("           str     r2");
+    Asm("           glo     rf");
+    Asm("           sm");
+    Asm("           plo     rf");
+    Asm("           ghi     rc");
+    Asm("           str     r2");
+    Asm("           ghi     rf");
+    Asm("           smb");
+    Asm("           phi     rf                  ; RF now has difference");
+    Asm("           lbnf    alloc_nxt           ; jumpt if block is too small");
+    Asm("           ghi     rf                  ; see if need to split block");
+    Asm("           lbnz    alloc_sp            ; jump if so");
+    Asm("           glo     rf                  ; get low byte of difference");
+    Asm("           ani     0f8h                ; want to see if at least 8 extra bytes");
+    Asm("           lbnz    alloc_sp            ; jump if so");
+    Asm("alloc_2:   glo     rd                  ; set address for return");
+    Asm("           plo     rf");
+    Asm("           ghi     rd");
+    Asm("           phi     rf");
+    Asm("           dec     rd                  ; move back to flags byte");
+    Asm("           dec     rd");
+    Asm("           dec     rd");
+    Asm("           ldi     2                   ; mark block as used");
+    Asm("           str     rd");
+    Asm("           sep     sret                ; and return to caller");
+    Asm("alloc_sp:  ghi     rd                  ; save this address");
+    Asm("           stxd");
+    Asm("           glo     rd");
+    Asm("           stxd");
+    Asm("           dec     rd                  ; move to lsb of block size");
+    Asm("           glo     rc                  ; write requested size");
+    Asm("           str     rd");
+    Asm("           dec     rd");
+    Asm("           ghi     rc                  ; write msb of size");
+    Asm("           str     rd");
+    Asm("           inc     rd                  ; move back to data");
+    Asm("           inc     rd");
+    Asm("           glo     rc                  ; now add size");
+    Asm("           str     r2");
+    Asm("           glo     rd");
+    Asm("           add");
+    Asm("           plo     rd");
+    Asm("           ghi     rd");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           adc");
+    Asm("           phi     rd                  ; rd now points to new block");
+    Asm("           ldi     1                   ; mark as a free block");
+    Asm("           str     rd");
+    Asm("           inc     rd");
+    Asm("           dec     rf                  ; remove 3 bytes from block size");
+    Asm("           dec     rf");
+    Asm("           dec     rf");
+    Asm("           ghi     rf                  ; and write into block header");
+    Asm("           str     rd");
+    Asm("           inc     rd");
+    Asm("           glo     rf");
+    Asm("           str     rd");
+    Asm("           irx                         ; recover address");
+    Asm("           ldxa");
+    Asm("           plo     rd");
+    Asm("           ldx");
+    Asm("           phi     rd");
+    Asm("           lbr     alloc_2             ; finish allocating");
+    Asm("alloc_nxt: glo     rf                  ; add block size to address");
+    Asm("           str     r2");
+    Asm("           glo     rd");
+    Asm("           add");
+    Asm("           plo     rd");
+    Asm("           ghi     rf");
+    Asm("           str     r2");
+    Asm("           ghi     rd");
+    Asm("           adc");
+    Asm("           phi     rd");
+    Asm("           lbr     alloc_1             ; check next cell");
+    Asm("alloc_new: lda     r9                  ; retrieve start of heap");
+    Asm("           phi     rd");
+    Asm("           ldn     r9");
+    Asm("           plo     rd");
+    Asm("           glo     rc                  ; subtract req. size from pointer");
+    Asm("           str     r2");
+    Asm("           glo     rd");
+    Asm("           sm");
+    Asm("           plo     rd");
+    Asm("           ghi     rc");
+    Asm("           str     r2");
+    Asm("           ghi     rd");
+    Asm("           smb");
+    Asm("           phi     rd");
+    Asm("           dec     rd                  ; point to lsb of block size");
+    Asm("           glo     rc                  ; write size");
+    Asm("           str     rd");
+    Asm("           dec     rd");
+    Asm("           ghi     rc");
+    Asm("           str     rd");
+    Asm("           dec     rd");
+    Asm("           ldi     2                   ; mark as allocated block");
+    Asm("           str     rd");
+    Asm("           glo     rd                  ; set address");
+    Asm("           plo     rf");
+    Asm("           ghi     rd");
+    Asm("           phi     rf");
+    Asm("           inc     rf                  ; point to actual data space");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           glo     rd                  ; write new heap address");
+    Asm("           str     r9");
+    Asm("           dec     r9");
+    Asm("           ghi     rd");
+    Asm("           str     r9");
+    Asm("           sep     scall               ; check for out of memory");
+    Asm("           dw      checkeom");
+    Asm("           sep     sret                ; return to caller");
+
+    /* ************************************** */
+    /* ***** Deallocate memory          ***** */
+    /* ***** RF - address to deallocate ***** */
+    /* ************************************** */
+    if (passNumber == 1) lblDealloc = address;
+    Asm("dealloc:   dec     rf                  ; move to flags byte");
+    Asm("           dec     rf");
+    Asm("           dec     rf");
+    Asm("           ldi     1                   ; mark block as free");
+    Asm("           str     rf");
+    Asm("heapgc:    ghi     rc                  ; save consumed registers");
+    Asm("           stxd");
+    Asm("           glo     rc");
+    Asm("           stxd");
+    Asm("           ghi     rd");
+    Asm("           stxd");
+    Asm("           glo     rd");
+    Asm("           stxd");
+    Asm("           ldi     [HEAP_].0           ; need start of heap");
+    Asm("           plo     r9");
+    Asm("           ldi     [HEAP_].1");
+    Asm("           phi     r9");
+    Asm("           lda     r9                  ; retrieve heap start address");
+    Asm("           phi     rd");
+    Asm("           lda     r9");
+    Asm("           plo     rd");
+    Asm("heapgc_1:  lda     rd                  ; retrieve flags byte");
+    Asm("           lbz     heapgc_dn           ; return if end of heap found");
+    Asm("           plo     re                  ; save copy of flags");
+    Asm("           lda     rd                  ; retrieve block size");
+    Asm("           phi     rc");
+    Asm("           lda     rd");
+    Asm("           plo     rc");
+    Asm("           glo     rd                  ; RF=RD+RC, point to next block");
+    Asm("           str     r2");
+    Asm("           glo     rc");
+    Asm("           add");
+    Asm("           plo     rf");
+    Asm("           ghi     rd");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           adc");
+    Asm("           phi     rf");
+    Asm("           lda     rf                  ; retrieve flags for next block");
+    Asm("           lbz     heapgc_dn           ; return if on last block");
+    Asm("           smi     2                   ; is block allocated?");
+    Asm("           lbz     heapgc_a            ; jump if so");
+    Asm("           glo     re                  ; check flags of current block");
+    Asm("           smi     2                   ; is it allocated");
+    Asm("           lbz     heapgc_a            ; jump if so");
+    Asm("           lda     rf                  ; retrieve next block size into RF");
+    Asm("           plo     re");
+    Asm("           lda     rf");
+    Asm("           plo     rf");
+    Asm("           glo     re");
+    Asm("           phi     rf");
+    Asm("           inc     rf                  ; add 3 bytes for header");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           glo     rf                  ; RC += RF, combine sizes");
+    Asm("           str     r2");
+    Asm("           glo     rc");
+    Asm("           add");
+    Asm("           plo     rc");
+    Asm("           ghi     rf");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           adc");
+    Asm("           phi     rc");
+    Asm("           dec     rd                  ; write size of combined blocks");
+    Asm("           glo     rc");
+    Asm("           str     rd");
+    Asm("           dec     rd");
+    Asm("           ghi     rc");
+    Asm("           str     rd");
+    Asm("           dec     rd                  ; move back to flags byte");
+    Asm("           lbr     heapgc_1            ; keep checking for merges");
+    Asm("heapgc_a:  glo     rf                  ; move pointer to next block");
+    Asm("           plo     rd");
+    Asm("           ghi     rf");
+    Asm("           phi     rd");
+    Asm("           dec     rd                  ; move back to flags byte");
+    Asm("           lbr     heapgc_1            ; and check next block");
+    Asm("heapgc_dn: irx                         ; recover consumed registers");
+    Asm("           ldxa");
+    Asm("           plo     rd");
+    Asm("           ldxa");
+    Asm("           phi     rd");
+    Asm("           ldxa");
+    Asm("           plo     rc");
+    Asm("           ldx");
+    Asm("           phi     rc");
+    Asm("           sep     sret                ; return to caller");
+
+    /* ********************************************* */
+    /* ***** Return amount of free heap memory ***** */
+    /* ***** Returns: RC - free heap memory    ***** */
+    /* ********************************************* */
+    Asm("hfree:     ldi     0                   ; clear count");
+    Asm("           plo     rc");
+    Asm("           phi     rc");
+    Asm("           ldi     [HEAP_].0           ; setup heap pointer");
+    Asm("           plo     r9");
+    Asm("           ldi     [HEAP_].1");
+    Asm("           phi     r9");
+    Asm("           lda     r9                  ; retrieve start of heap");
+    Asm("           phi     rf");
+    Asm("           ldn     r9");
+    Asm("           plo     rf");
+    Asm("hfree_lp:  lda     rf                  ; get heap allocation status byte");
+    Asm("           lbz     hfree_dn            ; jump if end of heap");
+    Asm("           plo     re                  ; save this for a moment");
+    Asm("           lda     rf                  ; retrieve block size");
+    Asm("           phi     rd");
+    Asm("           lda     rf");
+    Asm("           plo     rd");
+    Asm("           str     r2                  ; add size to block address");
+    Asm("           glo     rf");
+    Asm("           add");
+    Asm("           plo     rf");
+    Asm("           ghi     rd");
+    Asm("           str     r2");
+    Asm("           ghi     rf");
+    Asm("           adc");
+    Asm("           phi     rf");
+    Asm("           glo     re                  ; recover status byte");
+    Asm("           smi     1                   ; is it a free block");
+    Asm("           lbnz    hfree_lp            ; jump if not");
+    Asm("           glo     rd                  ; add block size to count");
+    Asm("           str     r2");
+    Asm("           glo     rc");
+    Asm("           add");
+    Asm("           plo     rc");
+    Asm("           ghi     rd");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           adc");
+    Asm("           phi     rc");
+    Asm("           lbr     hfree_lp            ; check next block");
+    Asm("hfree_dn:  sep     sret                ; and return");
+
+    /* *********************************** */
+    /* ***** Check for out of memory ***** */
+    /* *********************************** */
+    Asm("checkeom:  ghi     rc                  ; save consumed register");
+    Asm("           stxd");
+    Asm("           glo     rc");
+    Asm("           stxd");
+    Asm("           ldi     [FREE_].0           ; get end of variable table");
+    Asm("           plo     r9");
+    Asm("           ldi     [FREE_].1");
+    Asm("           phi     r9");
+    Asm("           lda     r9                  ; retrieve variable table end");
+    Asm("           phi     rc");
+    Asm("           lda     r9");
+    Asm("           plo     rc");
+    Asm("           ldi     [HEAP_].0           ; point to heap start");
+    Asm("           plo     r9");
+    Asm("           ldi     [HEAP_].1");
+    Asm("           phi     r9");
+    Asm("           inc     r9                  ; point to lsb");
+    Asm("           ldn     r9                  ; get heap");
+    Asm("           str     r2");
+    Asm("           glo     rc                  ; subtract from variable table end");
+    Asm("           sm");
+    Asm("           dec     r9                  ; point to msb");
+    Asm("           ldn     r9                  ; retrieve it");
+    Asm("           str     r2");
+    Asm("           ghi     rc                  ; subtract from variable table end");
+    Asm("           smb");
+    Asm("           lbdf    oom                 ; jump of out of memory");
+    Asm("           irx                         ; recover consumed register");
+    Asm("           ldxa");
+    Asm("           plo     rc");
+    Asm("           ldx");
+    Asm("           phi     rc");
+    Asm("           sep     sret                ; and return to caller");
+    Asm("oom:       sep     scall               ; display out of memory error");
+    Asm("           dw      f_inmsg");
+    Asm("           db      'Out of memory: ',0");
+    Asm("           lbr     $                   ; show line of error and exit");
+
     }
-*/
 
 
 
@@ -1261,6 +1581,13 @@ void library() {
     output(LDI); output(a%256); output(PLO+RF);
     output(LDI); output(dataAddress/256); output(STR+RF); output(INC+RF);
     output(LDI); output(dataAddress%256); output(STR+RF);
+    }
+  if (useHeap) {
+    a = getVariable("HEAP_");
+    output(LDI); output(a/256); output(PHI+RF);
+    output(LDI); output(a%256); output(PLO+RF);
+    output(LDI); output((estack-256)/256); output(STR+RF); output(INC+RF);
+    output(LDI); output((estack-256)%256); output(STR+RF);
     }
   if ((useItoA || useAtoI) && useElfos == 0) {
     Asm("          sep  scall");
