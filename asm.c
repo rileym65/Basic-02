@@ -136,6 +136,18 @@ word processArgs(char* args) {
       token[pos] = 0;
       num = getVariable(token);
       }
+    else if (token[0] == '<') {
+      pos = 0;
+      while (token[pos+1] != 0 && token[pos+1] != '>') {
+        token[pos] = token[pos+1];
+        pos++;
+        }
+      token[pos] = 0;
+      if (findLine(atoi(token), &num)) {
+        printf("<ASM>Line number not found: %s\n",token);
+        exit(1);
+        }
+      }
     else if (token[0] >= 'a' && token[0] <= 'z') num = getLabel(token);
     else if (token[0] >= 'A' && token[0] <= 'Z') num = getLabel(token);
     else if (token[0] >= '0' && token[0] <= '9') num = convertNumber(token);
@@ -227,6 +239,37 @@ void processDb(char* args,char typ) {
           output(num/256);
           output(num%256);
           }
+        }
+      }
+    else if (token[0] == '[') {
+      pos = 0;
+      while (token[pos+1] != 0 && token[pos+1] != ']') {
+        token[pos] = token[pos+1];
+        pos++;
+        }
+      token[pos] = 0;
+      num = getVariable(token);
+      if (typ == 'B') output(num & 0xff);
+      else {
+        output(num/256);
+        output(num%256);
+        }
+      }
+    else if (token[0] == '<') {
+      pos = 0;
+      while (token[pos+1] != 0 && token[pos+1] != '>') {
+        token[pos] = token[pos+1];
+        pos++;
+        }
+      token[pos] = 0;
+      if (findLine(atoi(token), &num)) {
+        printf("<ASM>Line number not found: %s\n",token);
+        exit(1);
+        }
+      if (typ == 'B') output(num & 0xff);
+      else {
+        output(num/256);
+        output(num%256);
         }
       }
     else {
@@ -588,6 +631,146 @@ void Asm(char* line) {
     else if (strcasecmp(opcode,"xri") == 0) {
       output(XRI);
       output(processArgs(args) & 0xff);
+      }
+    else if (use1805) {
+      if (strcasecmp(opcode,"rldi") == 0) {
+        output(0x68);
+        output(0xc0 + (processArgs(args) & 0x0f));
+        }
+      else if (strcasecmp(opcode,"rlxa") == 0) {
+        output(0x68);
+        output(0x60 + (processArgs(args) & 0x0f));
+        }
+      else if (strcasecmp(opcode,"rsxd") == 0) {
+        output(0x68);
+        output(0xa0 + (processArgs(args) & 0x0f));
+        }
+      else if (strcasecmp(opcode,"dbnz") == 0) {
+        output(0x68);
+        output(0x20 + (processArgs(args) & 0x0f));
+        }
+      else if (strcasecmp(opcode,"rnx") == 0) {
+        output(0x68);
+        output(0xb0 + (processArgs(args) & 0x0f));
+        }
+      else if (strcasecmp(opcode,"dadd") == 0) {
+        output(0x68);
+        output(0xf4);
+        }
+      else if (strcasecmp(opcode,"dadi") == 0) {
+        output(0x68);
+        output(0xfc);
+        output(processArgs(args) & 0xff);
+        }
+      else if (strcasecmp(opcode,"dadc") == 0) {
+        output(0x68);
+        output(0x74);
+        }
+      else if (strcasecmp(opcode,"daci") == 0) {
+        output(0x68);
+        output(0x7c);
+        output(processArgs(args) & 0xff);
+        }
+      else if (strcasecmp(opcode,"dsm") == 0) {
+        output(0x68);
+        output(0xf7);
+        }
+      else if (strcasecmp(opcode,"dsmi") == 0) {
+        output(0x68);
+        output(0xff);
+        output(processArgs(args) & 0xff);
+        }
+      else if (strcasecmp(opcode,"dsmb") == 0) {
+        output(0x68);
+        output(0x77);
+        }
+      else if (strcasecmp(opcode,"dsbi") == 0) {
+        output(0x68);
+        output(0x7f);
+        output(processArgs(args) & 0xff);
+        }
+      else if (strcasecmp(opcode,"bci") == 0) {
+        output(0x68);
+        output(0x3e);
+        output(processArgs(args) & 0xff);
+        }
+      else if (strcasecmp(opcode,"bxi") == 0) {
+        output(0x68);
+        output(0x3f);
+        output(processArgs(args) & 0xff);
+        }
+      else if (strcasecmp(opcode,"ldc") == 0) {
+        output(0x68);
+        output(0x06);
+        }
+      else if (strcasecmp(opcode,"gec") == 0) {
+        output(0x68);
+        output(0x08);
+        }
+      else if (strcasecmp(opcode,"stpc") == 0) {
+        output(0x68);
+        output(0x00);
+        }
+      else if (strcasecmp(opcode,"dtc") == 0) {
+        output(0x68);
+        output(0x01);
+        }
+      else if (strcasecmp(opcode,"stm") == 0) {
+        output(0x68);
+        output(0x07);
+        }
+      else if (strcasecmp(opcode,"scm1") == 0) {
+        output(0x68);
+        output(0x05);
+        }
+      else if (strcasecmp(opcode,"scm2") == 0) {
+        output(0x68);
+        output(0x03);
+        }
+      else if (strcasecmp(opcode,"spm1") == 0) {
+        output(0x68);
+        output(0x04);
+        }
+      else if (strcasecmp(opcode,"spm2") == 0) {
+        output(0x68);
+        output(0x02);
+        }
+      else if (strcasecmp(opcode,"etq") == 0) {
+        output(0x68);
+        output(0x09);
+        }
+      else if (strcasecmp(opcode,"xie") == 0) {
+        output(0x68);
+        output(0x0a);
+        }
+      else if (strcasecmp(opcode,"xid") == 0) {
+        output(0x68);
+        output(0x0b);
+        }
+      else if (strcasecmp(opcode,"cie") == 0) {
+        output(0x68);
+        output(0x0c);
+        }
+      else if (strcasecmp(opcode,"cid") == 0) {
+        output(0x68);
+        output(0x0d);
+        }
+      else if (strcasecmp(opcode,"dsav") == 0) {
+        output(0x68);
+        output(0x76);
+        }
+      else if (strcasecmp(opcode,"scal") == 0) {
+        output(0x68);
+        output(0x80 + (processArgs(args) & 0x0f));
+        }
+      else if (strcasecmp(opcode,"scal") == 0) {
+        output(0x68);
+        output(0x90 + (processArgs(args) & 0x0f));
+        }
+      else { 
+        printf("<ASM>Unknown opcode: %s\n",opcode);
+        exit(1);
+        }
       }
     else { 
       printf("<ASM>Unknown opcode: %s\n",opcode);

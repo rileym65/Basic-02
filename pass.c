@@ -3,7 +3,6 @@
 int pass(char* filename) {
   int   i;
   word  target;
-  FILE *source;
   source = fopen(filename,"r");
   if (source == NULL) {
     printf("Could not open %s\n",filename);

@@ -124,6 +124,7 @@ int main(int argc, char** argv, char** envp) {
   useData = 0;
   useStg = 0;
   useAsm = 0;
+  use1805 = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;
