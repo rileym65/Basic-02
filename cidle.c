@@ -1,10 +1,8 @@
 #include "header.h"
 
 char* cidle(char* line) {
-  output(IDL);
-  if (useAsm) {
-    sprintf(buffer,"          idl"); writeAsm(buffer,"Idle the CPU");
-    }
+  Asm("          idl                           ; Idle the CPU");
+  line = trim(line);
   return line;
   }
 

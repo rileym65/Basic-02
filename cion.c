@@ -3,13 +3,9 @@
 char* cion(char* line) {
   word target;
   target = address;
-  output(SEX+R3);
-  output(RET); output(0x23);
-  if (useAsm) {
-    sprintf(buffer,"          sex   r3"); writeAsm(buffer,"Set X=P");
-    sprintf(buffer,"          ret"); writeAsm(buffer,"Turn interrupts on");
-    sprintf(buffer,"          db    023h"); writeAsm(buffer,"");
-    }
+  Asm("          sex   r3                      ; Set X=P");
+  Asm("          ret                           ; Turn interrupts on");
+  Asm("          db    023h");
   return line;
   }
 

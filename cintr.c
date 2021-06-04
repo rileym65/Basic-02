@@ -12,10 +12,15 @@ char* cintr(char* line) {
     showError("Line number not found");
     exit(1);
     }
-  output(LDI); output(target / 256);
-  output(PHI+R1);
-  output(LDI); output(target % 256);
-  output(PLO+R1);
+  Asm("          ldi   [INTR_].1               ; Point to interrupt line");
+  Asm("          phi   rf");
+  Asm("          ldi   [INTR_].0");
+  Asm("          plo   rf");
+  sprintf(buffer,"          ldi   0%xh                     ; Set to specified line",target/256); Asm(buffer);
+  Asm("          str   rf");
+  Asm("          inc   rf");
+  sprintf(buffer,"          ldi   0%xh",target%256); Asm(buffer);
+  Asm("          str   rf");
   return line;
   }
 

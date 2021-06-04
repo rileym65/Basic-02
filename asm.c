@@ -3,6 +3,7 @@
 char** labels;
 word*  labelValues;
 int    numLabels = 0;
+word   asmAddress;
 
 void addLabel(char* label, word value) {
   int i;
@@ -123,9 +124,10 @@ word processArgs(char* args) {
     else if (strcasecmp(token,"r12") == 0) num = 12;
     else if (strcasecmp(token,"r13") == 0) num = 13;
     else if (strcasecmp(token,"r14") == 0) num = 14;
-    else if (strcasecmp(token,"$") == 0) num = address;
+    else if (strcasecmp(token,"$") == 0) num = asmAddress;
     else if (strcasecmp(token,"[stack]") == 0) num = stack;
     else if (strcasecmp(token,"[estack]") == 0) num = estack;
+    else if (strcasecmp(token,"[keybuf]") == 0) num = keyBuffer;
     else if (token[0] == '\'' && strlen(token) == 3) num = token[1];
     else if (token[0] == '[') {
       pos = 0;
@@ -227,7 +229,7 @@ void processDb(char* args,char typ) {
         num = 0;
         pos = 0;
         while (token[pos] >= '0' && token[pos] <= '9') {
-          num = (num << 4) + (token[pos] - '0');
+          num = (num * 10) + (token[pos] - '0');
           pos++;
           }
         if (token[pos] != 0) {
@@ -295,12 +297,21 @@ void processDb(char* args,char typ) {
 
 void Asm(char* line) {
   int   pos;
+  char  qt;
   char *orig;
   char  label[32];
   char  opcode[32];
   char  args[128];
   word  value;
   orig = line;
+  asmAddress = address;
+  if (passNumber == 2) {
+    if (showAsm) printf("%s\n",line);
+    if (useAsm) {
+      write(asmFile, line, strlen(line));
+      write(asmFile, lineEnding, strlen(lineEnding));
+      }
+    }
   strcpy(label,"");
   strcpy(opcode,"");
   strcpy(args,"");
@@ -334,7 +345,9 @@ void Asm(char* line) {
     }
   line = trim(line);
   pos = 0;
-  while (*line != ';' && *line != 0) {
+  qt = 0;
+  while (((qt == 0 && *line != ';') || qt) && *line != 0) {
+    if (*line == '\'') qt = 1 - qt;
     args[pos++] = *line++;
     }
   args[pos] = 0;
@@ -521,6 +534,9 @@ void Asm(char* line) {
     else if (strcasecmp(opcode,"lsie") == 0) {
       output(LSIE);
       }
+    else if (strcasecmp(opcode,"lskp") == 0) {
+      output(NLBR);
+      }
     else if (strcasecmp(opcode,"lsnf") == 0) {
       output(LSNF);
       }
@@ -541,7 +557,6 @@ void Asm(char* line) {
       }
     else if (strcasecmp(opcode,"nbr") == 0) {
       output(NBR);
-      output(processArgs(args) & 0xff);
       }
     else if (strcasecmp(opcode,"nlbr") == 0) {
       output(NLBR);
@@ -608,6 +623,9 @@ void Asm(char* line) {
       }
     else if (strcasecmp(opcode,"shrc") == 0) {
       output(SHRC);
+      }
+    else if (strcasecmp(opcode,"skp") == 0) {
+      output(NBR);
       }
     else if (strcasecmp(opcode,"sm") == 0) {
       output(SM);

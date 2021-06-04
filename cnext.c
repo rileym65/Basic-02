@@ -28,24 +28,16 @@ char* cnext(char* line) {
     hasVar = -1;
     }
   if (hasVar == 0) {
-    output(SEP+R4); output(lblNext/256); output(lblNext%256);
-    if (useAsm) {
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Call NEXT handler");
-      sprintf(buffer,"          dw    next"); writeAsm(buffer,"");
-      }
+    Asm("          sep   scall                   ; Call NEXT handler");
+    Asm("          dw    next");
     }
   else {
-    output(LDI); output(addr/256); output(PHI+RC);
-    output(LDI); output(addr%256); output(PLO+RC);
-    output(SEP+R4); output(lblNextVar/256); output(lblNextVar%256);
-    if (useAsm) {
-      sprintf(buffer,"          ldi   %s.1",varname); writeAsm(buffer,"Get loop variable address");
-      sprintf(buffer,"          phi   rc"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %s.0",varname); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rc"); writeAsm(buffer,"");
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Call NEXT with var handler");
-      sprintf(buffer,"          dw    nextvar"); writeAsm(buffer,"");
-      }
+    sprintf(buffer,"          ldi   [%s].1                   ; Get loop variable address",varname); Asm(buffer);
+    Asm("          phi   rc");
+    sprintf(buffer,"          ldi   [%s].0",varname); Asm(buffer);
+    Asm("          plo   rc");
+    Asm("          sep   scall                   ; Call NEXT with var handler");
+    Asm("          dw    nextvar");
     }
 
   return line;

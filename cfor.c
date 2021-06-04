@@ -13,58 +13,34 @@ char* cfor(char* line) {
     if (strcasecmp(matches[3],"to") == 0 && strcasecmp(matches[5],"step") == 0) {
       vaddr = getVariable(matches[0]);
       value = atoi(matches[2]);
-      output(LDI); output(vaddr/256);
-      output(PHI+RF);
-      output(LDI); output(vaddr%256);
-      output(PLO+RF);
-      output(LDI); output(value/256);
-      output(STR+RF); output(INC+RF);
-      output(LDI); output(value%256);
-      output(STR+RF);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Get variable address");
-        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
-        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write value to variable");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   [%s].1                  ; Get variable address",matches[0]); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s].0",matches[0]); Asm(buffer);
+      Asm("          plo   rf");
+      sprintf(buffer,"          ldi   %d                      ; Write start to variable",value/256); Asm(buffer);
+      Asm("          str   rf");
+      Asm("          inc   rf");
+      sprintf(buffer,"          ldi   %d",value%256); Asm(buffer);
+      Asm("          str   rf");
       value = atoi(matches[4])+1;
-      output(LDI); output(value/256); output(STXD);
-      output(LDI); output(value%256); output(STXD);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write end value to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   %d                      ; Write end value to stack",value/256); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   %d",value%256); Asm(buffer);
+      Asm("          stxd");
       value = atoi(matches[6]);
-      output(LDI); output(value/256); output(STXD);
-      output(LDI); output(value%256); output(STXD);
-      output(LDI); output(vaddr/256); output(STXD);
-      output(LDI); output(vaddr%256); output(STXD);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write step value to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Write variable address to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   %d                      ; Write step value to stack",value/256); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   %d",value%256); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   [%s].1                  ; Write variable address to stack",matches[0]); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   [%s].0",matches[0]); Asm(buffer);
+      Asm("          stxd");
       addr = address + 6;
-      output(LDI); output(addr/256); output(STXD);
-      output(LDI); output(addr%256); output(STXD);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   $+6"); writeAsm(buffer,"Write execution address to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   $+3"); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        }
+      Asm("          ldi   $+6.1                   ; Write execution address to stack");
+      Asm("          stxd");
+      Asm("          ldi   $+3.0");
+      Asm("          stxd");
       while (*line != ':' && *line != 0) line++;
       return line;
       }
@@ -73,58 +49,34 @@ char* cfor(char* line) {
     if (strcasecmp(matches[3],"to") == 0) {
       vaddr = getVariable(matches[0]);
       value = atoi(matches[2]);
-      output(LDI); output(vaddr/256);
-      output(PHI+RF);
-      output(LDI); output(vaddr%256);
-      output(PLO+RF);
-      output(LDI); output(value/256);
-      output(STR+RF); output(INC+RF);
-      output(LDI); output(value%256);
-      output(STR+RF);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Get variable address");
-        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
-        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write value to variable");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   [%s].1                  ; Get variable address",matches[0]); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s].0",matches[0]); Asm(buffer);
+      Asm("          plo   rf");
+      sprintf(buffer,"          ldi   %d                      ; Write start to variable",value/256); Asm(buffer);
+      Asm("          str   rf");
+      Asm("          inc   rf");
+      sprintf(buffer,"          ldi   %d",value%256); Asm(buffer);
+      Asm("          str   rf");
       value = atoi(matches[4])+1;
-      output(LDI); output(value/256); output(STXD);
-      output(LDI); output(value%256); output(STXD);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write end value to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   %d                      ; Write end value to stack",value/256); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   %d",value%256); Asm(buffer);
+      Asm("          stxd");
       value = 1;
-      output(LDI); output(value/256); output(STXD);
-      output(LDI); output(value%256); output(STXD);
-      output(LDI); output(vaddr/256); output(STXD);
-      output(LDI); output(vaddr%256); output(STXD);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write step value to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Write variable address to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   %d                      ; Write step value to stack",value/256); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   %d",value%256); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   [%s].1                  ; Write variable address to stack",matches[0]); Asm(buffer);
+      Asm("          stxd");
+      sprintf(buffer,"          ldi   [%s].0",matches[0]); Asm(buffer);
+      Asm("          stxd");
       addr = address + 6;
-      output(LDI); output(addr/256); output(STXD);
-      output(LDI); output(addr%256); output(STXD);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   $+6"); writeAsm(buffer,"Write execution address to stack");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   $+3"); writeAsm(buffer,"");
-        sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-        }
+      Asm("          ldi   $+6.1                   ; Write execution address to stack");
+      Asm("          stxd");
+      Asm("          ldi   $+3.0");
+      Asm("          stxd");
       while (*line != ':' && *line != 0) line++;
       return line;
       }
@@ -150,27 +102,16 @@ char* cfor(char* line) {
   line = trim(line);
   line = cexpr(line);
   vaddr = getVariable(varname);
-  output(LDI); output(vaddr/256);
-  output(PHI+RF);
-  output(LDI); output(vaddr%256);
-  output(PLO+RF);
-  output(GHI+RC);
-  output(STR+RF);
-  output(INC+RF);
-  output(GLO+RC);
-  output(STR+RF);
-  if (useAsm) {
-    sprintf(buffer,"          ldi   %s.1",varname); writeAsm(buffer,"Get address of control variable");
-    sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   %s.0",varname); writeAsm(buffer,"");
-    sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          ghi   rc"); writeAsm(buffer,"Store start value into variable");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          glo   rc"); writeAsm(buffer,"");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-    }
 
+  sprintf(buffer,"          ldi   [%s].1                  ; Get variable address",varname); Asm(buffer);
+  Asm("          phi   rf");
+  sprintf(buffer,"          ldi   [%s].0",varname); Asm(buffer);
+  Asm("          plo   rf");
+  Asm("          ghi   rc                      ; Store start value into variable");
+  Asm("          str   rf");
+  Asm("          inc   rf");
+  Asm("          glo   rc");
+  Asm("          str   rf");
 
   if (strncasecmp(line,"to",2) != 0) {
     showError("Syntax error");
@@ -180,26 +121,17 @@ char* cfor(char* line) {
   line = trim(line);
   line = cexpr(line);
   line = trim(line);
-  output(INC+RC);
-  output(GHI+RC); output(STXD);
-  output(GLO+RC); output(STXD);
-  if (useAsm) {
-    sprintf(buffer,"          inc   rc"); writeAsm(buffer,"End value is 1 higher");
-    sprintf(buffer,"          ghi   rc"); writeAsm(buffer,"Store onto stack");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    sprintf(buffer,"          glo   rc"); writeAsm(buffer,"");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    }
+  Asm("          inc   rc                      ; End value is 1 higher");
+  Asm("          ghi   rc                      ; Store onto stack");
+  Asm("          stxd");
+  Asm("          glo   rc");
+  Asm("          stxd");
 
   if (*line == ':' || *line == 0) {
-    output(LDI); output(0); output(STXD);
-    output(LDI); output(1); output(STXD);
-    if (useAsm) {
-      sprintf(buffer,"          ldi   0"); writeAsm(buffer,"No step, so increment is 1");
-      sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   1"); writeAsm(buffer,"");
-      sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-      }
+    Asm("          ldi   0                       ; No step, so increment is 1");
+    Asm("          stxd");
+    Asm("          ldi   1");
+    Asm("          stxd");
     }
   else if (strncasecmp(line,"step",4) == 0) {
     line += 4;
@@ -210,14 +142,10 @@ char* cfor(char* line) {
       showError("Syntax error");
       exit(1);
       }
-    output(GHI+RC); output(STXD);
-    output(GLO+RC); output(STXD);
-    if (useAsm) {
-      sprintf(buffer,"          ghi   rc"); writeAsm(buffer,"Store increment on stack");
-      sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-      sprintf(buffer,"          glo   rc"); writeAsm(buffer,"");
-      sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-      }
+    Asm("          ghi   rc                      ; Store increment onto stack");
+    Asm("          stxd");
+    Asm("          glo   rc");
+    Asm("          stxd");
     }
   else {
     showError("Syntax error");
@@ -226,21 +154,15 @@ char* cfor(char* line) {
 
   addr = address + 12;
 
-  output(LDI); output(vaddr/256); output(STXD);
-  output(LDI); output(vaddr%256); output(STXD);
-
-  output(LDI); output(addr/256); output(STXD);
-  output(LDI); output(addr%256); output(STXD);
-  if (useAsm) {
-    sprintf(buffer,"          ldi   %s.1",varname); writeAsm(buffer,"Store variable address on stack");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   %s.0",varname); writeAsm(buffer,"");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   ($+6).1"); writeAsm(buffer,"Write next address to stack");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   ($+3).0"); writeAsm(buffer,"");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    }
+  sprintf(buffer,"          ldi   [%s].1                  ; Write variable address to stack",varname); Asm(buffer);
+  Asm("          stxd");
+  sprintf(buffer,"          ldi   [%s].0",varname); Asm(buffer);
+  Asm("          stxd");
+  addr = address + 6;
+  Asm("          ldi   $+6.1                   ; Write execution address to stack");
+  Asm("          stxd");
+  Asm("          ldi   $+3.0");
+  Asm("          stxd");
 
   return line;
   }

@@ -3,8 +3,9 @@
 char* clocate(char* line) {
   int  pos;
   word addr;
-  output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
-  output(27); output('['); output(0);
+  Asm("          sep   scall                   ; Send first portion of escape sequence");
+  Asm("          dw    f_inmsg");
+  Asm("          db    27,'[',0");
   line = cexpr(line);
   line = trim(line);
   if (*line != ',') {
@@ -12,28 +13,17 @@ char* clocate(char* line) {
     exit(1);
     }
   line++;
-  output(SEP+R4); output(lblItoA/256); output(lblItoA%256);
-  output(LDI); output(';');
-  output(SEP+R4); output(lblF_type/256); output(lblF_type%256);
-  if (useAsm) {
-    sprintf(buffer,"          ghi   rc"); writeAsm(buffer,"Get poke address");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"Save on the stack");
-    sprintf(buffer,"          glo   rc"); writeAsm(buffer,"");
-    sprintf(buffer,"          stxd"); writeAsm(buffer,"");
-    }
+  Asm("          sep   scall                   ; Send row");
+  Asm("          dw    itoa");
+  Asm("          ldi   ';'                     ; Next need a semicolon");
+  Asm("          sep   scall                   ; Send it");
+  Asm("          dw    f_type");
   line = cexpr(line);
-  output(SEP+R4); output(lblItoA/256); output(lblItoA%256);
-  output(LDI); output('H');
-  output(SEP+R4); output(lblF_type/256); output(lblF_type%256);
-  if (useAsm) {
-    sprintf(buffer,"          irx"); writeAsm(buffer,"Recover poke address");
-    sprintf(buffer,"          ldxa"); writeAsm(buffer,"");
-    sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldx"); writeAsm(buffer,"");
-    sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          plo   rc"); writeAsm(buffer,"Get low byte of poke value");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer,"And write it to memory");
-    }
+  Asm("          sep   scall                   ; Send column");
+  Asm("          dw    itoa");
+  Asm("          ldi   'H'                     ; Lastly need an H");
+  Asm("          sep   scall                   ; Send it");
+  Asm("          dw    f_type");
   return line;
   }
 

@@ -21,19 +21,14 @@ char* cend(char* line) {
     Asm("            sep  sret");
     }
   else if (exitAddress != 0xffff) {
-    output(LBR); output(exitAddress / 256); output(exitAddress % 256);
+    sprintf(buffer,"          lbr   0%xh                    ; Jump to exit address",exitAddress); Asm(buffer);
     }
   else if (useElfos) {
-    target = 0x303;
-    output(LBR); output(target / 256); output(target % 256);
+    Asm("          lbr   0303h                   ; Jump to exit address");
     }
   else {
-    output(IDL);
-    output(LBR); output(target / 256); output(target % 256);
-    if (useAsm) {
-      sprintf(buffer,"lend:     idl"); writeAsm(buffer,"Idle the CPU");
-      sprintf(buffer,"          lbr   lend",matches[0]); writeAsm(buffer,"");
-      }
+    Asm("          idl                           ; Idle the CPU");
+    Asm("          lbr   $-1");
     }
   return line;
   }

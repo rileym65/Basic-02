@@ -6,13 +6,9 @@ char* ccls(char* line) {
     showError("Syntax error");
     exit(1);
     }
-  output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
-  output(27); output('['); output('2'); output('J'); output(0);
-  if (useAsm) {
-    sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Display message");
-    sprintf(buffer,"          dw    f_inmsg"); writeAsm(buffer,"");
-    sprintf(buffer,"          db    27,'[2J',0"); writeAsm(buffer,"");
-    }
+  Asm("          sep   scall                   ; Display message");
+  Asm("          dw    f_inmsg");
+  Asm("          db    27,'[2J',0");
   return line;
   }
 

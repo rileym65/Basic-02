@@ -13,10 +13,7 @@ char* cgoto(char* line) {
     showError("Line number not found");
     exit(1);
     }
-  output(LBR); output(target / 256); output(target % 256);
-  if (useAsm) {
-    sprintf(buffer,"          lbr   l%d",lineno); writeAsm(buffer,"Jump");
-    }
+  sprintf(buffer,"          lbr   <%d>                    ; Jump",lineno); Asm(buffer);
   return line;
   }
 

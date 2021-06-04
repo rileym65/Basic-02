@@ -35,38 +35,22 @@ char* con(char* line) {
       }
     if (*line == ',') line++;
     }
-  output(GLO+RC);
-  if (useAsm) {
-    sprintf(buffer,"          glo   rc"); writeAsm(buffer,"Get low value of index");
-    }
+  Asm("          glo   rc                      ; Get low value of index");
   for (i=0; i<lineCount; i++) {
-    output(SMI); output(0x01);
-    if (useAsm) {
-      sprintf(buffer,"          smi   1"); writeAsm(buffer,"Subtract 1 from index");
-      }
+    Asm("          smi   1                       ; Subtract 1 from index");
     if (findLine(lines[i], &addr) != 0) {
       showError("Line number not found");
       exit(1);
       }
     if (mode == 'G') {
-      output(LBZ); output(addr/256); output(addr%256);
-      if (useAsm) {
-        sprintf(buffer,"          lbz   l%d",lines[i]); writeAsm(buffer,"Jump if index reached zero");
-        }
+      sprintf(buffer,"          lbz   <%d>                    ; Jump if index is zero", lines[i]); Asm(buffer);
       }
     if (mode == 'S') {
-      nxt = address + 9;
-      output(LBNZ); output(nxt/256); output(nxt%256);
-      output(SEP+R4); output(addr/256); output(addr%256);
-      addr = address + 3 + ((lineCount-i-1) * 11);
-      output(LBR); output(addr/256); output(addr%256);
-      if (useAsm) {
-        sprintf(buffer,"          lbnz  $+9"); writeAsm(buffer,"Jump if index not zero");
-        sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Perform subroutine call");
-        sprintf(buffer,"          dw    l%d",lines[i]); writeAsm(buffer,"");
-        addr = 3 + ((lineCount-i-1) * 11);
-        sprintf(buffer,"          lbr   $+%d",addr); writeAsm(buffer,"Jump past remaining entries");
-        }
+      Asm("          lbnz  $+9                     ; Jump if index not zero");
+      Asm("          sep   scall                   ; Perform subroutine call");
+      sprintf(buffer,"          dw    <%d>", lines[i]); Asm(buffer);
+      addr = 3 + ((lineCount-i-1) * 11);
+      sprintf(buffer,"          lbr   $+%d           ; Jump past remaining entries",addr); Asm(buffer);
       }
     }
   return line;

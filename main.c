@@ -207,9 +207,11 @@ int main(int argc, char** argv, char** envp) {
   addLabel("f_type",lblF_type);
   addLabel("f_setbd",lblF_setbd);
   addLabel("f_inmsg",lblF_inmsg);
+  addLabel("f_input",lblF_input);
   passNumber = 1;
   pass(sourceFile);
-  variableRAM = (variableStart == 0xffff) ? address : variableStart;
+  keyBuffer = address;
+  variableRAM = (variableStart == 0xffff) ? keyBuffer+iBufferSize : variableStart;
   passNumber = 2;
   if (useRnd) {
     getVariable("LFSR_");

@@ -184,6 +184,7 @@ LINK word   lblSub;
 LINK word   lblTrue;
 LINK word   lblXor;
 LINK char   currentLine[2048];
+LINK word   keyBuffer;
 LINK int    lineCount;
 LINK char   lineEnding[3];
 LINK word   lineNumber;

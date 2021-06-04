@@ -16,37 +16,24 @@ char* cprint(char* line) {
   while (*line != ':' && *line != 0) {
     line=trim(line);
     if (*line == '"') {
-      output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
-      if (useAsm) {
-        sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Display message");
-        sprintf(buffer,"          dw    f_inmsg"); writeAsm(buffer,"");
-        strcpy(buffer,"          db    '");
-        }
+      Asm("          sep   scall                   ; Display message");
+      Asm("          dw    f_inmsg");
+      strcpy(buffer,"          db    '");
       line++;
       while (*line != '"' && *line != 0) {
-        if (useAsm) {
-          buffer[strlen(buffer)+1] = 0;
-          buffer[strlen(buffer)] = *line;
-          }
-        output(*line++);
+        buffer[strlen(buffer)+1] = 0;
+        buffer[strlen(buffer)] = *line++;
         }
-      output(0);
-      if (useAsm) {
-        strcat(buffer,"',0"); writeAsm(buffer,"");
-        }
+      strcat(buffer,"',0"); Asm(buffer);
       if (*line == '"') line++;
       last = ' ';
       }
     else if (*line == ',') {
-      output(LDI); output(0x09);
-      output(SEP+R4); output(lblF_type/256); output(lblF_type%256);
+      Asm("          ldi   9                       ; Display a tab character");
+      Asm("          sep   scall                   ; Display cr/lf");
+      Asm("          dw    f_type");
       line++;
       last = ',';
-      if (useAsm) {
-        sprintf(buffer,"          ldi   9"); writeAsm(buffer,"Display a tab character");
-        sprintf(buffer,"          sep   scall"); writeAsm(buffer,"");
-        sprintf(buffer,"          dw    f_type"); writeAsm(buffer,"");
-        }
       }
     else if (*line == ';') {
       line++;
@@ -54,23 +41,15 @@ char* cprint(char* line) {
       }
     else {
       line = cexpr(line);
-      output(SEP+R4); output(lblItoA/256); output(lblItoA%256);
-      if (useAsm) {
-        sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Display integer value");
-        sprintf(buffer,"          dw    itoa"); writeAsm(buffer,"");
-        }
+      Asm("          sep   scall                   ; Display integer value");
+      Asm("          dw    itoa");
       last = ' ';
       }
     }
   if (last != ';' && last != ',') {
-    output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
-    output(10); output(13); output(0);
-    if (useAsm) {
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Display cr/lf");
-      sprintf(buffer,"          dw    f_inmsg"); writeAsm(buffer,"");
-      sprintf(buffer,"          db    10,13,0"); writeAsm(buffer,"");
-      }
-
+    Asm("          sep   scall                   ; Display cr/lf");
+    Asm("          dw    f_inmsg");
+    Asm("          db    10,13,0");
     }
   return line;
   }

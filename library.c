@@ -1564,7 +1564,7 @@ void library() {
     Asm("          ldi  ret.0");
     Asm("          plo  r5");
     }
-  t1 = variableRAM + iBufferSize + (2 * numberOfVariables);
+  t1 = variableRAM + (2 * numberOfVariables);
   t2 = getVariable("FREE_");
   Asm("          ldi  [free_].1");
   Asm("          phi  rf");

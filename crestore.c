@@ -39,8 +39,11 @@ char* crestore(char* line) {
     }
   line = trim(line);
   addr = getVariable("DATA_");
-  output(LDI); output(addr/256); output(PHI+RF);
-  output(LDI); output(addr%256); output(PLO+RF);
+  Asm("          ldi   [DATA_].1               ; Get address of DATA pointer");
+  Asm("          phi   rf");
+  Asm("          ldi   [DATA_].0");
+  Asm("          plo   rf");
+
   addr = dataAddress + (pos * 2);
   output(LDI); output(addr/256); output(STR+RF); output(INC+RF);
   output(LDI); output(addr%256); output(STR+RF);

@@ -3,6 +3,7 @@
 int pass(char* filename) {
   int   i;
   word  target;
+  char  tmp[16];
   source = fopen(filename,"r");
   if (source == NULL) {
     printf("Could not open %s\n",filename);
@@ -42,16 +43,14 @@ int pass(char* filename) {
     Asm("            sep  sret");
     }
   else if (exitAddress != 0xffff) {
-    output(LBR); output(exitAddress / 256); output(exitAddress % 256);
+    sprintf(buffer,"          lbr   0%xh                    ; Jump to exit address",exitAddress); Asm(buffer);
     }
   else if (useElfos) {
-    target = 0x303;
-    output(LBR); output(target / 256); output(target % 256);
+    Asm("          lbr   0303h                   ; Jump to exit address");
     }
   else {
-    target = address;
-    output(IDL);
-    output(LBR); output(target / 256); output(target % 256);
+    Asm("          idl                           ; Idle the CPU");
+    Asm("          lbr   $-1");
     }
   if (passNumber == 2 && showCompiler) printf("\n");
   if (useData) {
@@ -59,10 +58,21 @@ int pass(char* filename) {
       dataAddress = address;
       }
     if (showCompiler && passNumber == 2) printf("%04x:",address);
+    strcpy(buffer, "data:     dw    ");
     for (i=0; i<numData; i++) {
-      output(data[i]/256); output(data[i]%256);
+      sprintf(tmp,"%d",data[i]);
+      if (strlen(buffer) > 16) strcat(buffer,",");
+      strcat(buffer,tmp);
+      if (strlen(buffer) > 60) {
+        Asm(buffer);
+        strcpy(buffer, "          dw    ");
+        }
       }
+    if (strlen(buffer) > 16) Asm(buffer);
     if (passNumber == 2 && showCompiler) printf("\n");
+    }
+  if (useAtoI) {
+    Asm("keybuf:     db   0");
     }
   }
 

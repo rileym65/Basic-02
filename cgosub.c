@@ -13,11 +13,8 @@ char* cgosub(char* line) {
     showError("Line number not found");
     exit(1);
     }
-  output(SEP+R4); output(target / 256); output(target % 256);
-  if (useAsm) {
-    sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Call subroutine");
-    sprintf(buffer,"          dw    l%d",lineno); writeAsm(buffer,"");
-    }
+  Asm("          sep   scall                   ; Call subroutine");
+  sprintf(buffer,"          dw    <%d>",lineno); Asm(buffer);
   return line;
   }
 

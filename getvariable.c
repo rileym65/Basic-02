@@ -17,7 +17,7 @@ word getVariable(char* name) {
     }
   variableNames[numberOfVariables-1] = (char*)malloc(strlen(name)+1);
   strcpy(variableNames[numberOfVariables-1], name);
-  variableAddresses[numberOfVariables-1] = variableRAM + iBufferSize + (2 * (numberOfVariables - 1));
+  variableAddresses[numberOfVariables-1] = variableRAM + (2 * (numberOfVariables - 1));
   return variableAddresses[numberOfVariables-1];
   }
 

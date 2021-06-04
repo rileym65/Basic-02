@@ -12,56 +12,34 @@ char* clet(char* line) {
   if (match(line,"A=#")) {
     addr = getVariable(matches[0]);
     value = atoi(matches[2]);
-    output(LDI); output(addr/256);
-    output(PHI+RF);
-    output(LDI); output(addr%256);
-    output(PLO+RF);
-    output(LDI); output(value/256);
-    output(STR+RF); output(INC+RF);
-    output(LDI); output(value%256);
-    output(STR+RF);
-    if (useAsm) {
-      sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Get variable address");
-      sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %d",value/256); writeAsm(buffer,"Write value to variable");
-      sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %d",value%256); writeAsm(buffer,"");
-      sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-      }
+    sprintf(buffer,"          ldi   [%s].1                  ; Get variable address", matches[0]); Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   [%s].0", matches[0]); Asm(buffer);
+    Asm("          plo   rf");
+    sprintf(buffer,"          ldi   %d                      ; Write value to variable", value/256); Asm(buffer);
+    Asm("          str   rf");
+    Asm("          inc   rf");
+    sprintf(buffer,"          ldi   %d", value%256); Asm(buffer);
+    Asm("          str   rf");
     while (*line != 0 && *line != ':') line++;
     return line;
     }
   if (match(line,"A=A")) {
     addr = getVariable(matches[0]);
-    output(LDI); output(addr/256);
-    output(PHI+RF);
-    output(LDI); output(addr%256);
-    output(PLO+RF);
+    sprintf(buffer,"          ldi   [%s].1                  ; Get first variable address", matches[0]); Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   [%s].0", matches[0]); Asm(buffer);
+    Asm("          plo   rf");
     addr = getVariable(matches[2]);
-    output(LDI); output(addr/256);
-    output(PHI+RD);
-    output(LDI); output(addr%256);
-    output(PLO+RD);
-    output(LDA+RD); output(STR+RF); output(INC+RF);
-    output(LDN+RD); output(STR+RF);
-    if (useAsm) {
-      sprintf(buffer,"          ldi   %s.1",matches[0]); writeAsm(buffer,"Get first variable address");
-      sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %s.0",matches[0]); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %s.1",matches[2]); writeAsm(buffer,"Get second variable address");
-      sprintf(buffer,"          phi   rd"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %s.0",matches[2]); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rd"); writeAsm(buffer,"");
-      sprintf(buffer,"          lda   rd"); writeAsm(buffer,"Transfer value");
-      sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldn   rd"); writeAsm(buffer,"");
-      sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-      }
+    sprintf(buffer,"          ldi   [%s].1                  ; Get second variable address", matches[2]); Asm(buffer);
+    Asm("          phi   rd");
+    sprintf(buffer,"          ldi   [%s].0", matches[2]); Asm(buffer);
+    Asm("          plo   rd");
+    Asm("          lda   rd                      ; Transfer value");
+    Asm("          str   rf");
+    Asm("          inc   rf");
+    Asm("          ldn   rd                      ; Transfer value");
+    Asm("          str   rf");
     while (*line != 0 && *line != ':') line++;
     return line;
     }
@@ -69,64 +47,40 @@ char* clet(char* line) {
     if (strcasecmp(matches[0], matches[2]) == 0) {
       addr = getVariable(matches[0]) + 1;
       value = atoi(matches[4]);
-      output(LDI); output(addr/256);
-      output(PHI+RF);
-      output(LDI); output(addr%256);
-      output(PLO+RF);
-      output(LDN+RF); output(ADI); output(value%256);
-      output(STR+RF); output(DEC+RF);
-      output(LDN+RF); output(ADCI); output(value/256);
-      output(STR+RF);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   (%s+1).1",matches[0]); writeAsm(buffer,"Get variable address +1");
-        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   (%s+1).0",matches[0]); writeAsm(buffer,"");
-        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldn   rf"); writeAsm(buffer,"Add in constant value");
-        sprintf(buffer,"          adi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          dec   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldn   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          adci  %d",value/256); writeAsm(buffer,"");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   [%s]+1.1                ; Get variable address +1", matches[0]); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s]+1.0", matches[0]); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          ldn   rf");
+      sprintf(buffer,"          adi   %d                      ; Add in constant value", value%256); Asm(buffer);
+      Asm("          str   rf");
+      Asm("          dec   rf");
+      Asm("          ldn   rf");
+      sprintf(buffer,"          adci  %d", value/256); Asm(buffer);
+      Asm("          str   rf");
       while (*line != 0 && *line != ':') line++;
       return line;
       }
     else {
       addr = getVariable(matches[0]) + 1;
       value = atoi(matches[4]);
-      output(LDI); output(addr/256);
-      output(PHI+RF);
-      output(LDI); output(addr%256);
-      output(PLO+RF);
+      sprintf(buffer,"          ldi   [%s]+1.1                  ; Get first variable address +1", matches[0]); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s]+1.0", matches[0]); Asm(buffer);
+      Asm("          plo   rf");
       addr = getVariable(matches[2]) + 1;
-      output(LDI); output(addr/256);
-      output(PHI+RD);
-      output(LDI); output(addr%256);
-      output(PLO+RD);
-      output(LDN+RD); output(ADI); output(value%256);
-      output(STR+RF); output(DEC+RF); output(DEC+RD);
-      output(LDN+RD); output(ADCI); output(value/256);
-      output(STR+RF);
-      if (useAsm) {
-        sprintf(buffer,"          ldi   (%s+1).1",matches[0]); writeAsm(buffer,"Get first variable address +1");
-        sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   (%s+1).0",matches[0]); writeAsm(buffer,"");
-        sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   (%s+1).1",matches[2]); writeAsm(buffer,"Get second variable address +1");
-        sprintf(buffer,"          phi   rd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldi   (%s+1).0",matches[2]); writeAsm(buffer,"");
-        sprintf(buffer,"          plo   rd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldn   rd"); writeAsm(buffer, "Add constant and second variable");
-        sprintf(buffer,"          adi   %d",value%256); writeAsm(buffer,"");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"and store into first variable");
-        sprintf(buffer,"          dec   rf"); writeAsm(buffer,"");
-        sprintf(buffer,"          dec   rd"); writeAsm(buffer,"");
-        sprintf(buffer,"          ldn   rd"); writeAsm(buffer, "");
-        sprintf(buffer,"          adci  %d",value/256); writeAsm(buffer,"");
-        sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-        }
+      sprintf(buffer,"          ldi   [%s]+1.1                  ; Get second variable address +1", matches[2]); Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   [%s]+1.0", matches[2]); Asm(buffer);
+      Asm("          plo   rd");
+      Asm("          ldn   rd                      ; Add constant and second variable");
+      sprintf(buffer,"          adi   %d                      ; Add in constant value", value%256); Asm(buffer);
+      Asm("          str   rf                      ; Add store into first variable");
+      Asm("          dec   rf");
+      Asm("          dec   rd");
+      Asm("          ldn   rd");
+      sprintf(buffer,"          adci  %d", value/256); Asm(buffer);
+      Asm("          str   rf");
       while (*line != 0 && *line != ':') line++;
       return line;
       }
@@ -135,33 +89,40 @@ char* clet(char* line) {
     if (strcasecmp(matches[0], matches[2]) == 0) {
       addr = getVariable(matches[0]) + 1;
       value = atoi(matches[4]);
-      output(LDI); output(addr/256);
-      output(PHI+RF);
-      output(LDI); output(addr%256);
-      output(PLO+RF);
-      output(LDN+RF); output(SMI); output(value%256);
-      output(STR+RF); output(DEC+RF);
-      output(LDN+RF); output(SMBI); output(value/256);
-      output(STR+RF);
+      sprintf(buffer,"          ldi   [%s]+1.1                ; Get variable address +1", matches[0]); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s]+1.0", matches[0]); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          ldn   rf");
+      sprintf(buffer,"          smi   %d                      ; Subtract constant value", value%256); Asm(buffer);
+      Asm("          str   rf");
+      Asm("          dec   rf");
+      Asm("          ldn   rf");
+      sprintf(buffer,"          smbi  %d", value/256); Asm(buffer);
+      Asm("          str   rf");
       while (*line != 0 && *line != ':') line++;
       return line;
       }
     else {
       addr = getVariable(matches[0]) + 1;
       value = atoi(matches[4]);
-      output(LDI); output(addr/256);
-      output(PHI+RF);
-      output(LDI); output(addr%256);
-      output(PLO+RF);
+      sprintf(buffer,"          ldi   [%s]+1.1                  ; Get first variable address +1", matches[0]); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s]+1.0", matches[0]); Asm(buffer);
+      Asm("          plo   rf");
       addr = getVariable(matches[2]) + 1;
-      output(LDI); output(addr/256);
-      output(PHI+RD);
-      output(LDI); output(addr%256);
-      output(PLO+RD);
-      output(LDN+RD); output(SMI); output(value%256);
-      output(STR+RF); output(DEC+RF); output(DEC+RD);
-      output(LDN+RD); output(SMBI); output(value/256);
-      output(STR+RF);
+      sprintf(buffer,"          ldi   [%s]+1.1                  ; Get second variable address +1", matches[2]); Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   [%s]+1.0", matches[2]); Asm(buffer);
+      Asm("          plo   rd");
+      Asm("          ldn   rd                      ; Add constant and second variable");
+      sprintf(buffer,"          smi   %d                      ; Subtract constant value", value%256); Asm(buffer);
+      Asm("          str   rf                      ; Add store into first variable");
+      Asm("          dec   rf");
+      Asm("          dec   rd");
+      Asm("          ldn   rd");
+      sprintf(buffer,"          smbi  %d", value/256); Asm(buffer);
+      Asm("          str   rf");
       while (*line != 0 && *line != ':') line++;
       return line;
       }
@@ -188,29 +149,16 @@ char* clet(char* line) {
   line = trim(line);
   line = cexpr(line);
   addr = getVariable(varname);
-  output(LDI); output(addr/256);
-  output(PHI+RF);
-  output(LDI); output(addr%256);
-  output(PLO+RF);
-  output(GHI+RC);
-  output(STR+RF);
-  output(INC+RF);
-  output(GLO+RC);
-  output(STR+RF);
-  if (useAsm) {
-    sprintf(buffer,"          ldi   %s.1",varname); writeAsm(buffer,"Get destination variable address");
-    sprintf(buffer,"          phi   rf"); writeAsm(buffer, "");
-    sprintf(buffer,"          ldi   %s.0",varname); writeAsm(buffer,"");
-    sprintf(buffer,"          plo   rf"); writeAsm(buffer, "");
-    sprintf(buffer,"          ghi   rc"); writeAsm(buffer, "Write expr result to variable");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer, "");
-    sprintf(buffer,"          inc   rf"); writeAsm(buffer, "");
-    sprintf(buffer,"          glo   rc"); writeAsm(buffer, "");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer, "");
-    }
-
+  sprintf(buffer,"          ldi   [%s].1                  ; Get destination variable address", varname); Asm(buffer);
+  Asm("          phi   rf");
+  sprintf(buffer,"          ldi   [%s].0", varname); Asm(buffer);
+  Asm("          plo   rf");
+  Asm("          ghi   rc                      ; Write epxressin result to variable");
+  Asm("          str   rf");
+  Asm("          inc   rf");
+  Asm("          glo   rc");
+  Asm("          str   rf");
   while (*line != 0) line++;
-
   return line;
   }
 

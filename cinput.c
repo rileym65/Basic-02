@@ -15,25 +15,16 @@ char* cinput(char* line) {
     return line;
     }
   if (*line = '"') {
-    output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
-    if (useAsm) {
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Display message");
-      sprintf(buffer,"          dw    f_inmsg"); writeAsm(buffer,"");
-      strcpy(buffer,"          db    '");
-      }
+    Asm("          sep   scall                   ; Display prompt");
+    Asm("          dw    f_inmsg");
+    strcpy(buffer,"          db    '");
     line++;
     while (*line != '"' && *line != 0) {
-      if (useAsm) {
-        buffer[strlen(buffer)+1] = 0;
-        buffer[strlen(buffer)] = *line;
-        }
-      output(*line++);
+      buffer[strlen(buffer)+1] = 0;
+      buffer[strlen(buffer)] = *line++;
       }
+    strcat(buffer,"',0"); Asm(buffer);
     if (*line == '"') line++;
-    output(0);
-    if (useAsm) {
-      strcat(buffer,"',0"); writeAsm(buffer,"");
-      }
     line = trim(line);
     if (*line != ',') {
       showError("Syntax error");
@@ -60,45 +51,30 @@ char* cinput(char* line) {
       exit(1);
       }
     addr = getVariable(name);
-    output(LDI); output(variableRAM/256); output(PHI+RF);
-    output(LDI); output(variableRAM%256); output(PLO+RF);
-    output(SEP+R4); output(lblF_input/256); output(lblF_input%256);
-    output(LDI); output(variableRAM/256); output(PHI+RF);
-    output(LDI); output(variableRAM%256); output(PLO+RF);
-    output(SEP+R4); output(lblAtoI/256); output(lblAtoI%256);
-    output(LDI); output(addr/256); output(PHI+RF);
-    output(LDI); output(addr%256); output(PLO+RF);
-    output(GHI+RC); output(STR+RF); output(INC+RF);
-    output(GLO+RC); output(STR+RF);
-    output(SEP+R4); output(lblF_inmsg/256); output(lblF_inmsg%256);
-    output(10); output(13); output(0);
-    if (useAsm) {
-      sprintf(buffer,"          ldi   keybuf.1"); writeAsm(buffer,"Point to keyboard buffer");
-      sprintf(buffer,"          phi   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          ldi   keybuf.0"); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Get input from user");
-      sprintf(buffer,"          dw    f_input"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   keybuf.1"); writeAsm(buffer,"Point to keyboard buffer");
-      sprintf(buffer,"          phi   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          ldi   keybuf.0"); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Convert ASCII to integer");
-      sprintf(buffer,"          dw    atoi"); writeAsm(buffer,"");
-      sprintf(buffer,"          ldi   %s.1",name); writeAsm(buffer,"Point to destination variable");
-      sprintf(buffer,"          phi   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          ldi   %s.0",name); writeAsm(buffer,"");
-      sprintf(buffer,"          plo   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          ghi   rc"); writeAsm(buffer,"Store value into variable");
-      sprintf(buffer,"          str   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          inc   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          glo   rc"); writeAsm(buffer,"");
-      sprintf(buffer,"          str   rf"); writeAsm(buffer, "");
-      sprintf(buffer,"          sep   scall"); writeAsm(buffer,"Display cr/lf");
-      sprintf(buffer,"          dw    f_inmsg"); writeAsm(buffer,"");
-      sprintf(buffer,"          db    10,13,0"); writeAsm(buffer,"");
-      }
-
+    Asm("          ldi   [keybuf].1              ; Point to keyboard buffer");
+    Asm("          phi   rf");
+    Asm("          ldi   [keybuf].0");
+    Asm("          plo   rf");
+    Asm("          sep   scall                   ; Get input from user");
+    Asm("          dw    f_input");
+    Asm("          ldi   [keybuf].1              ; Point to keyboard buffer");
+    Asm("          phi   rf");
+    Asm("          ldi   [keybuf].0");
+    Asm("          plo   rf");
+    Asm("          sep   scall                   ; Convert ASCII to integer");
+    Asm("          dw    atoi");
+    sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+    Asm("          plo   rf");
+    Asm("          ghi   rc                      ; Store value into variable");
+    Asm("          str   rf");
+    Asm("          inc   rf");
+    Asm("          glo   rc");
+    Asm("          str   rf");
+    Asm("          sep   scall                   ; Display cr/lf");
+    Asm("          dw    f_inmsg");
+    Asm("          db    10,13,0");
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
