@@ -1586,8 +1586,8 @@ void library() {
     a = getVariable("HEAP_");
     output(LDI); output(a/256); output(PHI+RF);
     output(LDI); output(a%256); output(PLO+RF);
-    output(LDI); output((estack-256)/256); output(STR+RF); output(INC+RF);
-    output(LDI); output((estack-256)%256); output(STR+RF);
+    output(LDI); output(heap/256); output(STR+RF); output(INC+RF);
+    output(LDI); output(heap%256); output(STR+RF);
     }
   if ((useItoA || useAtoI) && useElfos == 0) {
     Asm("          sep  scall");

@@ -119,6 +119,7 @@ int main(int argc, char** argv, char** envp) {
   showVariables = 0;
   stack = 0;
   estack = 0;
+  heap = 0;
   useSelfTerm = 0;
   useElfos = 0;
   useData = 0;
@@ -178,6 +179,7 @@ int main(int argc, char** argv, char** envp) {
   if (programStart >= romStart && programStart <= romEnd) compMode = 'O';
   if (stack == 0) stack = ramEnd;
   if (estack == 0) estack = stack - 256;
+  if (heap == 0) heap = estack - 256;
   if (iBufferSize == 0) iBufferSize = 128;
   if (stack < ramStart || stack > ramEnd) {
     printf("Error: Stack is outside of RAM\n");
@@ -249,6 +251,8 @@ int main(int argc, char** argv, char** envp) {
   printf("Rom           : %04x-%04x\n",romStart,romEnd);
   printf("Stack         : %04x\n",stack);
   printf("Expr. Stack   : %04x\n",estack);
+  if (useHeap)
+    printf("Heap          : %04x\n",heap);
   printf("\n");
   printf("Include in runtime:\n");
   if (lblScall != 0)  printf("  Scall         : %04x\n",lblScall);

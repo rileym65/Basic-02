@@ -195,6 +195,7 @@ void processOption(char* option) {
     if (strncmp(option,"-rom=",5) == 0) processROM(option+5);
     if (strncmp(option,"-stack=",7) == 0) stack=getHex(option+7);
     if (strncmp(option,"-estack=",8) == 0) estack=getHex(option+8);
+    if (strncmp(option,"-heap=",6) == 0) heap=getHex(option+6);
     if (strncmp(option,"-keybuf=",8) == 0) iBufferSize=getHex(option+8);
   }
 

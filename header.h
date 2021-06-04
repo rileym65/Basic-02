@@ -138,6 +138,7 @@ LINK word   numDataLines;
 LINK word   iBufferSize;
 LINK word   stack;
 LINK word   estack;
+LINK word   heap;
 LINK word   exitAddress;
 LINK word   highest;
 LINK word   lastLineNumber;

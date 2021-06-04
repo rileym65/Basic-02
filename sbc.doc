@@ -121,6 +121,7 @@ Switches:
 -vars=hex       - Start of variable table
 -stack=hex      - set address for top of stack
 -estack=hex     - set address for top of expression stack 
+-heap=hex       - set address for top of heap
 -keybuf=hex     - size of key buffer
 -term=bios      - use BIOS terminal i/o (default)
      =self      - use internal serial i/o
