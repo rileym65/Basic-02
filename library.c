@@ -1209,10 +1209,27 @@ void library() {
 
 
   if (passNumber == 1) lblStart = address;
-  Asm("start:      ldi  [stack].1");
-  Asm("            phi  r2");
-  Asm("            ldi  [stack].0");
-  Asm("            plo  r2");
+  if (useStg) {
+    Asm("start:      ghi  r6");
+    Asm("            stxd");
+    Asm("            glo  r6");
+    Asm("            stxd");
+    Asm("            ldi  [STG_].1");
+    Asm("            phi  rf");
+    Asm("            ldi  [STG_].0");
+    Asm("            plo  rf");
+    Asm("            ghi  r2");
+    Asm("            str  rf");
+    Asm("            inc  rf");
+    Asm("            glo  r2");
+    Asm("            str  rf");
+    }
+  else {
+    Asm("start:      ldi  [stack].1");
+    Asm("            phi  r2");
+    Asm("            ldi  [stack].0");
+    Asm("            plo  r2");
+    }
   Asm("            ldi  [estack].1");
   Asm("            phi  r7");
   Asm("            ldi  [estack].0");
