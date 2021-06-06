@@ -30,6 +30,22 @@ int prepass(char* filename) {
   useNext = 0;
   useData = 0;
   useHeap = 0;
+  useAdd32 = 0;
+  useAnd32 = 0;
+  useAtoI32 = 0;
+  useCmp32 = 0;
+  useDiv32 = 0;
+  useICmp32 = 0;
+  useItoA32 = 0;
+  useMul32 = 0;
+  useNeg32 = 0;
+  useNull32 = 0;
+  useOr32 = 0;
+  useShl32 = 0;
+  useShr32 = 0;
+  useSub32 = 0;
+  useXor32 = 0;
+  useZero32 = 0;
 
   lblAtoI = 0;
   lblAbs = 0;

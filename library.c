@@ -62,16 +62,16 @@ void library() {
 
   if (useEf) {
     if (passNumber == 1) lblEf = address;
-    Asm(" readef:    ldi     0");
+    Asm("readef:     ldi     0");
     Asm("            bn1     ef1");
     Asm("            ori     1");
-    Asm(" ef1:       bn2     ef2");
+    Asm("ef1:        bn2     ef2");
     Asm("            ori     2");
-    Asm(" ef2:       bn3     ef3");
+    Asm("ef2:        bn3     ef3");
     Asm("            ori     4");
-    Asm(" ef3:       bn4     ef4");
+    Asm("ef3:        bn4     ef4");
     Asm("            ori     8");
-    Asm(" ef4:       sep     sret");
+    Asm("ef4:        sep     sret");
     }
 
   if (useSelfTerm) {
@@ -1522,10 +1522,933 @@ void library() {
     Asm("           dw      f_inmsg");
     Asm("           db      'Out of memory: ',0");
     Asm("           lbr     $                   ; show line of error and exit");
+    }
 
+  if (useAdd32) {
+    /* ************************************************ */
+    /* ***** 32-bit Add.    M[RF]=M[RF]+M[RD]     ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("add32i:  sex      rd                ; point x to second number");
+    Asm("         ldn      rf                ; get lsb");
+    Asm("         add                        ; add second lsb of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 2nd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get second byte");
+    Asm("         adc                        ; add second byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 3rd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get third byte");
+    Asm("         adc                        ; add third byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to msb");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get msb byte");
+    Asm("         adc                        ; add msb byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         sex      r2                ; restore stack");
+    Asm("         dec      rf                ; restore registers to original values");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useSub32) {
+    /* ************************************************ */
+    /* ***** 32-bit subtract.  M[RF]=M[RF]-M[RD]  ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("sub32i:  sex      rd                ; point x to second number");
+    Asm("         ldn      rf                ; get lsb");
+    Asm("         sm                         ; subtract second lsb of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 2nd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get second byte");
+    Asm("         smb                        ; subtract second byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 3rd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get third byte");
+    Asm("         smb                        ; subtract third byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to msb");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get msb byte");
+    Asm("         smb                        ; subtract msb byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         sex      r2                ; restore stack");
+    Asm("         dec      rf                ; restore registers to original values");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useMul32) {
+    /* ************************************************ */
+    /* ***** 32-bit multiply. M[RF]=M[RF]*M[RD]   ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ***** In routine:                          ***** */
+    /* *****    R9 - points to first number       ***** */
+    /* *****    RD - points to second number      ***** */
+    /* *****    RF - points to answer             ***** */
+    /* ************************************************ */
+    Asm("mul32:   ldi      0                 ; need to zero answer");
+    Asm("         stxd");
+    Asm("         stxd");
+    Asm("         stxd");
+    Asm("         stxd");
+    Asm("         glo      rf                ; r9 will point to first number");
+    Asm("         plo      r9");
+    Asm("         ghi      rf");
+    Asm("         phi      r9");
+    Asm("         glo      r2                ; rf will point to where the answer is");
+    Asm("         plo      rf");
+    Asm("         ghi      r2");
+    Asm("         phi      rf");
+    Asm("         inc      rf                ; point to LSB of answer");
+    Asm("scmul2:  glo      rd                ; need second number");
+    Asm("         plo      af");
+    Asm("         ghi      rd");
+    Asm("         phi      af");
+    Asm("         sep      scall             ; check for zero");
+    Asm("         dw       zero32");
+    Asm("         lbnf     scmul4            ; jump if number was not zero");
+    Asm("         inc      r2                ; now pointing at lsb of answer");
+    Asm("         lda      r2                ; get number from stack");
+    Asm("         str      r9                ; store into destination");
+    Asm("         inc      r9                ; point to 2nd byte");
+    Asm("         lda      r2                ; get number from stack");
+    Asm("         str      r9                ; store into destination");
+    Asm("         inc      r9                ; point to 3rd byte");
+    Asm("         lda      r2                ; get number from stack");
+    Asm("         str      r9                ; store into destination");
+    Asm("         inc      r9                ; point to msb");
+    Asm("         ldn      r2                ; get number from stack");
+    Asm("         str      r9                ; store into destination");
+    Asm("         sep      sret              ; return to caller");
+    Asm("scmul4:  ldn      rd                ; get lsb of second number");
+    Asm("         shr                        ; shift low bit into df");
+    Asm("         lbnf     scmulno           ; no add needed");
+    Asm("         ghi      rd                ; save position of second number");
+    Asm("         stxd");
+    Asm("         glo      rd");
+    Asm("         stxd");
+    Asm("         glo      r9                ; rd needs to be first number");
+    Asm("         plo      rd");
+    Asm("         ghi      r9");
+    Asm("         phi      rd");
+    Asm("         sep      scall             ; call add routine");
+    Asm("         dw       add32i");
+    Asm("         irx                        ; recover rd");
+    Asm("         ldxa");
+    Asm("         plo      rd");
+    Asm("         ldx");
+    Asm("         phi      rd");
+    Asm("scmulno: glo      r9                ; point to first number");
+    Asm("         plo      ra");
+    Asm("         ghi      r9");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; shift left");
+    Asm("         dw       shl32");
+    Asm("         glo      rd                ; now need pointer to second number");
+    Asm("         plo      ra");
+    Asm("         ghi      rd");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; shift right");
+    Asm("         dw       shr32");
+    Asm("         lbr      scmul2            ; loop until done");
+    }
+
+  if (useDiv32) {
+    /* ************************************************ */
+    /* ***** 32-bit division. M[RF]=M[RF]/M[RD]   ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ***** In routine:                          ***** */
+    /* *****    RF=a                              ***** */
+    /* *****    RD=b                              ***** */
+    /* *****    RC=result                         ***** */
+    /* *****    RB=shift                          ***** */
+    /* ************************************************ */
+    Asm("div32:   ldi      0                 ; set sign flag as positive");
+    Asm("         str      r2                ; place on the stack");
+    Asm("         inc      rf                ; point to msb of first number");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         ldn      rf                ; retrieve it");
+    Asm("         dec      rf                ; restore position");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         ani      080h              ; is number negative");
+    Asm("         lbz      div32_1           ; jump if not");
+    Asm("         ldi      1                 ; set sign flag");
+    Asm("         xor");
+    Asm("         stxd                       ; save flag");
+    Asm("         glo      rf                ; 2s compliment number");
+    Asm("         plo      ra");
+    Asm("         ghi      rf");
+    Asm("         phi      ra");
+    Asm("         sep      scall");
+    Asm("         dw       neg32");
+    Asm("         irx                        ; point back to sign flag");
+    Asm("div32_1: inc      rd                ; point to msb of second number");
+    Asm("         inc      rd");
+    Asm("         inc      rd");
+    Asm("         ldn      rd                ; retrieve it");
+    Asm("         dec      rd                ; restore position");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         ani      080h              ; is number negative");
+    Asm("         lbz      div32_2           ; jump if not");
+    Asm("         ldi      1                 ; adjust sign flag");
+    Asm("         xor");
+    Asm("         stxd                       ; save sign flag");
+    Asm("         glo      rd                ; 2s compliment second number");
+    Asm("         plo      ra");
+    Asm("         ghi      rd");
+    Asm("         phi      ra");
+    Asm("         sep      scall");
+    Asm("         dw       neg32");
+    Asm("         irx");
+    Asm("div32_2: dec      r2                ; preserve sign flag");
+    Asm("         ldi      0                 ; zero answer on stack");
+    Asm("         stxd");
+    Asm("         stxd");
+    Asm("         stxd");
+    Asm("         stxd");
+    Asm("         glo      r2                ; set RC here");
+    Asm("         plo      rc");
+    Asm("         ghi      r2");
+    Asm("         phi      rc");
+    Asm("         inc      rc                ; point rc to lsb of answer");
+    Asm("         ldi      1                 ; set shift to 1");
+    Asm("         plo      rb");
+    Asm("scdiv1:  sep      scall             ; compare a to b");
+    Asm("         dw       icmp32");
+    Asm("         lbnf     scdiv4            ; jump if b>=a");
+    Asm("         glo      rd                ; need to shift b");
+    Asm("         plo      ra");
+    Asm("         ghi      rd");
+    Asm("         phi      ra");
+    Asm("         sep      scall");
+    Asm("         dw       shl32");
+    Asm("         inc      rb                ; increment shift");
+    Asm("         lbr      scdiv1            ; loop until b>=a");
+    Asm("scdiv4:  glo      rf                ; point to a");
+    Asm("         plo      ra");
+    Asm("         ghi      rf");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; is a zero");
+    Asm("         dw       zero32");
+    Asm("         lbdf     scdivd1           ; jump if it was zero");
+    Asm("         glo      rd                ; point to b");
+    Asm("         plo      ra");
+    Asm("         ghi      rd");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; is b zero");
+    Asm("         dw       zero32");
+    Asm("         lbdf     scdivd1           ; jump if so");
+    Asm("         glo      rc                ; point to result");
+    Asm("         plo      ra");
+    Asm("         ghi      rc");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; need to shift result left");
+    Asm("         dw       shl32");
+    Asm("         sep      scall             ; compare a to b");
+    Asm("         dw       cmp32");
+    Asm("         lbdf     scdiv6            ; jump if a < b");
+    Asm("         ldn      rc                ; get LSB of result");
+    Asm("         ori      1                 ; set low bit");
+    Asm("         str      rc                ; and but it back");
+    Asm("         sep      scall             ; subtrcct a from b");
+    Asm("         dw       sub32");
+    Asm("scdiv6:  ldn      rd                ; get lsb of b");
+    Asm("         shr                        ; see if low bit is set");
+    Asm("         lbnf     scdiv5            ; jump if not");
+    Asm("         dec      rb                ; mark final shift");
+    Asm("         lbr      scdivd1           ; and then done");
+    Asm("scdiv5:  glo      rd                ; point to b");
+    Asm("         plo      ra");
+    Asm("         ghi      rd");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; need to shift b right");
+    Asm("         dw       shr32");
+    Asm("         dec      rb                ; decrement shift");
+    Asm("         lbr      scdiv4            ; loop back until done");
+    Asm("scdivd1: glo      rb                ; get shift");
+    Asm("         shl                        ; shift sign into df");
+    Asm("         lbdf     scdivd2           ; jump if so");
+    Asm("scdivd3: glo      rb                ; get shift");
+    Asm("         lbz      scdivdn           ; jump if zero");
+    Asm("         glo      rc                ; point to result");
+    Asm("         plo      ra");
+    Asm("         ghi      rc");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; shift it left");
+    Asm("         dw       shl32");
+    Asm("         dec      rb                ; decrement shift");
+    Asm("         lbr      scdivd3           ; loop back");
+    Asm("scdivd2: glo      rb                ; get shift");
+    Asm("         lbz      scdivdn           ; jump if zero");
+    Asm("         glo      rc                ; point to result");
+    Asm("         plo      ra");
+    Asm("         ghi      rc");
+    Asm("         phi      ra");
+    Asm("         sep      scall             ; shift it right");
+    Asm("         dw       shr32");
+    Asm("         inc      rb                ; increment shift");
+    Asm("         lbr      scdivd2");
+    Asm("scdivdn: ldi      4                 ; 4 bytes to trcnsfer");
+    Asm("         plo      r9");
+    Asm("scdivd5: lda      rc                ; get result byte");
+    Asm("         str      rf                ; store into answer");
+    Asm("         inc      rf");
+    Asm("         dec      r9                ; decrement count");
+    Asm("         glo      r9                ; see if done");
+    Asm("         lbnz     scdivd5           ; jump if not");
+    Asm("         dec      rf                ; recover answer");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         glo      rc                ; need to clean up the stack");
+    Asm("         plo      r2");
+    Asm("         ghi      rc");
+    Asm("         phi      r2");
+    Asm("         ldn      r2                ; retrieve sign");
+    Asm("         shr                        ; shift into df");
+    Asm("         lbnf     scdivrt           ; jump if signs were the same");
+    Asm("         glo      rf                ; otherwise negate number");
+    Asm("         plo      ra");
+    Asm("         ghi      rf");
+    Asm("         phi      ra");
+    Asm("         sep      scall");
+    Asm("         dw       neg32");
+    Asm("scdivrt: sep      sret              ; return to caller");
+    }
+
+  if (useCmp32) {
+    /* ************************************************ */
+    /* ***** 32-bit cmp.  M[RF]-M[RD]             ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ***** Returns: D=0 if M[RF]=M[RD]          ***** */
+    /* *****          DF=1 if M[RF]<M[RD]         ***** */
+    /* ************************************************ */
+    Asm("cmp32:   lda      rd                ; get lsb from second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         lda      rf                ; get lsb from first number");
+    Asm("         sm                         ; subtract");
+    Asm("         plo      re                ; save as zero test");
+    Asm("         lda      rd                ; get 2nd byte of second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         lda      rf                ; get 2nd byte of first number");
+    Asm("         smb                        ; perform subtraction");
+    Asm("         str      r2                ; store for combining with zero test");
+    Asm("         glo      re                ; get zero test");
+    Asm("         or                         ; or last result");
+    Asm("         plo      re                ; and put back");
+    Asm("         lda      rd                ; get 3rd byte of second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         lda      rf                ; get 3rd byte of first number");
+    Asm("         smb                        ; perform subtraction");
+    Asm("         str      r2                ; store for combining with zero test");
+    Asm("         glo      re                ; get zero test");
+    Asm("         or                         ; or last result");
+    Asm("         plo      re                ; and put back");
+    Asm("         ldn      rd                ; get msb of second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         ldn      rf                ; get msb of first number");
+    Asm("         smb                        ; perform subtraction");
+    Asm("         str      r2                ; store for combining with zero test");
+    Asm("         shl                        ; shift sign bit into df");
+    Asm("         glo      re                ; get zero test");
+    Asm("         or                         ; or last result");
+    Asm("         dec      rf                ; restore registers");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useICmp32) {
+    /* ************************************************ */
+    /* ***** 32-bit cmp.  M[RD]-M[RF]             ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ***** Returns: D=0 if M[RD]=M[RF]          ***** */
+    /* *****          DF=1 if M[RD]<M[RF]         ***** */
+    /* ************************************************ */
+    Asm("icmp32:  lda      rd                ; get lsb from second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         lda      rf                ; get lsb from first number");
+    Asm("         sd                         ; subtract");
+    Asm("         plo      re                ; save as zero test");
+    Asm("         lda      rd                ; get 2nd byte of second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         lda      rf                ; get 2nd byte of first number");
+    Asm("         sdb                        ; perform subtraction");
+    Asm("         str      r2                ; store for combining with zero test");
+    Asm("         glo      re                ; get zero test");
+    Asm("         or                         ; or last result");
+    Asm("         plo      re                ; and put back");
+    Asm("         lda      rd                ; get 3rd byte of second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         lda      rf                ; get 3rd byte of first number");
+    Asm("         sdb                        ; perform subtraction");
+    Asm("         str      r2                ; store for combining with zero test");
+    Asm("         glo      re                ; get zero test");
+    Asm("         or                         ; or last result");
+    Asm("         plo      re                ; and put back");
+    Asm("         ldn      rd                ; get msb of second number");
+    Asm("         str      r2                ; store for subtract");
+    Asm("         ldn      rf                ; get msb of first number");
+    Asm("         sdb                        ; perform subtraction");
+    Asm("         str      r2                ; store for combining with zero test");
+    Asm("         shl                        ; shift sign bit into df");
+    Asm("         glo      re                ; get zero test");
+    Asm("         or                         ; or last result");
+    Asm("         dec      rf                ; restore registers");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useNull32) {
+    /* *************************************** */
+    /* ***** M[RA] = 0                   ***** */
+    /* *************************************** */
+    Asm("null32:  ldi      0                 ; need to zero");
+    Asm("         str      rA                ; store to lsb");
+    Asm("         inc      rA                ; point to second byte");
+    Asm("         str      rA                ; store to second byte");
+    Asm("         inc      rA                ; point to third byte");
+    Asm("         str      rA                ; store to third byte");
+    Asm("         inc      rA                ; point to msb");
+    Asm("         str      rA                ; store to msb");
+    Asm("         dec      rA                ; restore rf");
+    Asm("         dec      rA");
+    Asm("         dec      rA");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useNeg32) {
+    /* ********************************************* */
+    /* ***** 2s compliment the number in M[RA] ***** */
+    /* ********************************************* */
+    Asm("neg32:   ldn      ra                ; get lsb");
+    Asm("         xri      0ffh              ; invert it");
+    Asm("         adi      1                 ; +1");
+    Asm("         str      ra");
+    Asm("         inc      ra                ; point to 2nd byte");
+    Asm("         ldn      ra                ; retrieve it");
+    Asm("         xri      0ffh              ; invert it");
+    Asm("         adci     0                 ; propagate carry");
+    Asm("         str      ra                ; and put back");
+    Asm("         inc      ra                ; point to 3rd byte");
+    Asm("         ldn      ra                ; retrieve it");
+    Asm("         xri      0ffh              ; invert it");
+    Asm("         adci     0                 ; propagate carry");
+    Asm("         str      ra                ; and put back");
+    Asm("         inc      ra                ; point to msb");
+    Asm("         ldn      ra                ; retrieve it");
+    Asm("         xri      0ffh              ; invert it");
+    Asm("         adci     0                 ; propagate carry");
+    Asm("         str      ra                ; and put back");
+    Asm("         dec      ra                ; restore rf");
+    Asm("         dec      ra");
+    Asm("         dec      ra");
+    Asm("         sep      sret              ; return");
+    }
+
+  if (useShl32) {
+    /* ************************************************ */
+    /* ***** 32-bit shift left.  M[RA]=M[RA]<<1   ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("shl32:   ldn      ra                ; get lsb");
+    Asm("         shl                        ; shift it");
+    Asm("         str      ra                ; put it back");
+    Asm("         inc      ra                ; point to second byte");
+    Asm("         ldn      ra                ; get it");
+    Asm("         shlc                       ; shift it");
+    Asm("         str      ra");
+    Asm("         inc      ra                ; point to third byte");
+    Asm("         ldn      ra                ; get it");
+    Asm("         shlc                       ; shift it");
+    Asm("         str      ra");
+    Asm("         inc      ra                ; point to msb");
+    Asm("         ldn      ra                ; get it");
+    Asm("         shlc                       ; shift it");
+    Asm("         str      ra");
+    Asm("         dec      ra                ; restore rf");
+    Asm("         dec      ra");
+    Asm("         dec      ra");
+    Asm("         sep      sret              ; and return");
+    }
+
+  if (useShr32) {
+    /* ************************************************ */
+    /* ***** 32-bit shift right. M[RA]=M[RA]>>1   ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("shr32:   inc      ra                ; point to msb");
+    Asm("         inc      ra");
+    Asm("         inc      ra");
+    Asm("         ldn      ra                ; get msb");
+    Asm("         shr                        ; shift it right");
+    Asm("         str      ra                ; put it back");
+    Asm("         dec      ra                ; point to third byte");
+    Asm("         ldn      ra                ; get third byte");
+    Asm("         shrc                       ; shift it");
+    Asm("         str      ra                ; put it back");
+    Asm("         dec      ra                ; point to second byte");
+    Asm("         ldn      ra                ; get second byte");
+    Asm("         shrc                       ; shift it");
+    Asm("         str      ra                ; put it back");
+    Asm("         dec      ra                ; point to lsb");
+    Asm("         ldn      ra                ; get lsb");
+    Asm("         shrc                       ; shift it");
+    Asm("         str      ra                ; put it back");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useZero32) {
+/* *************************************** */
+/* ***** is zero check               ***** */
+/* ***** returnss: DF=1 if M[RA]=0   ***** */
+/* *************************************** */
+    Asm("zero32:  sex      ra                ; point X to number");
+    Asm("         ldxa                       ; get byte 0");
+    Asm("         or                         ; combine with byte 1");
+    Asm("         irx                        ; point to byte 2");
+    Asm("         or                         ; combine");
+    Asm("         irx                        ; point to byte 3");
+    Asm("         or                         ; combine");
+    Asm("         dec      ra                ; restore rf");
+    Asm("         dec      ra");
+    Asm("         dec      ra");
+    Asm("         sex      r2                ; X back to 2");
+    Asm("         lbnz     notzero           ; jump if not zero");
+    Asm("         smi      0                 ; set df");
+    Asm("         sep      sret              ; and return");
+    Asm("notzero: adi      0                 ; clear df");
+    Asm("         sep      sret              ; and return");
     }
 
 
+  if (useAnd32) {
+    /* ************************************************ */
+    /* ***** 32-bit And.    M[RF]=M[RF]&M[RD]     ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("and32:   sex      rd                ; point x to second number");
+    Asm("         ldn      rf                ; get lsb");
+    Asm("         and                        ; and second lsb of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 2nd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get second byte");
+    Asm("         and                        ; and second byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 3rd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get third byte");
+    Asm("         and                        ; and third byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to msb");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get msb byte");
+    Asm("         or                         ; and msb byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         sex      r2                ; restore stack");
+    Asm("         dec      rf                ; restore registers to original values");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useOr32) {
+    /* ************************************************ */
+    /* ***** 32-bit Or.     M[RF]=M[RF]|M[RD]     ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("or32:    sex      rd                ; point x to second number");
+    Asm("         ldn      rf                ; get lsb");
+    Asm("         or                         ; or second lsb of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 2nd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get second byte");
+    Asm("         or                         ; or second byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 3rd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get third byte");
+    Asm("         or                         ; or third byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to msb");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get msb byte");
+    Asm("         or                         ; or msb byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         sex      r2                ; restore stack");
+    Asm("         dec      rf                ; restore registers to original values");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useXor32) {
+    /* ************************************************ */
+    /* ***** 32-bit Xor.    M[RF]=M[RF]^M[RD]     ***** */
+    /* ***** Numbers in memory stored LSB first   ***** */
+    /* ************************************************ */
+    Asm("xor32:   sex      rd                ; point x to second number");
+    Asm("         ldn      rf                ; get lsb");
+    Asm("         xor                        ; xor second lsb of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 2nd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get second byte");
+    Asm("         xor                        ; xor second byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to 3rd byte");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get third byte");
+    Asm("         xor                        ; xor third byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         inc      rf                ; point to msb");
+    Asm("         inc      rd");
+    Asm("         ldn      rf                ; get msb byte");
+    Asm("         xor                        ; xor msb byte of second number");
+    Asm("         str      rf                ; store it");
+    Asm("         sex      r2                ; restore stack");
+    Asm("         dec      rf                ; restore registers to original values");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         dec      rd");
+    Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useItoA32) {
+    /* ***************************************** */
+    /* ***** Convert RA:RB to bcd in M[RF] ***** */
+    /* ***************************************** */
+    Asm("tobcd32:     glo     rf           ; transfer address to rc");
+    Asm("             plo     rc");
+    Asm("             ghi     rf");
+    Asm("             phi     rc");
+    Asm("             ldi     10           ; 10 bytes to clear");
+    Asm("             plo     re");
+    Asm("tobcd32lp1:  ldi     0");
+    Asm("             str     rc           ; store into answer");
+    Asm("             inc     rc");
+    Asm("             dec     re           ; decrement count");
+    Asm("             glo     re           ; get count");
+    Asm("             lbnz    tobcd32lp1   ; loop until done");
+    Asm("             glo     rf           ; recover address");
+    Asm("             plo     rc");
+    Asm("             ghi     rf");
+    Asm("             phi     rc");
+    Asm("             ldi     32           ; 32 bits to process");
+    Asm("             plo     r9");
+    Asm("tobcd32lp2:  ldi     10           ; need to process 5 cells");
+    Asm("             plo     re           ; put into count");
+    Asm("tobcd32lp3:  ldn     rc           ; get byte");
+    Asm("             smi     5            ; need to see if 5 or greater");
+    Asm("             lbnf    tobcd32lp3a  ; jump if not");
+    Asm("             adi     8            ; add 3 to original number");
+    Asm("             str     rc           ; and put it back");
+    Asm("tobcd32lp3a: inc     rc           ; point to next cell");
+    Asm("             dec     re           ; decrement cell count");
+    Asm("             glo     re           ; retrieve count");
+    Asm("             lbnz    tobcd32lp3   ; loop back if not done");
+    Asm("             glo     rb           ; start by shifting number to convert");
+    Asm("             shl");
+    Asm("             plo     rb");
+    Asm("             ghi     rb");
+    Asm("             shlc");
+    Asm("             phi     rb");
+    Asm("             glo     ra");
+    Asm("             shlc");
+    Asm("             plo     ra");
+    Asm("             ghi     ra");
+    Asm("             shlc");
+    Asm("             phi     ra");
+    Asm("             shlc                 ; now shift result to bit 3");
+    Asm("             shl");
+    Asm("             shl");
+    Asm("             shl");
+    Asm("             str     rc");
+    Asm("             glo     rf           ; recover address");
+    Asm("             plo     rc");
+    Asm("             ghi     rf");
+    Asm("             phi     rc");
+    Asm("             ldi     10           ; 10 cells to process");
+    Asm("             plo     re");
+    Asm("tobcd32lp4:  lda     rc           ; get current cell");
+    Asm("             str     r2           ; save it");
+    Asm("             ldn     rc           ; get next cell");
+    Asm("             shr                  ; shift bit 3 into df");
+    Asm("             shr");
+    Asm("             shr");
+    Asm("             shr");
+    Asm("             ldn     r2           ; recover value for current cell");
+    Asm("             shlc                 ; shift with new bit");
+    Asm("             ani     0fh          ; keep only bottom 4 bits");
+    Asm("             dec     rc           ; point back");
+    Asm("             str     rc           ; store value");
+    Asm("             inc     rc           ; and move to next cell");
+    Asm("             dec     re           ; decrement count");
+    Asm("             glo     re           ; see if done");
+    Asm("             lbnz    tobcd32lp4   ; jump if not");
+    Asm("             glo     rf           ; recover address");
+    Asm("             plo     rc");
+    Asm("             ghi     rf");
+    Asm("             phi     rc");
+    Asm("             dec     r9           ; decrement bit count");
+    Asm("             glo     r9           ; see if done");
+    Asm("             lbnz    tobcd32lp2   ; loop until done");
+    Asm("             sep     sret         ; return to caller");
+
+    /* *************************************************** */
+    /* ***** Convert 32-bit binary to ASCII          ***** */
+    /* ***** RF - Pointer to 32-bit integer          ***** */
+    /* ***** RD - destination buffer                 ***** */
+    /* *************************************************** */
+    Asm("itoa32:    lda     rf           ; retrieve number into R7:R8");
+    Asm("           plo     rb");
+    Asm("           lda     rf");
+    Asm("           phi     rb");
+    Asm("           lda     rf");
+    Asm("           plo     ra");
+    Asm("           lda     rf");
+    Asm("           phi     ra");
+    Asm("           glo     r2           ; make room on stack for buffer");
+    Asm("           smi     11");
+    Asm("           plo     r2");
+    Asm("           ghi     r2");
+    Asm("           smbi    0");
+    Asm("           phi     r2");
+    Asm("           glo     r2           ; RF is output buffer");
+    Asm("           plo     rf");
+    Asm("           ghi     r2");
+    Asm("           phi     rf");
+    Asm("           inc     rf");
+    Asm("           ghi     ra           ; get high byte");
+    Asm("           shl                  ; shift bit to DF");
+    Asm("           lbdf    itoa32n      ; negative number");
+    Asm("itoa321:   sep     scall        ; convert to bcd");
+    Asm("           dw      tobcd32");
+    Asm("           glo     r2");
+    Asm("           plo     rf");
+    Asm("           ghi     r2");
+    Asm("           phi     rf");
+    Asm("           inc     rf");
+    Asm("           ldi     10");
+    Asm("           plo     rb");
+    Asm("           ldi     9            ; max 9 leading zeros");
+    Asm("           phi     rb");
+    Asm("loop1:     lda     rf");
+    Asm("           lbz     itoa32z      ; check leading zeros");
+    Asm("           str     r2           ; save for a moment");
+    Asm("           ldi     0            ; signal no more leading zeros");
+    Asm("           phi     rb");
+    Asm("           ldn     r2           ; recover character");
+    Asm("itoa322:   adi     030h");
+    Asm("           str     rd           ; store into output buffer");
+    Asm("           inc     rd");
+    Asm("itoa323:   dec     rb");
+    Asm("           glo     rb");
+    Asm("           lbnz    loop1");
+    Asm("           glo     r2           ; pop work buffer off stack");
+    Asm("           adi     11");
+    Asm("           plo     r2");
+    Asm("           ghi     r2");
+    Asm("           adci    0");
+    Asm("           phi     r2");
+    Asm("           ldi     0            ; place terminator in destination");
+    Asm("           str     rd");
+    Asm("           sep     sret         ; return to caller");
+    Asm("itoa32z:   ghi     rb           ; see if leading have been used up");
+    Asm("           lbz     itoa322      ; jump if so");
+    Asm("           smi     1            ; decrement count");
+    Asm("           phi     rb");
+    Asm("           lbr     itoa323      ; and loop for next character");
+    Asm("itoa32n:   ldi     '-'          ; show negative");
+    Asm("           str     rd           ; write to destination buffer");
+    Asm("           inc     rd");
+    Asm("           glo     rb           ; 2s compliment");
+    Asm("           xri     0ffh");
+    Asm("           adi     1");
+    Asm("           plo     rb");
+    Asm("           ghi     rb");
+    Asm("           xri     0ffh");
+    Asm("           adci    0");
+    Asm("           phi     rb");
+    Asm("           glo     ra");
+    Asm("           xri     0ffh");
+    Asm("           adci    0");
+    Asm("           plo     ra");
+    Asm("           ghi     ra");
+    Asm("           xri     0ffh");
+    Asm("           adci    0");
+    Asm("           phi     ra");
+    Asm("           lbr     itoa321        ; now convert/show number");
+    }
+
+  if (useAtoI32) {
+    /* **************************************************** */
+    /* ***** Convert ascii to int32                   ***** */
+    /* ***** RF - buffer to ascii                     ***** */
+    /* ***** RD - destinatin int32                    ***** */
+    /* ***** Returns R8:R9 result                     ***** */
+    /* *****         RF - First non-numeric character ***** */
+    /* **************************************************** */
+    Asm("atoi32:     ldi     0            ; zero result");
+    Asm("            phi     r8");
+    Asm("            plo     r8");
+    Asm("            phi     r9");
+    Asm("            plo     r9");
+    Asm("            stxd                 ; store sign on stack");
+    Asm("            ldn     rf           ; get byte from input");
+    Asm("            smi     '-'          ; check for negative number");
+    Asm("            lbnz    atoi32_lp    ; jump if not a negative number");
+    Asm("            ldi     1            ; replace sign");
+    Asm("            irx");
+    Asm("            stxd");
+    Asm("            inc     rf           ; move past sign");
+    Asm("atoi32_lp:  ldn     rf           ; get byte from input");
+    Asm("            smi     '0'          ; see if below digits");
+    Asm("            lbnf    atoi32_dn    ; jump if not valid digit");
+    Asm("            smi     10           ; check for high of range");
+    Asm("            lbdf    atoi32_dn    ; jump if not valid digit");
+    Asm("            glo     r9           ; multiply answer by 2");
+    Asm("            shl");
+    Asm("            plo     r9");
+    Asm("            plo     rb           ; put a copy in RA:RB as well");
+    Asm("            ghi     r9");
+    Asm("            shlc");
+    Asm("            phi     r9");
+    Asm("            phi     rb");
+    Asm("            glo     r8");
+    Asm("            shlc");
+    Asm("            plo     r8");
+    Asm("            plo     ra");
+    Asm("            ghi     r8");
+    Asm("            shlc");
+    Asm("            phi     r8");
+    Asm("            phi     ra");
+    Asm("            ldi     2            ; want to shift RA:RB twice");
+    Asm("            plo     re");
+    Asm("atoi32_1:   glo     rb           ; now shift RA:RB");
+    Asm("            shl");
+    Asm("            plo     rb");
+    Asm("            ghi     rb");
+    Asm("            shlc");
+    Asm("            phi     rb");
+    Asm("            glo     ra");
+    Asm("            shlc");
+    Asm("            plo     ra");
+    Asm("            ghi     ra");
+    Asm("            shlc");
+    Asm("            phi     ra");
+    Asm("            dec     re           ; decrement shift count");
+    Asm("            glo     re           ; see if done");
+    Asm("            lbnz    atoi32_1     ; shift again if not");
+    Asm("            glo     rb           ; now add RA:RB to R8:R9");
+    Asm("            str     r2");
+    Asm("            glo     r9");
+    Asm("            add");
+    Asm("            plo     r9");
+    Asm("            ghi     rb");
+    Asm("            str     r2");
+    Asm("            ghi     r9");
+    Asm("            adc");
+    Asm("            phi     r9");
+    Asm("            glo     ra");
+    Asm("            str     r2");
+    Asm("            glo     r8");
+    Asm("            adc");
+    Asm("            plo     r8");
+    Asm("            ghi     ra");
+    Asm("            str     r2");
+    Asm("            ghi     ra");
+    Asm("            str     r2");
+    Asm("            ghi     r8");
+    Asm("            adc");
+    Asm("            phi     r8");
+    Asm("            lda     rf           ; get byte from input");
+    Asm("            smi     '0'          ; conver to binary");
+    Asm("            str     r2           ; and add it to R8:R9");
+    Asm("            glo     r9");
+    Asm("            add");
+    Asm("            plo     r9");
+    Asm("            ghi     r9");
+    Asm("            adci    0");
+    Asm("            phi     r9");
+    Asm("            glo     r8");
+    Asm("            adci    0");
+    Asm("            plo     r8");
+    Asm("            ghi     r8");
+    Asm("            adci    0");
+    Asm("            phi     r8");
+    Asm("            lbr     atoi32_lp    ; loop back for more characters");
+    Asm("atoi32_dn:  irx                  ; recover sign");
+    Asm("            ldx");
+    Asm("            shr                  ; shift into DF");
+    Asm("            lbnf    atoi32_dn2   ; jump if not negative");
+    Asm("            glo     r9           ; negate the number");
+    Asm("            xri     0ffh");
+    Asm("            adi     1");
+    Asm("            plo     r9");
+    Asm("            ghi     r9");
+    Asm("            xri     0ffh");
+    Asm("            adci    0");
+    Asm("            phi     r9");
+    Asm("            glo     r8");
+    Asm("            xri     0ffh");
+    Asm("            adci    0");
+    Asm("            plo     r8");
+    Asm("            ghi     r8");
+    Asm("            xri     0ffh");
+    Asm("            adci    0");
+    Asm("            phi     r8");
+    Asm("atoi32_dn2: glo     r9           ; store result into destination");
+    Asm("            str     rd");
+    Asm("            inc     rd");
+    Asm("            ghi     r9");
+    Asm("            str     rd");
+    Asm("            inc     rd");
+    Asm("            glo     r8");
+    Asm("            str     rd");
+    Asm("            inc     rd");
+    Asm("            ghi     r8");
+    Asm("            str     rd");
+    Asm("            dec     rd           ; restore RD");
+    Asm("            dec     rd");
+    Asm("            dec     rd");
+    Asm("            sep     sret         ; and return to caller");
+    }
 
 
   if (passNumber == 1) lblStart = address;
@@ -1594,5 +2517,6 @@ void library() {
     Asm("          dw   f_setbd");
     }
   showCompiler = ctmp;
+  if (passNumber == 1) runtime = address;
   }
 

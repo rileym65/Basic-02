@@ -247,14 +247,15 @@ int main(int argc, char** argv, char** envp) {
     }
   printf("\n");
   printf("Lines compiled: %d\n",lineCount);
-  printf("Code generated: %d\n",codeGenerated);
-  printf("Variable RAM  : %04x\n",variableRAM);
-  printf("Ram           : %04x-%04x\n",ramStart,ramEnd);
-  printf("Rom           : %04x-%04x\n",romStart,romEnd);
-  printf("Stack         : %04x\n",stack);
-  printf("Expr. Stack   : %04x\n",estack);
+  printf("Runtime size  : %d\n",runtime-programStart);
+  printf("Program size  : %d\n",codeGenerated-(runtime-programStart));
+  printf("Variable RAM  : %04xh\n",variableRAM);
+  printf("Ram           : %04xh-%04xh\n",ramStart,ramEnd);
+  printf("Rom           : %04xh-%04xh\n",romStart,romEnd);
+  printf("Stack         : %04xh\n",stack);
+  printf("Expr. Stack   : %04xh\n",estack);
   if (useHeap)
-    printf("Heap          : %04x\n",heap);
+    printf("Heap          : %04xh\n",heap);
   printf("\n");
   printf("Include in runtime:\n");
   if (lblScall != 0)  printf("  Scall         : %04x\n",lblScall);
