@@ -73,7 +73,7 @@ int reduce(char last) {
          break;
     case OP_RND:
          Asm("           sep     scall               ; Perform RND()");
-         Asm("           dw      snd16");
+         Asm("           dw      rnd16");
          break;
     case OP_ABS:
          Asm("           sep     scall               ; Perform ABS()");
