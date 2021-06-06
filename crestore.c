@@ -45,19 +45,11 @@ char* crestore(char* line) {
   Asm("          plo   rf");
 
   addr = dataAddress + (pos * 2);
-  output(LDI); output(addr/256); output(STR+RF); output(INC+RF);
-  output(LDI); output(addr%256); output(STR+RF);
-  if (useAsm) {
-    sprintf(buffer,"          ldi   DATA_.1"); writeAsm(buffer,"Get address of DATA pointer");
-    sprintf(buffer,"          phi   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   DATA_.0"); writeAsm(buffer,"");
-    sprintf(buffer,"          plo   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   (data+(%d*2)).1",pos); writeAsm(buffer,"And set to new position");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          inc   rf"); writeAsm(buffer,"");
-    sprintf(buffer,"          ldi   (data+(%d*2)).0",pos); writeAsm(buffer,"");
-    sprintf(buffer,"          str   rf"); writeAsm(buffer,"");
-    }
+  sprintf(buffer,"          ldi   %d*2+data.1             ; Need a SEP R3 command",pos); Asm(buffer);
+  Asm("          str   rf");
+  Asm("          inc   rf");
+  sprintf(buffer,"          ldi   %d*2+data.0",pos); Asm(buffer);
+  Asm("          str   rf");
   return line;
   }
 
