@@ -9,6 +9,10 @@ char* cdma(char* line) {
   Asm("          plo   r0");
   Asm("          ldn   r7");
   Asm("          phi   r0");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word from stack");
+    Asm("          inc   r7");
+    }
   return line;
   }
 
