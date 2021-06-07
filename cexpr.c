@@ -69,71 +69,88 @@ int reduce(char last) {
   switch (op) {
     case OP_SGN:
          Asm("           sep     scall               ; Perform SGN()");
-         Asm("           dw      sgn16");
+         if (use32Bits) Asm("           dw      sgn32");
+           else Asm("           dw      sgn16");
          break;
     case OP_RND:
          Asm("           sep     scall               ; Perform RND()");
-         Asm("           dw      rnd16");
+         if (use32Bits) Asm("           dw      rnd32");
+           else Asm("           dw      rnd16");
          break;
     case OP_ABS:
          Asm("           sep     scall               ; Perform ABS()");
-         Asm("           dw      abs16");
+         if (use32Bits) Asm("           dw      abs32");
+           else Asm("           dw      abs16");
          break;
     case OP_MUL:
          Asm("           sep     scall               ; Perform multiplication");
-         Asm("           dw      mul16");
+         if (use32Bits) Asm("           dw      mul32");
+           else Asm("           dw      mul16");
          break;
     case OP_DIV:
          Asm("           sep     scall               ; Perform division");
-         Asm("           dw      div16");
+         if (use32Bits) Asm("           dw      div32");
+           else Asm("           dw      div16");
          break;
     case OP_MOD:
          Asm("           sep     scall               ; Perform modulo");
-         Asm("           dw      mod16");
+         if (use32Bits) Asm("           dw      mod32");
+           else Asm("           dw      mod16");
          break;
     case OP_ADD:
          Asm("           sep     scall               ; Perform addition");
-         Asm("           dw      add16");
+         if (use32Bits) Asm("           dw      add32");
+           else Asm("           dw      add16");
          break;
     case OP_SUB:
          Asm("           sep     scall               ; Perform subtraction");
-         Asm("           dw      sub16");
+         if (use32Bits) Asm("           dw      sub32");
+           else Asm("           dw      sub16");
          break;
     case OP_GT :
          Asm("           sep     scall               ; Perform greater than");
-         Asm("           dw      gt16");
+         if (use32Bits) Asm("           dw      gt32");
+           else Asm("           dw      gt16");
          break;
     case OP_LT :
          Asm("           sep     scall               ; Perform less than");
-         Asm("           dw      lt16");
+         if (use32Bits) Asm("           dw      lt32");
+           else Asm("           dw      lt16");
          break;
     case OP_GTE:
          Asm("           sep     scall               ; Perform greater or equal");
-         Asm("           dw      gte16");
+         if (use32Bits) Asm("           dw      gte32");
+           else Asm("           dw      gte16");
          break;
     case OP_LTE:
          Asm("           sep     scall               ; Perform less or equal");
-         Asm("           dw      lte16");
+         if (use32Bits) Asm("           dw      lte32");
+           else Asm("           dw      lte16");
          break;
     case OP_EQ :
          Asm("           sep     scall               ; Perform equal");
-         Asm("           dw      eq16");
+         if (use32Bits) Asm("           dw      eq32");
+           else Asm("           dw      eq16");
          break;
     case OP_NE :
          Asm("           sep     scall               ; Perform not equal");
-         Asm("           dw      ne16");
+         if (use32Bits) Asm("           dw      ne32");
+           else Asm("           dw      ne16");
          break;
     case OP_AND:
          Asm("           sep     scall               ; Perform AND");
-         Asm("           dw      and16");
+         if (use32Bits) Asm("           dw      and32");
+           else Asm("           dw      and16");
          break;
     case OP_OR :
          Asm("           sep     scall               ; Perform OR");
-         Asm("           dw      or16");
+         if (use32Bits) Asm("           dw      or32");
+           else Asm("           dw      or16");
          break;
     case OP_XOR:
          Asm("           sep     scall               ; Perform XOR");
-         Asm("           dw      xor16");
+         if (use32Bits) Asm("           dw      xor32");
+           else Asm("           dw      xor16");
          break;
     case OP_PEEK:
          Asm("           inc     r7                  ; Retrieve address for peek");
@@ -141,9 +158,19 @@ int reduce(char last) {
          Asm("           plo     rf");
          Asm("           ldn     r7");
          Asm("           phi     rf");
+         if (use32Bits) {
+           Asm("           inc     r7                  ; Remove high word");
+           Asm("           inc     r7");
+           }
          Asm("           ldi     0                   ; Result is a byte, so MSB=0");
          Asm("           str     r7");
          Asm("           dec     r7");
+         if (use32Bits) {
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
          Asm("           ldn     rf");
          Asm("           str     r7");
          Asm("           dec     r7");
@@ -154,6 +181,15 @@ int reduce(char last) {
          Asm("           plo     rf");
          Asm("           ldn     r7");
          Asm("           phi     rf");
+         if (use32Bits) {
+           Asm("           inc     r7                  ; Remove high word");
+           Asm("           inc     r7");
+           Asm("           ldi     0                   ; Result is a word, so MSW=0");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
          Asm("           lda     rf                  ; Result word from memory");
          Asm("           str     r7");
          Asm("           dec     r7");
@@ -164,9 +200,19 @@ int reduce(char last) {
     case OP_FLG:
          Asm("           inc     r7                  ; FLG needs no args, so remove dummy");
          Asm("           inc     r7");
+         if (use32Bits) {
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           }
          Asm("           ldi     0                   ; Result is a byte, so MSB=0");
          Asm("           str     r7");
          Asm("           dec     r7");
+         if (use32Bits) {
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
          Asm("           sep     scall               ; Read EF flags");
          Asm("           dw      readef");
          Asm("           str     r7");
@@ -175,7 +221,18 @@ int reduce(char last) {
     case OP_FRE:
          Asm("           inc     r7                  ; FRE needs no args, so remove dummy");
          Asm("           inc     r7");
+         if (use32Bits) {
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           }
          if (useHeap) {
+           if (use32Bits) {
+             Asm("           ldi     0                   ; High word is zero");
+             Asm("           str     r7");
+             Asm("           dec     r7");
+             Asm("           str     r7");
+             Asm("           dec     r7");
+             }
            Asm("           ldi     [HEAP_].1           ; Get address of heap");
            Asm("           phi     rf");
            Asm("           ldi     [HEAP_].0");
@@ -188,6 +245,13 @@ int reduce(char last) {
            Asm("           dec     r7");
            }
          else {
+           if (use32Bits) {
+             Asm("           ldi     0                   ; High word is zero");
+             Asm("           str     r7");
+             Asm("           dec     r7");
+             Asm("           str     r7");
+             Asm("           dec     r7");
+             }
            Asm("           ghi     r7                  ; use expr stack pointer as high");
            Asm("           str     r7");
            Asm("           dec     r7");
@@ -199,6 +263,13 @@ int reduce(char last) {
          Asm("           phi     rf");
          Asm("           ldi     [FREE_].0");
          Asm("           plo     rf");
+         if (use32Bits) {
+           Asm("           ldi     0                   ; High word is zero");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
          Asm("           lda     rf                  ; Retrieve free memory address");
          Asm("           str     r7");
          Asm("           dec     r7");
@@ -213,6 +284,10 @@ int reduce(char last) {
          Asm("           stxd");
          Asm("           inc     r7                  ; Retrieve port");
          Asm("           lda     r7");
+         if (use32Bits) {
+           Asm("           inc     r7                  ; Remove high word");
+           Asm("           inc     r7");
+           }
          Asm("           ani     7                   ; Keep only bottom 3 bits");
          Asm("           adi     068h                ; convert to INP instruction");
          Asm("           stxd");
@@ -225,6 +300,12 @@ int reduce(char last) {
          Asm("           ldi     0                   ; High byte is zero");
          Asm("           str     r7");
          Asm("           dec     r7");
+         if (use32Bits) {
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
          Asm("           ldx                         ; Retrieve value from INP");
          Asm("           str     r7");
          Asm("           dec     r7");
@@ -235,8 +316,19 @@ int reduce(char last) {
          Asm("           plo     rc");
          Asm("           ldn     r7");
          Asm("           phi     rc");
+         if (use32Bits) {
+           Asm("           inc     r7                  ; Remove high word");
+           Asm("           inc     r7");
+           }
          Asm("           sep     scall               ; Call alloc function");
          Asm("           dw      alloc");
+         if (use32Bits) {
+           Asm("           ldi     0                   ; Clear high word");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
          Asm("           ghi     rf                  ; Push address to expr stack");
          Asm("           str     r7");
          Asm("           dec     r7");
@@ -260,6 +352,7 @@ void add(int op) {
   }
 
 char* evaluate(char* buffer) {
+  int  i;
   char abuffer[128];
   int p;
   char token[64];
@@ -267,7 +360,7 @@ char* evaluate(char* buffer) {
   int flag;
   int func;
   int parens;
-  word number;
+  dword number;
   parens = 0;
   numTokens = 0;
   flag = 1;
@@ -365,13 +458,22 @@ char* evaluate(char* buffer) {
         buffer++;
         }
       if (neg) {
-        number = (number^0xffff) + 1;
+        number = (number^0xffffffff) + 1;
         }
       tokens[numTokens++] = 0;
       tokens[numTokens++] = OP_NUM;
-      sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",number/256); Asm(abuffer);
+      if (use32Bits) {
+        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        }
+      sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff00) >> 8); Asm(abuffer);
       Asm("           str     r7");
       Asm("           dec     r7");
+      sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
       sprintf(abuffer,"           ldi     %d",number%256); Asm(abuffer);
       Asm("           str     r7");
       Asm("           dec     r7");
@@ -393,9 +495,18 @@ char* evaluate(char* buffer) {
         }
       tokens[numTokens++] = 0;
       tokens[numTokens++] = OP_NUM;
-      sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",number/256); Asm(abuffer);
+      if (use32Bits) {
+        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        }
+      sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff00) >> 8); Asm(abuffer);
       Asm("           str     r7");
       Asm("           dec     r7");
+      sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
       sprintf(abuffer,"           ldi     %d",number%256); Asm(abuffer);
       Asm("           str     r7");
       Asm("           dec     r7");
@@ -418,12 +529,20 @@ char* evaluate(char* buffer) {
       Asm("           phi     rf");
       sprintf(abuffer,"           ldi     [%s].0",token); Asm(abuffer);
       Asm("           plo     rf");
-      Asm("           lda     rf");
-      Asm("           str     r7");
-      Asm("           dec     r7");
-      Asm("           ldn     rf");
-      Asm("           str     r7");
-      Asm("           dec     r7");
+      if (use32Bits) {
+        for (i=0; i<4; i++) {
+          Asm("           lda     rf");
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          }
+        }
+      else {
+        for (i=0; i<2; i++) {
+          Asm("           lda     rf");
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          }
+        }
       }
     else {
       printf("Expression error: %s\n",buffer);
@@ -460,8 +579,10 @@ char* evaluate(char* buffer) {
 
 
 char* cexpr(char* line) {
+  int   i;
   int   pos;
   word  num;
+  dword num32;
   char  token[128];
   char *temp;
   char  neg;
@@ -479,23 +600,51 @@ char* cexpr(char* line) {
       neg = -1;
       temp++;
       }
-    num = 0;
-    while (*temp >= '0' && *temp <= '9') {
-      num = (num * 10) + (*temp - '0');
-      temp++;
+    if (use32Bits) {
+      num32 = 0;
+      while (*temp >= '0' && *temp <= '9') {
+        num32 = (num32 * 10) + (*temp - '0');
+        temp++;
+        }
+      if (neg) num32 = (num32 ^0xffffffff) + 1;
+      temp=trim(temp);
+      if (*temp == ',' || *temp == ';' || *temp == 0 ||
+          (*temp >= 'a' && *temp <= 'z') ||
+          (*temp >= 'A' && *temp <= 'Z')) {
+        sprintf(buffer,"           ldi     %d                  ; Set expression result to constant",(num & 0xff000000) >> 24); Asm(buffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(buffer,"           ldi     %d",(num & 0xff0000) >> 16); Asm(buffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(buffer,"           ldi     %d",(num & 0xff00) >> 8); Asm(buffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(buffer,"           ldi     %d",num & 0xff); Asm(buffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        return temp;
+        }
       }
-    if (neg) num = (num ^0xffff) + 1;
-    temp=trim(temp);
-    if (*temp == ',' || *temp == ';' || *temp == 0 ||
-        (*temp >= 'a' && *temp <= 'z') ||
-        (*temp >= 'A' && *temp <= 'Z')) {
-      sprintf(buffer,"           ldi     %d                  ; Set expression result to constant",num/256); Asm(buffer);
-      Asm("           str     r7");
-      Asm("           dec     r7");
-      sprintf(buffer,"           ldi     %d",num%256); Asm(buffer);
-      Asm("           str     r7");
-      Asm("           dec     r7");
-      return temp;
+    else {
+      num = 0;
+      while (*temp >= '0' && *temp <= '9') {
+        num = (num * 10) + (*temp - '0');
+        temp++;
+        }
+      if (neg) num = (num ^0xffff) + 1;
+      temp=trim(temp);
+      if (*temp == ',' || *temp == ';' || *temp == 0 ||
+          (*temp >= 'a' && *temp <= 'z') ||
+          (*temp >= 'A' && *temp <= 'Z')) {
+        sprintf(buffer,"           ldi     %d                  ; Set expression result to constant",num/256); Asm(buffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(buffer,"           ldi     %d",num%256); Asm(buffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        return temp;
+        }
       }
     }
 
@@ -521,12 +670,20 @@ char* cexpr(char* line) {
       Asm("           phi     rf");
       sprintf(buffer,"           ldi     [%s].0",token); Asm(buffer);
       Asm("           plo     rf");
-      Asm("           lda     rf");
-      Asm("           str     r7");
-      Asm("           dec     r7");
-      Asm("           ldn     rf");
-      Asm("           str     r7");
-      Asm("           dec     r7");
+      if (use32Bits) {
+        for (i=0; i<4; i++) {
+          Asm("           lda     rf");
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          }
+        }
+      else {
+        for (i=0; i<2; i++) {
+          Asm("           lda     rf");
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          }
+        }
       return temp;
       }
     }
