@@ -121,6 +121,7 @@
 
 typedef unsigned char byte;
 typedef unsigned short word;
+typedef unsigned int   dword;
 
 LINK word   address;
 LINK int    asmFile;
@@ -215,6 +216,7 @@ LINK byte   SERN;
 LINK char   showAsm;
 LINK char   showCompiler;
 LINK char   showList;
+LINK char   showSymbols;
 LINK char   showVariables;
 LINK FILE  *source;
 LINK char   sourceFile[1024];
@@ -247,14 +249,22 @@ LINK byte   useStg;
 LINK char   useXor;
 LINK byte   useElfos;
 LINK byte   useAsm;
+LINK byte   use32Bits;
 LINK char   useAdd32;
 LINK char   useAnd32;
 LINK byte   useAtoI32;
 LINK char   useCmp32;
 LINK char   useDiv32;
+LINK byte   useEq32;
+LINK byte   useGt32;
+LINK byte   useGte32;
 LINK char   useICmp32;
 LINK byte   useItoA32;
+LINK byte   useLt32;
+LINK byte   useLte32;
+LINK byte   useMod32;
 LINK byte   useMul32;
+LINK byte   useNe32;
 LINK byte   useNeg32;
 LINK byte   useNull32;
 LINK char   useOr32;
@@ -267,6 +277,11 @@ LINK char **variableNames;
 LINK word  *variableAddresses;
 LINK word   variableRAM;
 LINK word   variableStart;
+
+LINK char** labels;
+LINK word*  labelValues;
+LINK int    numLabels;
+LINK word   asmAddress;
 
 extern void  Asm(char* line);
 extern void  addLabel(char* label, word value);

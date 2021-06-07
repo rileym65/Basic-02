@@ -114,6 +114,7 @@ int main(int argc, char** argv, char** envp) {
   romStart = 0xffff;
   romEnd = 0xffff;
   showAsm = 0;
+  showSymbols = 0;
   showCompiler = 0;
   showList = 0;
   showVariables = 0;
@@ -126,6 +127,7 @@ int main(int argc, char** argv, char** envp) {
   useStg = 0;
   useAsm = 0;
   use1805 = 0;
+  use32Bits = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;
@@ -201,6 +203,7 @@ int main(int argc, char** argv, char** envp) {
   numberOfVariables = 0;
   numData = 0;
   numDataLines = 0;
+  numLabels = 0;
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);
@@ -295,7 +298,14 @@ int main(int argc, char** argv, char** envp) {
   if (showVariables) {
     printf("Variables:\n");
     for (i=0; i<numberOfVariables; i++) {
-      printf("%-20s  %04x\n",variableNames[i],variableAddresses[i]);
+      printf("  %-20s  %04x\n",variableNames[i],variableAddresses[i]);
+      }
+    printf("\n");
+    }
+  if (showSymbols) {
+    printf("Symbols:\n");
+    for (i=0; i<numLabels; i++) {
+      printf("  %-20s  %04x\n",labels[i], labelValues[i]);
       }
     }
   }

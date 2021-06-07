@@ -1,10 +1,5 @@
 #include "header.h"
 
-char** labels;
-word*  labelValues;
-int    numLabels = 0;
-word   asmAddress;
-
 void addLabel(char* label, word value) {
   int i;
   if (passNumber == 2) return;

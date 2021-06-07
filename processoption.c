@@ -23,6 +23,7 @@ void processROM(char* buffer) {
   }
 
 void processOption(char* option) {
+    if (strcmp(option,"-32") == 0) use32Bits = -1;
     if (strcmp(option,"-1805") == 0) use1805 = -1;
     if (strcmp(option,"-a") == 0) useAsm = -1;
     if (strcmp(option,"-A") == 0) showAsm = -1;
@@ -31,6 +32,7 @@ void processOption(char* option) {
     if (strcmp(option,"-r") == 0) outMode = 'R';
     if (strcmp(option,"-l") == 0) showList = -1;
     if (strcmp(option,"-c") == 0) showCompiler = -1;
+    if (strcmp(option,"-s") == 0) showSymbols = -1;
     if (strcmp(option,"-v") == 0) showVariables = -1;
     if (strcmp(option,"-elfos") == 0) {
       useElfos = -1;
