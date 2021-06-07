@@ -25,6 +25,10 @@ char* clocate(char* line) {
   Asm("          plo   rc");
   Asm("          ldn   r7");
   Asm("          phi   rc");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   Asm("          ldi   [iobuffer]+2.1          ; Point to i/o buffer");
   Asm("          phi   rd");
   Asm("          ldi   [iobuffer]+2.0");
@@ -49,6 +53,10 @@ char* clocate(char* line) {
   Asm("          plo   rc");
   Asm("          ldn   r7");
   Asm("          phi   rc");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   Asm("          sep   scall                   ; Send column");
   Asm("          dw    itoa");
   Asm("          ldi   'H'                     ; Lastly need an H");
