@@ -9,6 +9,10 @@ char* cdealloc(char* line) {
   Asm("           plo     rf");
   Asm("           ldn     r7");
   Asm("           phi     rf");
+  if (use32Bits) {
+    Asm("           inc     r7                  ; Remove high word from stack");
+    Asm("           inc     r7");
+    }
   Asm("           sep     scall               ; Call dealloc routine");
   Asm("           dw      dealloc");
   return line;
