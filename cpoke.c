@@ -15,6 +15,10 @@ char* cpoke(char* line) {
   Asm("          stxd                          ; Store for now");
   Asm("          ldn   r7");
   Asm("          stxd");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   line = cexpr(line);
   Asm("          irx                           ; Recover poke address");
   Asm("          ldxa");
@@ -24,6 +28,10 @@ char* cpoke(char* line) {
   Asm("          inc   r7                      ; Get low byte of poke value");
   Asm("          lda   r7");
   Asm("          str   rf                      ; And write it to memory");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   return line;
   }
 
