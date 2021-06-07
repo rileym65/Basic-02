@@ -17,6 +17,10 @@ char* cout(char* line) {
   Asm("          ani   7                       ; Keep only bottom 3 bits");
   Asm("          ori   060h                    ; Convert to OUT command");
   Asm("          stxd                          ; Place on stack");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   line = cexpr(line);
   Asm("          irx                           ; Recover OUT command");
   Asm("          ldx");
@@ -28,6 +32,10 @@ char* cout(char* line) {
   Asm("          str   r2                      ; Place back on stack");
   Asm("          sep   r2                      ; Execute code on stack");
   Asm("          dec   r2                      ; Put stack pointer back where it belongs");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   return line;
   }
 
