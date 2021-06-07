@@ -51,15 +51,15 @@ char* cinput(char* line) {
       exit(1);
       }
     addr = getVariable(name);
-    Asm("          ldi   [keybuf].1              ; Point to keyboard buffer");
+    Asm("          ldi   [iobuffer].1            ; Point to keyboard buffer");
     Asm("          phi   rf");
-    Asm("          ldi   [keybuf].0");
+    Asm("          ldi   [iobuffer].0");
     Asm("          plo   rf");
     Asm("          sep   scall                   ; Get input from user");
     Asm("          dw    f_input");
-    Asm("          ldi   [keybuf].1              ; Point to keyboard buffer");
+    Asm("          ldi   [iobuffer].1            ; Point to keyboard buffer");
     Asm("          phi   rf");
-    Asm("          ldi   [keybuf].0");
+    Asm("          ldi   [iobuffer].0");
     Asm("          plo   rf");
     Asm("          sep   scall                   ; Convert ASCII to integer");
     Asm("          dw    atoi");

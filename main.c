@@ -208,6 +208,7 @@ int main(int argc, char** argv, char** envp) {
   addLabel("f_setbd",lblF_setbd);
   addLabel("f_inmsg",lblF_inmsg);
   addLabel("f_input",lblF_input);
+  addLabel("f_msg",lblF_msg);
   passNumber = 1;
   pass(sourceFile);
   keyBuffer = address;

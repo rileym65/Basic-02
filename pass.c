@@ -72,7 +72,7 @@ int pass(char* filename) {
     if (passNumber == 2 && showCompiler) printf("\n");
     }
   if (useAtoI) {
-    Asm("keybuf:     db   0");
+    Asm("iobuffer:   db   0");
     }
   }
 

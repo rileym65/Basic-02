@@ -1048,40 +1048,40 @@ void library() {
     }
   if (useItoA) {
     /* ************************************** */
-    /* ***** Convert RC to bcd in M[RD] ***** */
+    /* ***** Convert RC to bcd in M[RF] ***** */
     /* ************************************** */
     if (passNumber == 1) lblToBcd = address;
-    Asm("tobcd:    ghi     rd");
+    Asm("tobcd:    ghi     rf");
     Asm("          stxd");
-    Asm("          glo     rd");
+    Asm("          glo     rf");
     Asm("          stxd");
     Asm("          ldi     5");
     Asm("          plo     re");
     Asm("tobcdlp1: ldi     0");
-    Asm("          str     rd");
-    Asm("          inc     rd");
+    Asm("          str     rf");
+    Asm("          inc     rf");
     Asm("          dec     re");
     Asm("          glo     re");
     Asm("          lbnz    tobcdlp1");
     Asm("          irx");
     Asm("          ldxa");
-    Asm("          plo     rd");
+    Asm("          plo     rf");
     Asm("          ldx");
-    Asm("          phi     rd");
+    Asm("          phi     rf");
     Asm("          ldi     16");
     Asm("          plo     r9");
     Asm("tobcdlp2: ldi     5");
     Asm("          plo     re");
-    Asm("          ghi     rd");
+    Asm("          ghi     rf");
     Asm("          stxd");
-    Asm("          glo     rd");
+    Asm("          glo     rf");
     Asm("          stxd");
-    Asm("tobcdlp3: ldn     rd");
+    Asm("tobcdlp3: ldn     rf");
     Asm("          smi     5");
     Asm("          lbnf    tobcdlp3a");
     Asm("          adi     8");
-    Asm("          str     rd");
-    Asm("tobcdlp3a: inc     rd");
+    Asm("          str     rf");
+    Asm("tobcdlp3a: inc     rf");
     Asm("          dec     re");
     Asm("          glo     re");
     Asm("          lbnz    tobcdlp3");
@@ -1095,21 +1095,21 @@ void library() {
     Asm("          shl");
     Asm("          shl");
     Asm("          shl");
-    Asm("          str     rd");
+    Asm("          str     rf");
     Asm("          irx");
     Asm("          ldxa");
-    Asm("          plo     rd");
+    Asm("          plo     rf");
     Asm("          ldx");
-    Asm("          phi     rd");
-    Asm("          ghi     rd");
+    Asm("          phi     rf");
+    Asm("          ghi     rf");
     Asm("          stxd");
-    Asm("          glo     rd");
+    Asm("          glo     rf");
     Asm("          stxd");
     Asm("          ldi     5");
     Asm("          plo     re");
-    Asm("tobcdlp4: lda     rd");
+    Asm("tobcdlp4: lda     rf");
     Asm("          str     r2");
-    Asm("          ldn     rd");
+    Asm("          ldn     rf");
     Asm("          shr");
     Asm("          shr");
     Asm("          shr");
@@ -1117,17 +1117,17 @@ void library() {
     Asm("          ldn     r2");
     Asm("          shlc");
     Asm("          ani     0fh");
-    Asm("          dec     rd");
-    Asm("          str     rd");
-    Asm("          inc     rd");
+    Asm("          dec     rf");
+    Asm("          str     rf");
+    Asm("          inc     rf");
     Asm("          dec     re");
     Asm("          glo     re");
     Asm("          lbnz    tobcdlp4");
     Asm("          irx");
     Asm("          ldxa");
-    Asm("          plo     rd");
+    Asm("          plo     rf");
     Asm("          ldx");
-    Asm("          phi     rd");
+    Asm("          phi     rf");
     Asm("          dec     r9");
     Asm("          glo     r9");
     Asm("          lbnz    tobcdlp2");
@@ -1136,6 +1136,7 @@ void library() {
     /* *************************************************** */
     /* ***** Output 16-bit integer                   ***** */
     /* ***** RC - 16-bit integer                     ***** */
+    /* ***** RD - Buffer for output                  ***** */
     /* *************************************************** */
     if (passNumber == 1) lblItoA = address;
     Asm("itoa:     glo     r2");
@@ -1145,16 +1146,16 @@ void library() {
     Asm("          smbi    0");
     Asm("          phi     r2");
     Asm("          glo     r2");
-    Asm("          plo     rd");
+    Asm("          plo     rf");
     Asm("          ghi     r2");
-    Asm("          phi     rd");
-    Asm("          inc     rd");
+    Asm("          phi     rf");
+    Asm("          inc     rf");
     Asm("          ghi     rc");
     Asm("          shl");
     Asm("          lbnf    itoa1");
     Asm("          ldi     '-'");
-    Asm("          sep     scall");
-    Asm("          dw      f_type");
+    Asm("          str     rd");
+    Asm("          inc     rd");
     Asm("          glo     rc");
     Asm("          xri     0ffh");
     Asm("          plo     rc");
@@ -1165,23 +1166,23 @@ void library() {
     Asm("itoa1:    sep     scall");
     Asm("          dw      tobcd");
     Asm("          glo     r2");
-    Asm("          plo     rd");
+    Asm("          plo     rf");
     Asm("          ghi     r2");
-    Asm("          phi     rd");
-    Asm("          inc     rd");
+    Asm("          phi     rf");
+    Asm("          inc     rf");
     Asm("          ldi     5");
     Asm("          plo     r8");
     Asm("          ldi     4");
     Asm("          phi     r8");
-    Asm("itoalp1:  lda     rd");
+    Asm("itoalp1:  lda     rf");
     Asm("          lbz     itoaz");
     Asm("          str     r2");
     Asm("          ldi     0");
     Asm("          phi     r8");
     Asm("          ldn     r2");
     Asm("itoa2:    adi     030h");
-    Asm("          sep     scall");
-    Asm("          dw      f_type");
+    Asm("          str     rd");
+    Asm("          inc     rd");
     Asm("itoa3:    dec     r8");
     Asm("          glo     r8");
     Asm("          lbnz    itoalp1");
@@ -1191,6 +1192,8 @@ void library() {
     Asm("          ghi     r2");
     Asm("          adci    0");
     Asm("          phi     r2");
+    Asm("          ldi     0");
+    Asm("          str     rd");
     Asm("          sep     sret");
     Asm("itoaz:    ghi     r8");
     Asm("          lbz     itoa2");

@@ -127,7 +127,7 @@ word processArgs(char* args) {
     else if (strcasecmp(token,"$") == 0) num = asmAddress;
     else if (strcasecmp(token,"[stack]") == 0) num = stack;
     else if (strcasecmp(token,"[estack]") == 0) num = estack;
-    else if (strcasecmp(token,"[keybuf]") == 0) num = keyBuffer;
+    else if (strcasecmp(token,"[iobuffer]") == 0) num = keyBuffer;
     else if (token[0] == '\'' && strlen(token) == 3) num = token[1];
     else if (token[0] == '[') {
       pos = 0;

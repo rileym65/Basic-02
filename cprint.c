@@ -46,8 +46,18 @@ char* cprint(char* line) {
       Asm("          plo   rc");
       Asm("          ldn   r7");
       Asm("          phi   rc");
+      Asm("          ldi   [iobuffer].1            ; Point to i/o buffer");
+      Asm("          phi   rd");
+      Asm("          ldi   [iobuffer].0");
+      Asm("          plo   rd");
       Asm("          sep   scall                   ; Display integer value");
       Asm("          dw    itoa");
+      Asm("          ldi   [iobuffer].1            ; Display result");
+      Asm("          phi   rf");
+      Asm("          ldi   [iobuffer].0");
+      Asm("          plo   rf");
+      Asm("          sep   scall");
+      Asm("          dw    f_msg");
       last = ' ';
       }
     }
