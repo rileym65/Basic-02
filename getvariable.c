@@ -2,7 +2,9 @@
 
 word getVariable(char* name) {
   int i;
+  int vsize;
   if (passNumber == 1) return 0;
+  vsize = (use32Bits) ? 4 : 2;
   for (i=0; i<numberOfVariables; i++) {
     if (strcasecmp(name, variableNames[i]) == 0) return variableAddresses[i];
     }
@@ -17,7 +19,7 @@ word getVariable(char* name) {
     }
   variableNames[numberOfVariables-1] = (char*)malloc(strlen(name)+1);
   strcpy(variableNames[numberOfVariables-1], name);
-  variableAddresses[numberOfVariables-1] = variableRAM + (2 * (numberOfVariables - 1));
+  variableAddresses[numberOfVariables-1] = variableRAM + (vsize * (numberOfVariables - 1));
   return variableAddresses[numberOfVariables-1];
   }
 

@@ -103,6 +103,7 @@ int prepass(char* filename) {
             if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt32 = -1;
             if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt32 = -1;
             if (strncasecmp(currentLine+i,"print",5) == 0) useItoA32 = -1;
+            if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI32 = -1;
             }
           else {
             if (currentLine[i] == '+') useAdd = -1;
@@ -120,6 +121,7 @@ int prepass(char* filename) {
             if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt = -1;
             if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
             if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
+            if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
             }
           if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
           if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
@@ -144,6 +146,16 @@ int prepass(char* filename) {
   if (useMod) useDiv = -1;
   if (useNext) useSub = -1;
   if (useMul32) {
+    useAdd32 = -1;
+    useZero32 = -1;
+    useShl32 = -1;
+    useShr32 = -1;
+    }
+  if (useDiv32) {
+    useSub32 = -1;
+    useNeg32 = -1;
+    useComp32 = -1;
+    useIComp32 = -1;
     useAdd32 = -1;
     useZero32 = -1;
     useShl32 = -1;

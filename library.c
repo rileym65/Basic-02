@@ -917,11 +917,13 @@ void library() {
     Asm("          ghi     r2");
     Asm("          phi     ra");
     Asm("          sex     ra");
-    Asm("          irx          ; move past call return");
-    Asm("          irx          ; need a copy of return addr");
-    Asm("          irx          ; need a copy of return addr");
-    Asm("          irx          ; exec msb");
-    Asm("          irx          ; var addr lsb");
+    Asm("          irx          ; return address lsb");
+    Asm("          irx          ; return address msb");
+    Asm("          irx          ; exec address lsb");
+    Asm("          ldxa         ; retrieve exec address");
+    Asm("          plo     r9");
+    Asm("          ldxa");
+    Asm("          phi     r9");
     Asm("          ldxa         ; get it");
     Asm("          plo     rf   ; set rf to address");
     Asm("          ldxa         ; get msb");
@@ -935,29 +937,16 @@ void library() {
     Asm("          ldn     rf   ; get msb of var value");
     Asm("          adc          ; add in step");
     Asm("          str     rf   ; store back into variable");
-    Asm("          lda     rf   ; retrieve variable value");
-    Asm("          str     r7   ; store on expr stack");
-    Asm("          dec     r7");
-    Asm("          ldn     rf");
-    Asm("          str     r7");
-    Asm("          dec     r7");
-    Asm("          irx          ; retrieve loop end value");
-    Asm("          ldxa");
-    Asm("          plo     re");
-    Asm("          ldx");
-    Asm("          str     r7");
-    Asm("          dec     r7   ; exp stack ready ");
-    Asm("          glo     re");
-    Asm("          str     r7");
-    Asm("          dec     r7   ; exp stack ready ");
-    Asm("          sex     r2");
-    Asm("          sep     scall");
-    Asm("          dw      sub16");
-    Asm("          inc     r7   ; point to msb");
-    Asm("          inc     r7");
-    Asm("          ldn     r7   ; get it");
-    Asm("          shl          ; was it negative");
-    Asm("          lbdf    stay");
+    Asm("          irx          ; point to loop count lsb");
+    Asm("          ldi     1    ; need to decrement count");
+    Asm("          sd           ; decrement it");
+    Asm("          str     ra   ; and put it back");
+    Asm("          irx          ; point to loop count msb");
+    Asm("          ldi     0    ; propagate carry");
+    Asm("          sdb");
+    Asm("          str     ra   ; and put it back");
+    Asm("          sex     r2   ; point X back to R2");
+    Asm("          lbdf    stay ; Jump if loop not done");
     Asm("          inc     r2");
     Asm("          dec     ra");
     Asm("          ldxa");
@@ -972,18 +961,11 @@ void library() {
     Asm("          ghi     ra");
     Asm("          phi     r2");
     Asm("          sep     sret ; nothing to do so return");
-    Asm("stay:     inc     r2   ; move back");
-    Asm("          inc     r2");
-    Asm("          inc     r2");
-    Asm("          ldxa");
+    Asm("stay:     glo     r9   ; set return address to exec address");
     Asm("          plo     r6");
-    Asm("          ldx");
-    Asm("          phi     r6   ; into r6");
-    Asm("          dec     r2");
-    Asm("          dec     r2");
-    Asm("          dec     r2");
-    Asm("          dec     r2");
-    Asm("          sep     sret  ; return");
+    Asm("          ghi     r9");
+    Asm("          phi     r6");
+    Asm("          sep     sret ; and then return");
     }
 
   if (useAtoI) {
@@ -1741,7 +1723,7 @@ void library() {
     /* *****    RC=result                         ***** */
     /* *****    RB=shift                          ***** */
     /* ************************************************ */
-    Asm("div32:   ldi      0                 ; set sign flag as positive");
+    Asm("div32i:  ldi      0                 ; set sign flag as positive");
     Asm("         str      r2                ; place on the stack");
     Asm("         inc      rf                ; point to msb of first number");
     Asm("         inc      rf");
@@ -1832,7 +1814,7 @@ void library() {
     Asm("         ori      1                 ; set low bit");
     Asm("         str      rc                ; and but it back");
     Asm("         sep      scall             ; subtrcct a from b");
-    Asm("         dw       sub32");
+    Asm("         dw       sub32i");
     Asm("scdiv6:  ldn      rd                ; get lsb of b");
     Asm("         shr                        ; see if low bit is set");
     Asm("         lbnf     scdiv5            ; jump if not");
@@ -1895,6 +1877,26 @@ void library() {
     Asm("         sep      scall");
     Asm("         dw       neg32");
     Asm("scdivrt: sep      sret              ; return to caller");
+
+    Asm("div32:   glo      r7                ; setup pointers");
+    Asm("         plo      rd");
+    Asm("         plo      rf");
+    Asm("         ghi      r7                ; setup pointers");
+    Asm("         phi      rd");
+    Asm("         phi      rf");
+    Asm("         inc      rd");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         sep      scall             ; Perform division");
+    Asm("         dw       div32i");
+    Asm("         inc      r7                ; Remove 2nd number from stack");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         sep      sret              ; Return to caller");
     }
 
   if (useComp32) {
@@ -2112,103 +2114,103 @@ void library() {
 
   if (useAnd32) {
     /* ************************************************ */
-    /* ***** 32-bit And.    M[RF]=M[RF]&M[RD]     ***** */
+    /* ***** 32-bit And expr stack                ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
     /* ************************************************ */
-    Asm("and32:   sex      rd                ; point x to second number");
-    Asm("         ldn      rf                ; get lsb");
-    Asm("         and                        ; and second lsb of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to 2nd byte");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get second byte");
-    Asm("         and                        ; and second byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to 3rd byte");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get third byte");
-    Asm("         and                        ; and third byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to msb");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get msb byte");
-    Asm("         or                         ; and msb byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         sex      r2                ; restore stack");
-    Asm("         dec      rf                ; restore registers to original values");
-    Asm("         dec      rf");
-    Asm("         dec      rf");
-    Asm("         dec      rd");
-    Asm("         dec      rd");
-    Asm("         dec      rd");
+    Asm("and32:   inc      r7                ; point to second number");
+    Asm("         glo      r7                ; copy address to rf");
+    Asm("         plo      rf");
+    Asm("         ghi      r7");
+    Asm("         phi      rf");
+    Asm("         inc      rf                ; point rf to first number");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         sex      rf                ; point X to destination");
+    Asm("         lda      r7                ; get byte 1");
+    Asm("         and                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 2");
+    Asm("         lda      r7                ; get byte 2");
+    Asm("         and                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 3");
+    Asm("         lda      r7                ; get byte 3");
+    Asm("         and                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 4");
+    Asm("         ldn      r7                ; get byte 7");
+    Asm("         and                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         sex      r2                ; Set x back to R2");
     Asm("         sep      sret              ; return to caller");
     }
 
   if (useOr32) {
     /* ************************************************ */
-    /* ***** 32-bit Or.     M[RF]=M[RF]|M[RD]     ***** */
+    /* ***** 32-bit Or.  expr stack               ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
     /* ************************************************ */
-    Asm("or32:    sex      rd                ; point x to second number");
-    Asm("         ldn      rf                ; get lsb");
-    Asm("         or                         ; or second lsb of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to 2nd byte");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get second byte");
-    Asm("         or                         ; or second byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to 3rd byte");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get third byte");
-    Asm("         or                         ; or third byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to msb");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get msb byte");
-    Asm("         or                         ; or msb byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         sex      r2                ; restore stack");
-    Asm("         dec      rf                ; restore registers to original values");
-    Asm("         dec      rf");
-    Asm("         dec      rf");
-    Asm("         dec      rd");
-    Asm("         dec      rd");
-    Asm("         dec      rd");
+    Asm("or32:    inc      r7                ; point to second number");
+    Asm("         glo      r7                ; copy address to rf");
+    Asm("         plo      rf");
+    Asm("         ghi      r7");
+    Asm("         phi      rf");
+    Asm("         inc      rf                ; point rf to first number");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         sex      rf                ; point X to destination");
+    Asm("         lda      r7                ; get byte 1");
+    Asm("         or                         ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 2");
+    Asm("         lda      r7                ; get byte 2");
+    Asm("         or                         ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 3");
+    Asm("         lda      r7                ; get byte 3");
+    Asm("         or                         ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 4");
+    Asm("         ldn      r7                ; get byte 7");
+    Asm("         or                         ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         sex      r2                ; Set x back to R2");
     Asm("         sep      sret              ; return to caller");
     }
 
   if (useXor32) {
     /* ************************************************ */
-    /* ***** 32-bit Xor.    M[RF]=M[RF]^M[RD]     ***** */
+    /* ***** 32-bit Xor. expr stack               ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
     /* ************************************************ */
-    Asm("xor32:   sex      rd                ; point x to second number");
-    Asm("         ldn      rf                ; get lsb");
-    Asm("         xor                        ; xor second lsb of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to 2nd byte");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get second byte");
-    Asm("         xor                        ; xor second byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to 3rd byte");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get third byte");
-    Asm("         xor                        ; xor third byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         inc      rf                ; point to msb");
-    Asm("         inc      rd");
-    Asm("         ldn      rf                ; get msb byte");
-    Asm("         xor                        ; xor msb byte of second number");
-    Asm("         str      rf                ; store it");
-    Asm("         sex      r2                ; restore stack");
-    Asm("         dec      rf                ; restore registers to original values");
-    Asm("         dec      rf");
-    Asm("         dec      rf");
-    Asm("         dec      rd");
-    Asm("         dec      rd");
-    Asm("         dec      rd");
+    Asm("xor32:   inc      r7                ; point to second number");
+    Asm("         glo      r7                ; copy address to rf");
+    Asm("         plo      rf");
+    Asm("         ghi      r7");
+    Asm("         phi      rf");
+    Asm("         inc      rf                ; point rf to first number");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         sex      rf                ; point X to destination");
+    Asm("         lda      r7                ; get byte 1");
+    Asm("         xor                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 2");
+    Asm("         lda      r7                ; get byte 2");
+    Asm("         xor                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 3");
+    Asm("         lda      r7                ; get byte 3");
+    Asm("         xor                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         inc      rf                ; point to byte 4");
+    Asm("         ldn      r7                ; get byte 7");
+    Asm("         xor                        ; and with first number");
+    Asm("         str      rf                ; store");
+    Asm("         sex      r2                ; Set x back to R2");
     Asm("         sep      sret              ; return to caller");
     }
 
@@ -2586,16 +2588,16 @@ void library() {
     Asm("            xri     0ffh");
     Asm("            adci    0");
     Asm("            phi     r8");
-    Asm("atoi32_dn2: glo     r9           ; store result into destination");
-    Asm("            str     rd");
-    Asm("            inc     rd");
-    Asm("            ghi     r9");
+    Asm("atoi32_dn2: ghi     r8           ; store result into destination");
     Asm("            str     rd");
     Asm("            inc     rd");
     Asm("            glo     r8");
     Asm("            str     rd");
     Asm("            inc     rd");
-    Asm("            ghi     r8");
+    Asm("            ghi     r9");
+    Asm("            str     rd");
+    Asm("            inc     rd");
+    Asm("            glo     r9");
     Asm("            str     rd");
     Asm("            dec     rd           ; restore RD");
     Asm("            dec     rd");
