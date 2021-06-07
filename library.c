@@ -2605,7 +2605,7 @@ void library() {
     output(LDI); output(heap/256); output(STR+RF); output(INC+RF);
     output(LDI); output(heap%256); output(STR+RF);
     }
-  if ((useItoA || useAtoI) && useElfos == 0) {
+  if ((useItoA || useAtoI || useItoA32 || useAtoI32) && useElfos == 0) {
     Asm("          sep  scall");
     Asm("          dw   f_setbd");
     }
