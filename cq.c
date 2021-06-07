@@ -16,6 +16,10 @@ char* cq(char* line) {
   line = cexpr(line);
   Asm("          inc   r7                      ; Recover computed value");
   Asm("          lda   r7");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   Asm("          lbz   $+5                     ; Jump if non zero");
   Asm("          req                           ; Turn off Q");
   Asm("          skp                           ; Skip past seq");
