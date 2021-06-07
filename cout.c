@@ -12,7 +12,8 @@ char* cout(char* line) {
   line++;
   Asm("          ldi   0d3h                    ; Need a SEP R3 command");
   Asm("          stxd                          ; Place on stack");
-  Asm("          glo   rc                      ; Get port");
+  Asm("          inc   r7                      ; Get port");
+  Asm("          lda   r7");
   Asm("          ani   7                       ; Keep only bottom 3 bits");
   Asm("          ori   060h                    ; Convert to OUT command");
   Asm("          stxd                          ; Place on stack");
@@ -20,7 +21,8 @@ char* cout(char* line) {
   Asm("          irx                           ; Recover OUT command");
   Asm("          ldx");
   Asm("          plo   re                      ; Set aside for a moment");
-  Asm("          glo   rc                      ; Write OUT value to stack");
+  Asm("          inc   r7                      ; Write out value to stack");
+  Asm("          lda   r7");
   Asm("          stxd");
   Asm("          glo   re                      ; Recover OUT command");
   Asm("          str   r2                      ; Place back on stack");

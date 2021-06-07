@@ -4,9 +4,10 @@ char* cdma(char* line) {
   word target;
   line = trim(line);
   line = cexpr(line);
-  Asm("          glo   rc                      ; Set R0 to address");
+  Asm("          inc   r7                      ; Set R0 to address");
+  Asm("          lda   r7");
   Asm("          plo   r0");
-  Asm("          ghi   rc");
+  Asm("          ldn   r7");
   Asm("          phi   r0");
   return line;
   }

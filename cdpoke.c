@@ -10,20 +10,23 @@ char* cdpoke(char* line) {
     exit(1);
     }
   line++;
-  Asm("          ghi   rc                      ; Get poke address");
-  Asm("          stxd");
-  Asm("          glo   rc");
+  Asm("          inc   r7                      ; Get poke address");
+  Asm("          lda   r7");
+  Asm("          stxd                          ; Store for now");
+  Asm("          ldn   r7");
   Asm("          stxd");
   line = cexpr(line);
   Asm("          irx                           ; Recover poke address");
   Asm("          ldxa");
-  Asm("          plo   rf");
-  Asm("          ldx");
   Asm("          phi   rf");
-  Asm("          ghi   rc                      ; Get high byte of poke value");
+  Asm("          ldx");
+  Asm("          plo   rf");
+  Asm("          inc   rf                      ; Point to LSB");
+  Asm("          inc   r7");
+  Asm("          lda   r7                      ; Get low byte of poke value");
   Asm("          str   rf                      ; And write it to memory");
-  Asm("          inc   rf");
-  Asm("          glo   rc                      ; Get low byte of poke value");
+  Asm("          dec   rf");
+  Asm("          ldn   r7                      ; Get high byte of poke value");
   Asm("          str   rf                      ; And write it to memory");
   return line;
   }

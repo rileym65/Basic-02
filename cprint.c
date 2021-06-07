@@ -41,6 +41,11 @@ char* cprint(char* line) {
       }
     else {
       line = cexpr(line);
+      Asm("          inc   r7                      ; Recover expression result");
+      Asm("          lda   r7");
+      Asm("          plo   rc");
+      Asm("          ldn   r7");
+      Asm("          phi   rc");
       Asm("          sep   scall                   ; Display integer value");
       Asm("          dw    itoa");
       last = ' ';

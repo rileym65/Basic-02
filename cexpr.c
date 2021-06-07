@@ -455,11 +455,6 @@ char* evaluate(char* buffer) {
     }
   while (reduce(-1));
   if (numTokens != 2) printf("Expression error\n");
-  Asm("           inc     r7                  ; Retrieve expression result");
-  Asm("           lda     r7");
-  Asm("           plo     rc");
-  Asm("           ldn     r7");
-  Asm("           phi     rc");
   return buffer;
   }
 
@@ -495,9 +490,11 @@ char* cexpr(char* line) {
         (*temp >= 'a' && *temp <= 'z') ||
         (*temp >= 'A' && *temp <= 'Z')) {
       sprintf(buffer,"           ldi     %d                  ; Set expression result to constant",num/256); Asm(buffer);
-      Asm("           phi     rc");
+      Asm("           str     r7");
+      Asm("           dec     r7");
       sprintf(buffer,"           ldi     %d",num%256); Asm(buffer);
-      Asm("           plo     rc");
+      Asm("           str     r7");
+      Asm("           dec     r7");
       return temp;
       }
     }
@@ -525,9 +522,11 @@ char* cexpr(char* line) {
       sprintf(buffer,"           ldi     [%s].0",token); Asm(buffer);
       Asm("           plo     rf");
       Asm("           lda     rf");
-      Asm("           phi     rc");
+      Asm("           str     r7");
+      Asm("           dec     r7");
       Asm("           ldn     rf");
-      Asm("           plo     rc");
+      Asm("           str     r7");
+      Asm("           dec     r7");
       return temp;
       }
     }

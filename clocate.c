@@ -13,12 +13,22 @@ char* clocate(char* line) {
     exit(1);
     }
   line++;
+  Asm("          inc   r7                      ; Get row");
+  Asm("          lda   r7");
+  Asm("          plo   rc");
+  Asm("          ldn   r7");
+  Asm("          phi   rc");
   Asm("          sep   scall                   ; Send row");
   Asm("          dw    itoa");
   Asm("          ldi   ';'                     ; Next need a semicolon");
   Asm("          sep   scall                   ; Send it");
   Asm("          dw    f_type");
   line = cexpr(line);
+  Asm("          inc   r7                      ; Get column");
+  Asm("          lda   r7");
+  Asm("          plo   rc");
+  Asm("          ldn   r7");
+  Asm("          phi   rc");
   Asm("          sep   scall                   ; Send column");
   Asm("          dw    itoa");
   Asm("          ldi   'H'                     ; Lastly need an H");

@@ -14,7 +14,8 @@ char* cq(char* line) {
     return line;
     }
   line = cexpr(line);
-  Asm("          glo   rc                      ; Recover computed value");
+  Asm("          inc   r7                      ; Recover computed value");
+  Asm("          lda   r7");
   Asm("          lbz   $+5                     ; Jump if non zero");
   Asm("          req                           ; Turn off Q");
   Asm("          skp                           ; Skip past seq");

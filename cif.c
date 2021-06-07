@@ -5,14 +5,15 @@ char* cif(char* line) {
   line = trim(line);
   line = cexpr(line);
   line = trim(line);
-  Asm("          glo   rc                      ; Check result of compare");
+  Asm("          inc   r7                      ; Check lsb of result");
+  Asm("          lda   r7");
   Asm("          lbnz  $+7                     ; Jump if successful");
   if (findNextLine(lastLineNumber, &addr) != 0) {
     showError("Line number not found");
     exit(1);
     }
   findNextLineNumber(lastLineNumber, &addr);
-  Asm("          ghi   rc                      ; Check high result of compare");
+  Asm("          ldn   r7                      ; Check high result of compare");
   sprintf(buffer,"          lbz   <%d>                    ; Jump if successful",addr); Asm(buffer);
   if (strncasecmp(line,"then",4) == 0) {
     line += 4;

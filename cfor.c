@@ -103,14 +103,15 @@ char* cfor(char* line) {
   line = cexpr(line);
   vaddr = getVariable(varname);
 
-  sprintf(buffer,"          ldi   [%s].1                  ; Get variable address",varname); Asm(buffer);
+  sprintf(buffer,"          ldi   [%s]+1.1                ; Get variable address",varname); Asm(buffer);
   Asm("          phi   rf");
-  sprintf(buffer,"          ldi   [%s].0",varname); Asm(buffer);
+  sprintf(buffer,"          ldi   [%s]+1.0",varname); Asm(buffer);
   Asm("          plo   rf");
-  Asm("          ghi   rc                      ; Store start value into variable");
+  Asm("          inc   r7                      ; Store start value into variable");
+  Asm("          lda   r7");
   Asm("          str   rf");
-  Asm("          inc   rf");
-  Asm("          glo   rc");
+  Asm("          dec   rf");
+  Asm("          ldn   r7");
   Asm("          str   rf");
 
   if (strncasecmp(line,"to",2) != 0) {
@@ -121,6 +122,11 @@ char* cfor(char* line) {
   line = trim(line);
   line = cexpr(line);
   line = trim(line);
+  Asm("          inc   r7                      ; Get end value");
+  Asm("          lda   r7");
+  Asm("          plo   rc");
+  Asm("          ldn   r7");
+  Asm("          phi   rc");
   Asm("          inc   rc                      ; End value is 1 higher");
   Asm("          ghi   rc                      ; Store onto stack");
   Asm("          stxd");
@@ -142,9 +148,12 @@ char* cfor(char* line) {
       showError("Syntax error");
       exit(1);
       }
-    Asm("          ghi   rc                      ; Store increment onto stack");
+    Asm("          inc   r7                      ; Store increment onto stack");
+    Asm("          lda   r7");
+    Asm("          plo   re");
+    Asm("          ldn   r7");
     Asm("          stxd");
-    Asm("          glo   rc");
+    Asm("          glo   re");
     Asm("          stxd");
     }
   else {
