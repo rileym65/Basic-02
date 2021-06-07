@@ -86,20 +86,38 @@ int prepass(char* filename) {
       for (i=0; i<strlen(currentLine); i++) {
         if (currentLine[i] == '"') qt = 1-qt;
         if (qt == 0) {
-          if (currentLine[i] == '+') useAdd = -1;
-          if (currentLine[i] == '-') useSub = -1;
-          if (currentLine[i] == '*') useMul = -1;
-          if (currentLine[i] == '/') useDiv = -1;
-          if (currentLine[i] == '%') useMod = -1;
-          if (currentLine[i] == '&') useAnd = -1;
-          if (currentLine[i] == '|') useOr = -1;
-          if (currentLine[i] == '^') useXor = -1;
-          if (currentLine[i] == '=') useEq = -1;
-          if (currentLine[i] == '<' && currentLine[i+1] == '>') useNe = -1;
-          if (currentLine[i] == '<' && currentLine[i+1] == '=') useLte = -1;
-          if (currentLine[i] == '>' && currentLine[i+1] == '=') useGte = -1;
-          if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt = -1;
-          if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
+          if (use32Bits) {
+            if (currentLine[i] == '+') useAdd32 = -1;
+            if (currentLine[i] == '-') useSub32 = -1;
+            if (currentLine[i] == '*') useMul32 = -1;
+            if (currentLine[i] == '/') useDiv32 = -1;
+            if (currentLine[i] == '%') useMod32 = -1;
+            if (currentLine[i] == '&') useAnd32 = -1;
+            if (currentLine[i] == '|') useOr32 = -1;
+            if (currentLine[i] == '^') useXor32 = -1;
+            if (currentLine[i] == '=') useEq32 = -1;
+            if (currentLine[i] == '<' && currentLine[i+1] == '>') useNe32 = -1;
+            if (currentLine[i] == '<' && currentLine[i+1] == '=') useLte32 = -1;
+            if (currentLine[i] == '>' && currentLine[i+1] == '=') useGte32 = -1;
+            if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt32 = -1;
+            if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt32 = -1;
+            }
+          else {
+            if (currentLine[i] == '+') useAdd = -1;
+            if (currentLine[i] == '-') useSub = -1;
+            if (currentLine[i] == '*') useMul = -1;
+            if (currentLine[i] == '/') useDiv = -1;
+            if (currentLine[i] == '%') useMod = -1;
+            if (currentLine[i] == '&') useAnd = -1;
+            if (currentLine[i] == '|') useOr = -1;
+            if (currentLine[i] == '^') useXor = -1;
+            if (currentLine[i] == '=') useEq = -1;
+            if (currentLine[i] == '<' && currentLine[i+1] == '>') useNe = -1;
+            if (currentLine[i] == '<' && currentLine[i+1] == '=') useLte = -1;
+            if (currentLine[i] == '>' && currentLine[i+1] == '=') useGte = -1;
+            if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt = -1;
+            if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
+            }
           if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
           if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
@@ -123,6 +141,12 @@ int prepass(char* filename) {
   if (useRnd) useMod = -1;
   if (useMod) useDiv = -1;
   if (useNext) useSub = -1;
+  if (useMul32) {
+    useAdd32 = -1;
+    useZero32 = -1;
+    useShl32 = -1;
+    useShr32 = -1;
+    }
   if (lblF_inmsg == 0xffff) {
     useAtoI = 0;
     useItoA = 0;
