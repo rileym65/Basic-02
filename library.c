@@ -1619,9 +1619,9 @@ void library() {
     Asm("         phi      rf");
     Asm("         inc      rf                ; point to LSB of answer");
     Asm("scmul2:  glo      rd                ; need second number");
-    Asm("         plo      af");
+    Asm("         plo      rf");
     Asm("         ghi      rd");
-    Asm("         phi      af");
+    Asm("         phi      rf");
     Asm("         sep      scall             ; check for zero");
     Asm("         dw       zero32");
     Asm("         lbnf     scmul4            ; jump if number was not zero");
