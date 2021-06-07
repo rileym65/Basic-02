@@ -474,7 +474,6 @@ char* evaluate(char* buffer) {
       Asm("           str     r7");
       Asm("           dec     r7");
       sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
-      sprintf(abuffer,"           ldi     %d",number%256); Asm(abuffer);
       Asm("           str     r7");
       Asm("           dec     r7");
       }
@@ -507,7 +506,6 @@ char* evaluate(char* buffer) {
       Asm("           str     r7");
       Asm("           dec     r7");
       sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
-      sprintf(abuffer,"           ldi     %d",number%256); Asm(abuffer);
       Asm("           str     r7");
       Asm("           dec     r7");
       }

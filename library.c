@@ -1735,7 +1735,7 @@ void library() {
     Asm("         ldi      1                 ; set shift to 1");
     Asm("         plo      rb");
     Asm("scdiv1:  sep      scall             ; compare a to b");
-    Asm("         dw       icmp32");
+    Asm("         dw       icomp32");
     Asm("         lbnf     scdiv4            ; jump if b>=a");
     Asm("         glo      rd                ; need to shift b");
     Asm("         plo      ra");
@@ -1766,7 +1766,7 @@ void library() {
     Asm("         sep      scall             ; need to shift result left");
     Asm("         dw       shl32");
     Asm("         sep      scall             ; compare a to b");
-    Asm("         dw       cmp32");
+    Asm("         dw       comp32");
     Asm("         lbdf     scdiv6            ; jump if a < b");
     Asm("         ldn      rc                ; get LSB of result");
     Asm("         ori      1                 ; set low bit");
@@ -1837,14 +1837,14 @@ void library() {
     Asm("scdivrt: sep      sret              ; return to caller");
     }
 
-  if (useCmp32) {
+  if (useComp32) {
     /* ************************************************ */
     /* ***** 32-bit cmp.  M[RF]-M[RD]             ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
     /* ***** Returns: D=0 if M[RF]=M[RD]          ***** */
     /* *****          DF=1 if M[RF]<M[RD]         ***** */
     /* ************************************************ */
-    Asm("cmp32:   lda      rd                ; get lsb from second number");
+    Asm("comp32:  lda      rd                ; get lsb from second number");
     Asm("         str      r2                ; store for subtract");
     Asm("         lda      rf                ; get lsb from first number");
     Asm("         sm                         ; subtract");
@@ -1882,14 +1882,14 @@ void library() {
     Asm("         sep      sret              ; return to caller");
     }
 
-  if (useICmp32) {
+  if (useIComp32) {
     /* ************************************************ */
     /* ***** 32-bit cmp.  M[RD]-M[RF]             ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
     /* ***** Returns: D=0 if M[RD]=M[RF]          ***** */
     /* *****          DF=1 if M[RD]<M[RF]         ***** */
     /* ************************************************ */
-    Asm("icmp32:  lda      rd                ; get lsb from second number");
+    Asm("icomp32: lda      rd                ; get lsb from second number");
     Asm("         str      r2                ; store for subtract");
     Asm("         lda      rf                ; get lsb from first number");
     Asm("         sd                         ; subtract");
@@ -2150,6 +2150,96 @@ void library() {
     Asm("         dec      rd");
     Asm("         dec      rd");
     Asm("         sep      sret              ; return to caller");
+    }
+
+  if (useCmp32) {
+    Asm("true32:     ldi     0ffh");
+    Asm("            sex     r7");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
+
+    Asm("false32:    ldi     000h");
+    Asm("            sex     r7");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            stxd");
+    Asm("            sex     r2");
+    Asm("            sep     sret");
+
+    Asm("cmp32:   glo      r7                ; copy expr stack to rd");
+    Asm("         plo      rd");
+    Asm("         plo      rf");
+    Asm("         ghi      r7");
+    Asm("         phi      rd");
+    Asm("         phi      rf");
+    Asm("         inc      rd                ; point to lsb of second number");
+    Asm("         inc      rf                ; point to lsb of first number");
+    Asm("         inc      rf                ; point to lsb of first number");
+    Asm("         inc      rf                ; point to lsb of first number");
+    Asm("         inc      rf                ; point to lsb of first number");
+    Asm("         inc      rf                ; point to lsb of first number");
+    Asm("         sep      scall             ; compare numbers");
+    Asm("         dw       comp32");
+    Asm("         inc      r7                ; Remove numbers from stack");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         sep      sret              ; Return to caller");
+    }
+
+  if (useEq32) {
+    Asm("eq32:    sep      scall             ; compare numbers");
+    Asm("         dw       cmp32");
+    Asm("         lbnz     false32           ; fails if numbers were unequal");
+    Asm("         lbr      true32            ; true if A=B");
+    }
+
+  if (useNe32) {
+    Asm("ne32:    sep      scall             ; compare numbers");
+    Asm("         dw       cmp32");
+    Asm("         lbz      false32           ; fails if numbers were equal");
+    Asm("         lbr      true32            ; true if A<>B");
+    }
+
+  if (useLt32) {
+    Asm("lt32:    sep      scall             ; compare numbers");
+    Asm("         dw       cmp32");
+    Asm("         lbz      false32           ; fails if numbers were equal");
+    Asm("         lbdf     true32            ; true if A<B");
+    Asm("         lbr      false32           ; otherwise false");
+    }
+
+  if (useGt32) {
+    Asm("gt32:    sep      scall             ; compare numbers");
+    Asm("         dw       cmp32");
+    Asm("         lbz      false32           ; fails if numbers were equal");
+    Asm("         lbnf     true32            ; true if A>B");
+    Asm("         lbr      false32           ; otherwise false");
+    }
+
+  if (useLte32) {
+    Asm("lte32:   sep      scall             ; compare numbers");
+    Asm("         dw       cmp32");
+    Asm("         lbz      true32            ; true if numbers were equal");
+    Asm("         lbdf     true32            ; true if A<B");
+    Asm("         lbr      false32           ; otherwise false");
+    }
+
+  if (useGte32) {
+    Asm("gte32:   sep      scall             ; compare numbers");
+    Asm("         dw       cmp32");
+    Asm("         lbz      true32            ; true if numbers were equal");
+    Asm("         lbnf     true32            ; true if A>B");
+    Asm("         lbr      false32           ; otherwise false");
     }
 
   if (useItoA32) {

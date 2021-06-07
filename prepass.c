@@ -35,7 +35,8 @@ int prepass(char* filename) {
   useAtoI32 = 0;
   useCmp32 = 0;
   useDiv32 = 0;
-  useICmp32 = 0;
+  useIComp32 = 0;
+  useIComp32 = 0;
   useItoA32 = 0;
   useMul32 = 0;
   useNeg32 = 0;
@@ -146,6 +147,10 @@ int prepass(char* filename) {
     useZero32 = -1;
     useShl32 = -1;
     useShr32 = -1;
+    }
+  if (useEq32 || useNe32 || useGt32 || useLt32 || useGte32 || useLte32) {
+    useCmp32 = -1;
+    useComp32 = -1;
     }
   if (lblF_inmsg == 0xffff) {
     useAtoI = 0;
