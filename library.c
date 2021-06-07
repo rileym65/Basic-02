@@ -1604,7 +1604,7 @@ void library() {
     /* *****    RD - points to second number      ***** */
     /* *****    RF - points to answer             ***** */
     /* ************************************************ */
-    Asm("mul32:   ldi      0                 ; need to zero answer");
+    Asm("mul32i:  ldi      0                 ; need to zero answer");
     Asm("         stxd");
     Asm("         stxd");
     Asm("         stxd");
@@ -1619,9 +1619,9 @@ void library() {
     Asm("         phi      rf");
     Asm("         inc      rf                ; point to LSB of answer");
     Asm("scmul2:  glo      rd                ; need second number");
-    Asm("         plo      rf");
+    Asm("         plo      ra");
     Asm("         ghi      rd");
-    Asm("         phi      rf");
+    Asm("         phi      ra");
     Asm("         sep      scall             ; check for zero");
     Asm("         dw       zero32");
     Asm("         lbnf     scmul4            ; jump if number was not zero");
@@ -1669,6 +1669,26 @@ void library() {
     Asm("         sep      scall             ; shift right");
     Asm("         dw       shr32");
     Asm("         lbr      scmul2            ; loop until done");
+
+    Asm("mul32:   glo      r7                ; setup pointers");
+    Asm("         plo      rd");
+    Asm("         plo      rf");
+    Asm("         ghi      r7                ; setup pointers");
+    Asm("         phi      rd");
+    Asm("         phi      rf");
+    Asm("         inc      rd");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         sep      scall             ; Perform multiply");
+    Asm("         dw       mul32i");
+    Asm("         inc      r7                ; Remove 2nd number from stack");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         sep      sret              ; Return to caller");
     }
 
   if (useDiv32) {
