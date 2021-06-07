@@ -37,6 +37,10 @@ char* con(char* line) {
     }
   Asm("          inc   r7                      ; Get low value of index");
   Asm("          lda   r7");
+  if (use32Bits) {
+    Asm("          inc   r7                      ; Remove high word");
+    Asm("          inc   r7");
+    }
   for (i=0; i<lineCount; i++) {
     Asm("          smi   1                       ; Subtract 1 from index");
     if (findLine(lines[i], &addr) != 0) {
