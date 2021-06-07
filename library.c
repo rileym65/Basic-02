@@ -1613,6 +1613,26 @@ void library() {
     Asm("         dec      rd");
     Asm("         dec      rd");
     Asm("         sep      sret              ; return to caller");
+
+    Asm("sub32:   glo      r7                ; setup pointers");
+    Asm("         plo      rd");
+    Asm("         plo      rf");
+    Asm("         ghi      r7                ; setup pointers");
+    Asm("         phi      rd");
+    Asm("         phi      rf");
+    Asm("         inc      rd");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         inc      rf");
+    Asm("         sep      scall             ; Perform subtraction");
+    Asm("         dw       sub32i");
+    Asm("         inc      r7                ; Remove 2nd number from stack");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         inc      r7");
+    Asm("         sep      sret              ; Return to caller");
     }
 
   if (useMul32) {
