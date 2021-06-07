@@ -61,17 +61,27 @@ char* cinput(char* line) {
     Asm("          phi   rf");
     Asm("          ldi   [iobuffer].0");
     Asm("          plo   rf");
-    Asm("          sep   scall                   ; Convert ASCII to integer");
-    Asm("          dw    atoi");
-    sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
-    Asm("          phi   rf");
-    sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
-    Asm("          plo   rf");
-    Asm("          ghi   rc                      ; Store value into variable");
-    Asm("          str   rf");
-    Asm("          inc   rf");
-    Asm("          glo   rc");
-    Asm("          str   rf");
+    if (use32Bits) {
+      sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+      Asm("          plo   rd");
+      Asm("          sep   scall                   ; Convert ASCII to integer");
+      Asm("          dw    atoi32");
+      }
+    else {
+      Asm("          sep   scall                   ; Convert ASCII to integer");
+      Asm("          dw    atoi");
+      sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          ghi   rc                      ; Store value into variable");
+      Asm("          str   rf");
+      Asm("          inc   rf");
+      Asm("          glo   rc");
+      Asm("          str   rf");
+      }
     Asm("          sep   scall                   ; Display cr/lf");
     Asm("          dw    f_inmsg");
     Asm("          db    10,13,0");
