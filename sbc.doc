@@ -98,6 +98,7 @@ producing a fully self-contained program that has no external dependencies.
 line is currently limited to 2048 character.
 
 Switches:
+-32             - compile in 32-bit mode
 -a              - produce assembly file
 -A              - display assembly
 -b              - output as binary

@@ -42,11 +42,13 @@ int prepass(char* filename) {
   useItoA32 = 0;
   useMul32 = 0;
   useNeg32 = 0;
+  useNext32 = 0;
   useNull32 = 0;
   useOr32 = 0;
   useSgn32 = 0;
   useShl32 = 0;
   useShr32 = 0;
+  useStep32 = 0;
   useSub32 = 0;
   useXor32 = 0;
   useZero32 = 0;
@@ -107,6 +109,8 @@ int prepass(char* filename) {
             if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt32 = -1;
             if (strncasecmp(currentLine+i,"print",5) == 0) useItoA32 = -1;
             if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI32 = -1;
+            if (strncasecmp(currentLine+i,"next",4) == 0) useNext32 = -1;
+            if (strncasecmp(currentLine+i,"step",4) == 0) useStep32 = -1;
             if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub32 = -1;
             if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn32 = -1;
             if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs32 = -1;
@@ -128,6 +132,8 @@ int prepass(char* filename) {
             if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
             if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
             if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
+            if (strncasecmp(currentLine+i,"next",4) == 0) useNext = -1;
+            if (strncasecmp(currentLine+i,"step",4) == 0) useStep = -1;
             if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
             if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn = -1;
             if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
@@ -135,8 +141,6 @@ int prepass(char* filename) {
           if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
           if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
-          if (strncasecmp(currentLine+i,"next",4) == 0) useNext = -1;
-          if (strncasecmp(currentLine+i,"step",4) == 0) useStep = -1;
           if (strncasecmp(currentLine+i,"read",4) == 0) useData = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
           if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
@@ -158,6 +162,9 @@ int prepass(char* filename) {
   if (useStep) {
     useDiv = -1;
     }
+  if (useStep32) {
+    useDiv32 = -1;
+    }
   if (useMul32) {
     useAdd32 = -1;
     useZero32 = -1;
@@ -173,6 +180,10 @@ int prepass(char* filename) {
     useZero32 = -1;
     useShl32 = -1;
     useShr32 = -1;
+    }
+  if (useNext32) {
+    useSub32 = -1;
+    useAbs32 = -1;
     }
   if (useEq32 || useNe32 || useGt32 || useLt32 || useGte32 || useLte32) {
     useCmp32 = -1;
