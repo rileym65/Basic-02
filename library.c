@@ -2304,6 +2304,44 @@ void library() {
     Asm("         lbr      false32           ; otherwise false");
     }
 
+  if (useAbs32) {
+    if (passNumber == 1) lblAbs = address;
+    Asm("abs32:    inc     r7");
+    Asm("          inc     r7");
+    Asm("          inc     r7");
+    Asm("          inc     r7");
+    Asm("          ldn     r7");
+    Asm("          shl");
+    Asm("          lbnf    absrt32");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          ldn     r7");
+    Asm("          xri     0ffh");
+    Asm("          adi     1");
+    Asm("          str     r7");
+    Asm("          inc     r7");
+    Asm("          ldn     r7");
+    Asm("          xri     0ffh");
+    Asm("          adci    0");
+    Asm("          str     r7");
+    Asm("          inc     r7");
+    Asm("          ldn     r7");
+    Asm("          xri     0ffh");
+    Asm("          adci    0");
+    Asm("          str     r7");
+    Asm("          inc     r7");
+    Asm("          ldn     r7");
+    Asm("          xri     0ffh");
+    Asm("          adci    0");
+    Asm("          str     r7");
+    Asm("absrt32:  dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    }
+
   if (useSgn32) {
     Asm("sgn32:    inc     r7");
     Asm("          lda     r7");
