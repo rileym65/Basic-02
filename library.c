@@ -652,7 +652,7 @@ void library() {
     Asm("            or");
     Asm("            sex     r2");
     Asm("            lbz     true");
-    Asm("            lbz     false");
+    Asm("            lbr     false");
     }
 
   if (useNe) {
@@ -665,7 +665,7 @@ void library() {
     Asm("            or");
     Asm("            sex     r2");
     Asm("            lbnz    true");
-    Asm("            lbz     false");
+    Asm("            lbr     false");
     }
 
   if (useGt) {
@@ -681,7 +681,7 @@ void library() {
     Asm("            ldn     r7");
     Asm("            shl");
     Asm("            lbnf    true");
-    Asm("            lbz     false");
+    Asm("            lbr     false");
     }
 
   if (useLt) {
@@ -697,7 +697,7 @@ void library() {
     Asm("            ldn     r7");
     Asm("            shl");
     Asm("            lbdf    true");
-    Asm("            lbz     false");
+    Asm("            lbr     false");
     }
 
   if (useGte) {
@@ -713,7 +713,7 @@ void library() {
     Asm("            ldn     r7");
     Asm("            shl");
     Asm("            lbnf    true");
-    Asm("            lbz     false");
+    Asm("            lbr     false");
     }
 
   if (useLte) {
@@ -729,7 +729,7 @@ void library() {
     Asm("            ldn     r7");
     Asm("            shl");
     Asm("            lbdf    true");
-    Asm("            lbz     false");
+    Asm("            lbr     false");
     }
 
   if (useAbs) {
