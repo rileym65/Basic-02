@@ -28,14 +28,14 @@ char* cout(char* line) {
   Asm("          inc   r7                      ; Write out value to stack");
   Asm("          lda   r7");
   Asm("          stxd");
-  Asm("          glo   re                      ; Recover OUT command");
-  Asm("          str   r2                      ; Place back on stack");
-  Asm("          sep   r2                      ; Execute code on stack");
-  Asm("          dec   r2                      ; Put stack pointer back where it belongs");
   if (use32Bits) {
     Asm("          inc   r7                      ; Remove high word");
     Asm("          inc   r7");
     }
+  Asm("          glo   re                      ; Recover OUT command");
+  Asm("          str   r2                      ; Place back on stack");
+  Asm("          sep   r2                      ; Execute code on stack");
+  Asm("          dec   r2                      ; Put stack pointer back where it belongs");
   return line;
   }
 
