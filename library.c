@@ -785,8 +785,6 @@ void library() {
 
   if (useRnd) {
     if (passNumber == 1) lblRnd = address;
-    Asm("rnd16:    ldi     16");
-    Asm("          plo     rc");
     Asm("lfsr_lp:  ldi     [LFSR_].1");
     Asm("          phi     r9");
     Asm("          ldi     [LFSR_].0");
@@ -850,6 +848,12 @@ void library() {
     Asm("          dec     rc");
     Asm("          glo     rc");
     Asm("          lbnz    lfsr_lp");
+    Asm("          sep     sret");
+
+    Asm("rnd16:    ldi     16");
+    Asm("          plo     rc");
+    Asm("          sep     scall         ; Shift the register");
+    Asm("          dw      lfsr_lp");
     Asm("          ldi     [LFSR_].1");
     Asm("          phi     r9");
     Asm("          ldi     [LFSR_].0");
@@ -1827,6 +1831,8 @@ void library() {
     Asm("         sep      scall             ; need to shift b right");
     Asm("         dw       shr32");
     Asm("         dec      rb                ; decrement shift");
+    Asm("         glo      rb                ; see if run out of shifts");
+    Asm("         lbz      scdivd1           ; done if so");
     Asm("         lbr      scdiv4            ; loop back until done");
     Asm("scdivd1: glo      rb                ; get shift");
     Asm("         shl                        ; shift sign into df");
@@ -1851,7 +1857,18 @@ void library() {
     Asm("         dw       shr32");
     Asm("         inc      rb                ; increment shift");
     Asm("         lbr      scdivd2");
-    Asm("scdivdn: ldi      4                 ; 4 bytes to trcnsfer");
+    Asm("scdivdn: lda      rf                ; recover remainder");
+    Asm("         plo      rb");
+    Asm("         lda      rf");
+    Asm("         phi      rb");
+    Asm("         lda      rf                ; recover remainder");
+    Asm("         plo      ra");
+    Asm("         ldn      rf");
+    Asm("         phi      ra");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         dec      rf");
+    Asm("         ldi      4                 ; 4 bytes to trcnsfer");
     Asm("         plo      r9");
     Asm("scdivd5: lda      rc                ; get result byte");
     Asm("         str      rf                ; store into answer");
@@ -1897,6 +1914,28 @@ void library() {
     Asm("         inc      r7");
     Asm("         inc      r7");
     Asm("         sep      sret              ; Return to caller");
+    }
+
+  if (useMod32) {
+    Asm("mod32:      sep     scall");
+    Asm("            dw      div32");
+    Asm("            inc     r7");
+    Asm("            inc     r7");
+    Asm("            inc     r7");
+    Asm("            inc     r7");
+    Asm("            ghi     ra");
+    Asm("            str     r7");
+    Asm("            dec     r7");
+    Asm("            glo     ra");
+    Asm("            str     r7");
+    Asm("            dec     r7");
+    Asm("            ghi     rb");
+    Asm("            str     r7");
+    Asm("            dec     r7");
+    Asm("            glo     rb");
+    Asm("            str     r7");
+    Asm("            dec     r7");
+    Asm("            sep     sret");
     }
 
   if (useComp32) {
