@@ -272,6 +272,7 @@ LINK byte   useNeg32;
 LINK byte   useNext32;
 LINK byte   useNull32;
 LINK char   useOr32;
+LINK char   useRnd32;
 LINK char   useSgn32;
 LINK byte   useShl32;
 LINK byte   useShr32;

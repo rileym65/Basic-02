@@ -45,6 +45,7 @@ int prepass(char* filename) {
   useNext32 = 0;
   useNull32 = 0;
   useOr32 = 0;
+  useRnd32 = 0;
   useSgn32 = 0;
   useShl32 = 0;
   useShr32 = 0;
@@ -114,6 +115,7 @@ int prepass(char* filename) {
             if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub32 = -1;
             if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn32 = -1;
             if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs32 = -1;
+            if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd32 = -1;
             }
           else {
             if (currentLine[i] == '+') useAdd = -1;
@@ -137,13 +139,13 @@ int prepass(char* filename) {
             if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
             if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn = -1;
             if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
+            if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
             }
           if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
           if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
           if (strncasecmp(currentLine+i,"read",4) == 0) useData = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
-          if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
           if (strncasecmp(currentLine+i,"alloc(",6) == 0) useHeap = -1;
           }
         }
@@ -154,6 +156,7 @@ int prepass(char* filename) {
   if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
   if (useCmp) useSub = -1;
   if (useRnd) useMod = -1;
+  if (useRnd32) useMod32 = -1;
   if (useMod) useDiv = -1;
   if (useNext) {
     useSub = -1;
@@ -171,6 +174,7 @@ int prepass(char* filename) {
     useShl32 = -1;
     useShr32 = -1;
     }
+  if (useMod32) useDiv32 = -1;
   if (useDiv32) {
     useSub32 = -1;
     useNeg32 = -1;

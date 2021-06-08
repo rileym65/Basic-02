@@ -783,8 +783,7 @@ void library() {
     Asm("          sep     sret");
     }
 
-  if (useRnd) {
-    if (passNumber == 1) lblRnd = address;
+  if (useRnd || useRnd32) {
     Asm("lfsr_lp:  ldi     [LFSR_].1");
     Asm("          phi     r9");
     Asm("          ldi     [LFSR_].0");
@@ -849,7 +848,10 @@ void library() {
     Asm("          glo     rc");
     Asm("          lbnz    lfsr_lp");
     Asm("          sep     sret");
+    }
 
+  if (useRnd) {
+    if (passNumber == 1) lblRnd = address;
     Asm("rnd16:    ldi     16");
     Asm("          plo     rc");
     Asm("          sep     scall         ; Shift the register");
@@ -868,6 +870,7 @@ void library() {
     Asm("          ldn     r7");
     Asm("          phi     r9");
     Asm("          ghi     rf");
+    Asm("          ani     07fh");
     Asm("          str     r7");
     Asm("          dec     r7");
     Asm("          glo     rf");
@@ -1936,6 +1939,55 @@ void library() {
     Asm("            str     r7");
     Asm("            dec     r7");
     Asm("            sep     sret");
+    }
+
+  if (useRnd32) {
+    Asm("rnd32:    ldi     32");
+    Asm("          plo     rc");
+    Asm("          sep     scall         ; Shift the register");
+    Asm("          dw      lfsr_lp");
+    Asm("          ldi     [LFSR_].1");
+    Asm("          phi     r9");
+    Asm("          ldi     [LFSR_].0");
+    Asm("          plo     r9");
+
+    Asm("          inc     r7            ; Retrieve range");
+    Asm("          lda     r7");
+    Asm("          plo     rb");
+    Asm("          lda     r7");
+    Asm("          phi     rb");
+    Asm("          lda     r7");
+    Asm("          plo     ra");
+    Asm("          ldn     r7");
+    Asm("          phi     ra");
+    
+    Asm("          lda     r9            ; Transfer random number");
+    Asm("          ani     07fh          ; no negative numbers");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          lda     r9");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          lda     r9");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          lda     r9");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    
+    Asm("          ghi     ra            ; Put range on expr stack");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          glo     ra");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          ghi     rb");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          glo     rb");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          lbr     mod32          ; and perform modulo");
     }
 
   if (useComp32) {
