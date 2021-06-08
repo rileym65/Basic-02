@@ -2304,6 +2304,50 @@ void library() {
     Asm("         lbr      false32           ; otherwise false");
     }
 
+  if (useSgn32) {
+    Asm("sgn32:    inc     r7");
+    Asm("          lda     r7");
+    Asm("          str     r2");
+    Asm("          lda     r7");
+    Asm("          or");
+    Asm("          str     r2");
+    Asm("          lda     r7");
+    Asm("          or");
+    Asm("          str     r2");
+    Asm("          ldn     r7");
+    Asm("          shl");
+    Asm("          lbdf    sgnm32");
+    Asm("          ldn     r7");
+    Asm("          or");
+    Asm("          lbz     sgn032");
+    Asm("          ldi     0");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          ldi     1");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    Asm("sgnm32:   ldi     0ffh");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    Asm("sgn032:   dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    }
+
   if (useItoA32) {
     /* ***************************************** */
     /* ***** Convert RA:RB to bcd in M[RF] ***** */
