@@ -2648,6 +2648,13 @@ void library() {
   Asm("          phi  rf");
   Asm("          ldi  [free_].0");
   Asm("          plo  rf");
+  if (use32Bits) {
+    Asm("          ldi  0");
+    Asm("          str  rf");
+    Asm("          inc  rf");
+    Asm("          str  rf");
+    Asm("          inc  rf");
+    }
   output(LDI); output(t1/256);                                   //           LDI  freemem.1
   output(STR+RF);                                                //           STR  RF
   output(INC+RF);                                                //           INC  RF

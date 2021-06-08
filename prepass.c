@@ -28,6 +28,7 @@ int prepass(char* filename) {
   useEf = 0;
   useRnd = 0;
   useNext = 0;
+  useStep = 0;
   useData = 0;
   useHeap = 0;
   useAdd32 = 0;
@@ -104,6 +105,7 @@ int prepass(char* filename) {
             if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt32 = -1;
             if (strncasecmp(currentLine+i,"print",5) == 0) useItoA32 = -1;
             if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI32 = -1;
+            if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub32 = -1;
             }
           else {
             if (currentLine[i] == '+') useAdd = -1;
@@ -122,14 +124,15 @@ int prepass(char* filename) {
             if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
             if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
             if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
+            if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
             }
           if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
           if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
           if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
           if (strncasecmp(currentLine+i,"next",4) == 0) useNext = -1;
+          if (strncasecmp(currentLine+i,"step",4) == 0) useStep = -1;
           if (strncasecmp(currentLine+i,"read",4) == 0) useData = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
-          if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
           if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
           if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
           if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn = -1;
@@ -144,7 +147,13 @@ int prepass(char* filename) {
   if (useCmp) useSub = -1;
   if (useRnd) useMod = -1;
   if (useMod) useDiv = -1;
-  if (useNext) useSub = -1;
+  if (useNext) {
+    useSub = -1;
+    useAbs = -1;
+    }
+  if (useStep) {
+    useDiv = -1;
+    }
   if (useMul32) {
     useAdd32 = -1;
     useZero32 = -1;

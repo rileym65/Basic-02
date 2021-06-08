@@ -259,16 +259,22 @@ int reduce(char last) {
            Asm("           str     r7");
            Asm("           dec     r7");
            }
-         Asm("           ldi     [FREE_].1           ; Get address of free memory");
-         Asm("           phi     rf");
-         Asm("           ldi     [FREE_].0");
-         Asm("           plo     rf");
          if (use32Bits) {
+           Asm("           ldi     [FREE_]+2.1           ; Get address of free memory");
+           Asm("           phi     rf");
+           Asm("           ldi     [FREE_]+2.0");
+           Asm("           plo     rf");
            Asm("           ldi     0                   ; High word is zero");
            Asm("           str     r7");
            Asm("           dec     r7");
            Asm("           str     r7");
            Asm("           dec     r7");
+           }
+         else {
+           Asm("           ldi     [FREE_].1           ; Get address of free memory");
+           Asm("           phi     rf");
+           Asm("           ldi     [FREE_].0");
+           Asm("           plo     rf");
            }
          Asm("           lda     rf                  ; Retrieve free memory address");
          Asm("           str     r7");
@@ -277,7 +283,8 @@ int reduce(char last) {
          Asm("           str     r7");
          Asm("           dec     r7");
          Asm("           sep     scall               ; Perform subtraction");
-         Asm("           dw      sub16");
+         if (use32Bits) Asm("           dw      sub32");
+           else Asm("           dw      sub16");
          break;
     case OP_INP:
          Asm("           ldi     0d3h                ; Push SEP R3 onto stack");
