@@ -616,16 +616,16 @@ char* cexpr(char* line) {
       if (*temp == ',' || *temp == ';' || *temp == 0 ||
           (*temp >= 'a' && *temp <= 'z') ||
           (*temp >= 'A' && *temp <= 'Z')) {
-        sprintf(buffer,"           ldi     %d                  ; Set expression result to constant",(num & 0xff000000) >> 24); Asm(buffer);
+        sprintf(buffer,"           ldi     %d                  ; Set expression result to constant",(num32 & 0xff000000) >> 24); Asm(buffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        sprintf(buffer,"           ldi     %d",(num & 0xff0000) >> 16); Asm(buffer);
+        sprintf(buffer,"           ldi     %d",(num32 & 0xff0000) >> 16); Asm(buffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        sprintf(buffer,"           ldi     %d",(num & 0xff00) >> 8); Asm(buffer);
+        sprintf(buffer,"           ldi     %d",(num32 & 0xff00) >> 8); Asm(buffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        sprintf(buffer,"           ldi     %d",num & 0xff); Asm(buffer);
+        sprintf(buffer,"           ldi     %d",num32 & 0xff); Asm(buffer);
         Asm("           str     r7");
         Asm("           dec     r7");
         return temp;
