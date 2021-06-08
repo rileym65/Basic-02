@@ -45,9 +45,9 @@ char* cdata(char* line) {
     if (passNumber == 1) {
       numData++;
       if (numData == 1)
-        data = (word*)malloc(sizeof(word));
+        data = (dword*)malloc(sizeof(dword));
       else
-        data = (word*)realloc(data, sizeof(word) * numData);
+        data = (dword*)realloc(data, sizeof(dword) * numData);
       data[numData-1] = num;
       }
     if (*line == ',') {

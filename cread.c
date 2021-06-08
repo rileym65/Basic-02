@@ -45,6 +45,14 @@ char* cread(char* line) {
     Asm("          inc   rc");
     Asm("          lda   rd");
     Asm("          str   rc");
+    if (use32Bits) {
+      Asm("          inc   rc");
+      Asm("          lda   rd");
+      Asm("          str   rc");
+      Asm("          inc   rc");
+      Asm("          lda   rd");
+      Asm("          str   rc");
+      }
     last = addr;
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {

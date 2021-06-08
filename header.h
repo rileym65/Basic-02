@@ -130,7 +130,7 @@ LINK char   baseName[1024];
 LINK char   buffer[2048];
 LINK char   compMode;
 LINK word   codeGenerated;
-LINK word  *data;
+LINK dword  *data;
 LINK word   dataAddress;
 LINK word  *dataLines;
 LINK word  *dataPositions;

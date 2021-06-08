@@ -60,7 +60,12 @@ int pass(char* filename) {
     if (showCompiler && passNumber == 2) printf("%04x:",address);
     strcpy(buffer, "data:     dw    ");
     for (i=0; i<numData; i++) {
-      sprintf(tmp,"%d",data[i]);
+      if (use32Bits) {
+        sprintf(tmp,"%d,%d",(data[i] & 0xffff0000) >> 16, data[i] & 0xffff);
+        }
+      else {
+        sprintf(tmp,"%d",data[i]);
+        }
       if (strlen(buffer) > 16) strcat(buffer,",");
       strcat(buffer,tmp);
       if (strlen(buffer) > 60) {
