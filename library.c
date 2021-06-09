@@ -2890,6 +2890,19 @@ void library() {
     }
 
   if (useFp) {
+    Asm("fpdot1:    db      0cdh, 0cch, 0cch, 03dh");
+    Asm("fp_0:      db      00,00,00,00");
+    Asm("fp_1:      db      00,00,080h,03fh");
+    Asm("fp_2:      db      00,00,000h,040h");
+    Asm("fp_10:     db      00,00,020h,041h");
+    Asm("fp_100:    db      00,00,0c8h,042h");
+    Asm("fp_1000:   db      00,00,07ah,044h");
+    Asm("fp_e:      db      054h, 0f8h, 02dh, 040h");
+    Asm("fp_pi:     db      0dbh, 00fh, 049h, 040h");
+    Asm("fp_3:      db      00,00,040h,040h");
+    Asm("fpdot5:    db      000h, 000h, 000h, 03fh");
+    Asm("fp_halfpi: db      0dbh, 00fh, 0c9h, 03fh");
+
     /* ******************************************* */
     /* ***** Normalize and combine FP result ***** */
     /* ***** R7:R8 - Mantissa                ***** */

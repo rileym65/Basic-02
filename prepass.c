@@ -53,6 +53,12 @@ int prepass(char* filename) {
   useSub32 = 0;
   useXor32 = 0;
   useZero32 = 0;
+  useAddFp = 0;
+  useDivFp = 0;
+  useMulFp = 0;
+  useSubFp = 0;
+  useFtoA = 0;
+  useAtoF = 0;
 
   lblAtoI = 0;
   lblAbs = 0;
@@ -153,6 +159,9 @@ int prepass(char* filename) {
     }
   fclose(source);
 
+  if (useFp) {
+    useAddFp = useAdd32;
+    }
   if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
   if (useCmp) useSub = -1;
   if (useRnd) useMod = -1;
