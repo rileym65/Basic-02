@@ -99,6 +99,7 @@ line is currently limited to 2048 character.
 
 Switches:
 -32             - compile in 32-bit mode
+-fp             - enable floating point
 -a              - produce assembly file
 -A              - display assembly
 -b              - output as binary

@@ -24,6 +24,7 @@ void processROM(char* buffer) {
 
 void processOption(char* option) {
     if (strcmp(option,"-32") == 0) use32Bits = -1;
+    if (strcmp(option,"-fp") == 0) { useFp = -1; use32Bits = -1; }
     if (strcmp(option,"-1805") == 0) use1805 = -1;
     if (strcmp(option,"-a") == 0) useAsm = -1;
     if (strcmp(option,"-A") == 0) showAsm = -1;

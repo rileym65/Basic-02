@@ -128,6 +128,7 @@ int main(int argc, char** argv, char** envp) {
   useAsm = 0;
   use1805 = 0;
   use32Bits = 0;
+  useFp = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;
