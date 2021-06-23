@@ -119,6 +119,9 @@
 #define RE       0x0e
 #define RF       0x0f
 
+#define OP_NUMFP  0x01
+#define OP_NUM    0x00
+
 typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int   dword;
@@ -220,6 +223,8 @@ LINK char   showSymbols;
 LINK char   showVariables;
 LINK FILE  *source;
 LINK char   sourceFile[1024];
+LINK int    tokens[64];
+LINK int    numTokens;
 LINK char   use1805;
 LINK char   useAbs;
 LINK char   useAdd;
@@ -281,11 +286,19 @@ LINK byte   useStep32;
 LINK byte   useSub32;
 LINK char   useXor32;
 LINK char   useZero32;
+LINK char   useAbsFp;
 LINK char   useAddFp;
 LINK char   useAtoF;
 LINK char   useDivFp;
+LINK byte   useEqFp;
 LINK char   useFtoA;
+LINK byte   useGtFp;
+LINK byte   useGteFp;
+LINK byte   useLtFp;
+LINK byte   useLteFp;
 LINK byte   useMulFp;
+LINK byte   useNeFp;
+LINK char   useSgnFp;
 LINK byte   useSubFp;
 LINK char **variableNames;
 LINK word  *variableAddresses;
@@ -306,7 +319,7 @@ extern char* cdealloc(char* line);
 extern char* cdma(char* line);
 extern char* cdpoke(char* line);
 extern char* cend(char* line);
-extern char* cexpr(char* line);
+extern char* cexpr(char* line, int etype);
 extern char* cfor(char* line);
 extern char* cgosub(char* line);
 extern char* cgoto(char* line);
@@ -344,6 +357,7 @@ extern int   prepass(char* filename);
 extern void  processOption(char* option);
 extern void  showError(char* msg);
 extern char* trim(char* line);
+
 extern void  writeAsm(char* line,char* rem);
 
 #endif

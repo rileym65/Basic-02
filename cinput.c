@@ -1,6 +1,7 @@
 #include "header.h"
 
 char* cinput(char* line) {
+  int  fp;
   char qt;
   word addr;
   char name[256];
@@ -31,6 +32,7 @@ char* cinput(char* line) {
       exit(1);
       }
     }
+  fp = 0;
   line++;
   while (*line != ':' && *line != 0) {
     if (!(*line >= 'a' && *line <= 'z') &&
@@ -44,6 +46,19 @@ char* cinput(char* line) {
            (*line >= '0' && *line <= '9') ||
            *line == '_') {
       name[pos++] = *line++;
+      if (useFp) {
+        if (*line == '!') {
+          name[pos++] = *line++;
+          fp = -1;
+          while ((*line >= 'a' && *line <= 'z') ||
+                 (*line >= 'A' && *line <= 'Z') ||
+                 (*line >= '0' && *line <= '9') ||
+                 *line == '_') {
+            showError("Invalid variable name");
+            exit(1);
+            }
+          }
+        }
       }
     name[pos] = 0;
     if (strlen(name) == 0) {
@@ -61,7 +76,15 @@ char* cinput(char* line) {
     Asm("          phi   rf");
     Asm("          ldi   [iobuffer].0");
     Asm("          plo   rf");
-    if (use32Bits) {
+    if (useFp) {
+      sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+      Asm("          plo   rd");
+      Asm("          sep   scall                   ; Convert ASCII to integer");
+      Asm("          dw    atof");
+      }
+    else if (use32Bits) {
       sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rd");
       sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);

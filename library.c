@@ -3096,178 +3096,174 @@ void library() {
 
     /* **************************************************** */
     /* ***** Convert 32-bit integer to floating point ***** */
+    /* ***** numbers are on expr stack                ***** */
     /* ***** RF - Pointer to 32-bit integer           ***** */
     /* ***** RD - Destination floating point          ***** */
     /* **************************************************** */
-    Asm("itof:      ghi     r7           ; save expr stack");
-    Asm("           stxd");
-    Asm("           glo     r7");
-    Asm("           stxd");
-    Asm("           lda     rf           ; retrieve 32-bit integer into r7:r8");
-    Asm("           plo     r8");
+    Asm("itof:      inc     r7");
+    Asm("           lda     r7           ; retrieve 32-bit integer into ra:rb");
+    Asm("           plo     rb");
     Asm("           str     r2           ; store for zero check");
-    Asm("           lda     rf");
-    Asm("           phi     r8");
+    Asm("           lda     r7");
+    Asm("           phi     rb");
     Asm("           or                   ; combine with zero check");
     Asm("           str     r2           ; keep zero check on stack");
-    Asm("           lda     rf");
-    Asm("           plo     r7");
+    Asm("           lda     r7");
+    Asm("           plo     ra");
     Asm("           or");
     Asm("           str     r2");
-    Asm("           lda     rf           ; MSB");
-    Asm("           phi     r7");
+    Asm("           ldn     r7           ; MSB");
+    Asm("           phi     ra");
     Asm("           or");
     Asm("           lbz     itof0        ; jump if input number is zero");
     Asm("           ldi     0            ; set sign flag");
     Asm("           str     r2");
-    Asm("           ghi     r7           ; see if number is negative");
+    Asm("           ghi     ra           ; see if number is negative");
     Asm("           shl                  ; shift sign bit into DF");
     Asm("           lbnf    itof_p       ; jump if number is positive");
     Asm("           ldi     1            ; set sign flag");
     Asm("           stxd");
-    Asm("           sep     scall        ; 2s compliment input number");
-    Asm("           dw      fpcomp2");
+    Asm("           glo     rb           ; 2s compliment input number");
+    Asm("           xri     0ffh");
+    Asm("           adi     1");
+    Asm("           plo     rb");
+    Asm("           ghi     rb");
+    Asm("           xri     0ffh");
+    Asm("           adci    1");
+    Asm("           plo     rb");
+    Asm("           glo     ra");
+    Asm("           xri     0ffh");
+    Asm("           adci    1");
+    Asm("           plo     ra");
+    Asm("           ghi     ra");
+    Asm("           xri     0ffh");
+    Asm("           adci    1");
+    Asm("           phi     ra");
     Asm("           irx                  ; point x back to sign flag");
     Asm("itof_p:    ldi     150          ; exponent starts at 150");
     Asm("           plo     re");
-    Asm("itof_1:    ghi     r7           ; see if need right shifts");
+    Asm("itof_1:    ghi     ra           ; see if need right shifts");
     Asm("           lbz     itof_2       ; jump if not");
     Asm("           shr                  ; otherwise shift number right");
-    Asm("           phi     r7");
-    Asm("           glo     r7");
+    Asm("           phi     ra");
+    Asm("           glo     ra");
     Asm("           shrc");
-    Asm("           plo     r7");
-    Asm("           ghi     r8");
+    Asm("           plo     ra");
+    Asm("           ghi     rb");
     Asm("           shrc");
-    Asm("           phi     r8");
-    Asm("           glo     r8");
+    Asm("           phi     rb");
+    Asm("           glo     rb");
     Asm("           shrc");
-    Asm("           plo     r8");
+    Asm("           plo     rb");
     Asm("           inc     re           ; increment exponent");
     Asm("           lbr     itof_1       ; and loop to see if more shifts needed");
-    Asm("itof_2:    glo     r7           ; see if we need left shifts");
+    Asm("itof_2:    glo     ra           ; see if we need left shifts");
     Asm("           ani     080h");
     Asm("           lbnz    itof_3       ; jump if no shifts needed");
-    Asm("           glo     r8           ; shift number left");
+    Asm("           glo     rb           ; shift number left");
     Asm("           shl");
-    Asm("           plo     r8");
-    Asm("           ghi     r8");
+    Asm("           plo     rb");
+    Asm("           ghi     rb");
     Asm("           shlc");
-    Asm("           phi     r8");
-    Asm("           glo     r7");
+    Asm("           phi     rb");
+    Asm("           glo     ra");
     Asm("           shlc");
-    Asm("           plo     r7");
-    Asm("           ghi     r7");
+    Asm("           plo     ra");
+    Asm("           ghi     ra");
     Asm("           shlc");
-    Asm("           phi     r7");
+    Asm("           phi     ra");
     Asm("           dec     re           ; decrement exponent");
     Asm("           lbr     itof_2       ; and loop to see if more shifts needed");
-    Asm("itof_3:    glo     r7           ; prepare to merge in exponent");
+    Asm("itof_3:    glo     ra           ; prepare to merge in exponent");
     Asm("           shl");
-    Asm("           plo     r7");
+    Asm("           plo     ra");
     Asm("           glo     re           ; get exponent");
-    Asm("           phi     r7           ; store into result");
+    Asm("           phi     ra           ; store into result");
     Asm("           shr                  ; shift it right 1 bit");
-    Asm("           glo     r7");
+    Asm("           glo     ra");
     Asm("           shrc                 ; shift final exponent bit in");
-    Asm("           plo     r7");
+    Asm("           plo     ra");
     Asm("           ldx                  ; recover sign flag");
     Asm("           shr                  ; shift it into DF");
-    Asm("           ghi     r7           ; get msb of result");
+    Asm("           ghi     ra           ; get msb of result");
     Asm("           shrc                 ; shift in sign bit");
-    Asm("           phi     r7           ; and put it back");
-    Asm("itof0:     glo     r8           ; store answer into destination");
-    Asm("           str     rd");
-    Asm("           inc     rd");
-    Asm("           ghi     r8");
-    Asm("           str     rd");
-    Asm("           inc     rd");
-    Asm("           glo     r7");
-    Asm("           str     rd");
-    Asm("           inc     rd");
-    Asm("           ghi     r7");
-    Asm("           str     rd");
-    Asm("           irx                  ; recover expr stack");
-    Asm("           ldxa");
-    Asm("           plo     r7");
-    Asm("           ldx");
-    Asm("           phi     r7");
+    Asm("           phi     ra           ; and put it back");
+    Asm("itof0:     ghi     ra           ; store answer into destination");
+    Asm("           str     r7");
+    Asm("           dec     r7");
+    Asm("           glo     ra");
+    Asm("           str     r7");
+    Asm("           dec     r7");
+    Asm("           ghi     rb");
+    Asm("           str     r7");
+    Asm("           dec     r7");
+    Asm("           glo     rb");
+    Asm("           str     r7");
+    Asm("           dec     r7");
     Asm("           sep     sret         ; and return");
 
-    /* *************************************************
-    /* ***** Convert floating point to integer     *****
-    /* ***** RF - pointer to floating point number *****
-    /* ***** RD - destination integer              *****
-    /* ***** Returns: DF=1 - overflow              *****
-    /* ***** Uses:                                 *****
-    /* *****       R9.0  - exponent                *****
-    /* *****       R9.1  - sign                    *****
-    /* *****       R7:R8 - number                  *****
-    /* *****       RA:RB - fractional              *****
-    /* *****       RC.0  - digit count             *****
-    /* *************************************************
-    Asm("ftoi:     ghi      r7           ; save expr stack");
-    Asm("          stxd");
-    Asm("          glo      r7");
-    Asm("          stxd");
-    Asm("          lda      rf           ; retrieve number into R7:R8");
-    Asm("          plo      r8");
-    Asm("          lda      rf");
-    Asm("          phi      r8");
-    Asm("          lda      rf");
-    Asm("          plo      r7");
-    Asm("          lda      rf");
-    Asm("          phi      r7");
+    /* ************************************************* */
+    /* ***** Convert floating point to integer     ***** */
+    /* ***** Numbers are on expr stack             ***** */
+    /* ***** RF - pointer to floating point number ***** */
+    /* ***** RD - destination integer              ***** */
+    /* ***** Returns: DF=1 - overflow              ***** */
+    /* ***** Uses:                                 ***** */
+    /* *****       R9.0  - exponent                ***** */
+    /* *****       R9.1  - sign                    ***** */
+    /* *****       RD:RF - number                  ***** */
+    /* *****       RA:RB - fractional              ***** */
+    /* *****       RC.0  - digit count             ***** */
+    /* ************************************************* */
+    Asm("ftoi:     inc      r7");
+    Asm("          lda      r7         ; retrieve number into RD:RF");
+    Asm("          plo      rf");
+    Asm("          lda      r7");
+    Asm("          phi      rf");
+    Asm("          lda      r7");
+    Asm("          plo      rd");
+    Asm("          ldn      r7");
+    Asm("          phi      rd");
     Asm("          shl                   ; shift sign into DF");
     Asm("          ldi      0            ; clear D");
     Asm("          shlc                  ; shift sign into D");
     Asm("          phi      r9           ; and store it");
-    Asm("ftoi_1:   glo      r7           ; get low bit of exponent");
+    Asm("ftoi_1:   glo      rd           ; get low bit of exponent");
     Asm("          shl                   ; shift into DF");
-    Asm("          ghi      r7           ; get high 7 bits of exponent");
+    Asm("          ghi      rd           ; get high 7 bits of exponent");
     Asm("          shlc                  ; shift in the low bit");
     Asm("          plo      r9           ; store it");
     Asm("          lbnz     ftoi_2       ; jump if exponent is not zero");
     Asm("          ldi      0            ; result is zero");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          str      rd");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          str      r7");
+    Asm("          dec      r7");
     Asm("          adi      0            ; clear DF");
-    Asm("          shr");
-    Asm("          irx                   ; recover expr stack");
-    Asm("          ldxa");
-    Asm("          plo      r7");
-    Asm("          ldx");
-    Asm("          phi      r7");
     Asm("          sep      sret         ; return to caller");
     Asm("ftoi_2:   smi      0ffh         ; check for infinity");
     Asm("          lbnz     ftoi_5       ; jump if not");
     Asm("ftoi_ov:  ldi      0ffh         ; write highest integer");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          str      rd");
-    Asm("          inc      rd");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          str      r7");
+    Asm("          dec      r7");
     Asm("          ldi      07fh         ; positive number");
-    Asm("          str      rd");
-    Asm("          smi      0            ; set DF to signal overflow");
-    Asm("          shr");
-    Asm("          irx                   ; recover expr stack");
-    Asm("          ldxa");
-    Asm("          plo      r7");
-    Asm("          ldx");
-    Asm("          phi      r7");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          smi      0            ; set DF to signal ovelow");
     Asm("          sep      sret         ; and return");
     Asm("ftoi_5:   ldi      0            ; clear high byte of number");
-    Asm("          phi      r7");
-    Asm("          glo      r7           ; set implied 1");
+    Asm("          phi      rd");
+    Asm("          glo      rd           ; set implied 1");
     Asm("          ori      080h");
-    Asm("          plo      r7           ; and put it back");
+    Asm("          plo      rd           ; and put it back");
     Asm("          ldi      0            ; clear fractional");
     Asm("          phi      ra");
     Asm("          plo      ra");
@@ -3285,21 +3281,21 @@ void library() {
     Asm("          glo      rb");
     Asm("          shrc");
     Asm("          plo      rb");
-    Asm("          glo      r8           ; get low bit of number");
+    Asm("          glo      rf           ; get low bit of number");
     Asm("          shr                   ; shift it into DF");
     Asm("          lbnf     ftoi_6a      ; jump if bit was clear");
     Asm("          glo      ra           ; otherwise set high bit in fractional");
     Asm("          ori      080h");
     Asm("          plo      ra           ; put it back");
-    Asm("ftoi_6a:  glo      r7           ; shift number right");
+    Asm("ftoi_6a:  glo      rd           ; shift number right");
     Asm("          shr");
-    Asm("          plo      r7");
-    Asm("          ghi      r8");
+    Asm("          plo      rd");
+    Asm("          ghi      rf");
     Asm("          shrc");
-    Asm("          phi      r8");
-    Asm("          glo      r8");
+    Asm("          phi      rf");
+    Asm("          glo      rf");
     Asm("          shrc");
-    Asm("          plo      r8");
+    Asm("          plo      rf");
     Asm("          glo      r9           ; get exponent");
     Asm("          adi      1            ; increase it");
     Asm("          plo      r9           ; put it back");
@@ -3307,46 +3303,38 @@ void library() {
     Asm("ftoi_7:   glo      r9           ; get exponent");
     Asm("          smi      151          ; check for greater than 150");
     Asm("          lbnf     ftoi_8       ; jump if not");
-    Asm("          ghi      r7           ; check for overflow");
+    Asm("          ghi      rd           ; check for ovelow");
     Asm("          ani      080h");
-    Asm("          lbnz     ftoi_ov      ; jump if overflow");
-    Asm("          glo      r8           ; shift number left");
+    Asm("          lbnz     ftoi_ov      ; jump if ovelow");
+    Asm("          glo      rf           ; shift number left");
     Asm("          shl");
-    Asm("          plo      r8");
-    Asm("          ghi      r8");
+    Asm("          plo      rf");
+    Asm("          ghi      rf");
     Asm("          shlc");
-    Asm("          phi      r8");
-    Asm("          glo      r7");
+    Asm("          phi      rf");
+    Asm("          glo      rd");
     Asm("          shlc");
-    Asm("          plo      r7");
-    Asm("          ghi      r7");
+    Asm("          plo      rd");
+    Asm("          ghi      rd");
     Asm("          shlc");
-    Asm("          phi      r7");
+    Asm("          phi      rd");
     Asm("          glo      r9           ; get exponent");
     Asm("          adi      1            ; increment it");
     Asm("          plo      r9           ; and put it back");
     Asm("          lbr      ftoi_7       ; loop until exponent in range");
-    Asm("ftoi_8:   glo      r8           ; store number into destination");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          ghi      r8");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          glo      r7");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          ghi      r7");
-    Asm("          str      rd");
-    Asm("          dec      rd           ; move destination pointer back");
-    Asm("          dec      rd");
-    Asm("          dec      rd");
-    Asm("          adi      0            ; signal no overflow");
-    Asm("          shr");
-    Asm("          irx                   ; recover expr stack");
-    Asm("          ldxa");
-    Asm("          plo      r7");
-    Asm("          ldx");
-    Asm("          phi      r7");
+    Asm("ftoi_8:   ghi      rd           ; store number into destination");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          glo      rd");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          ghi      rf");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          glo      rf");
+    Asm("          str      r7");
+    Asm("          dec      r7           ; move destination pointer back");
+    Asm("          adi      0            ; signal no ovelow");
     Asm("          sep      sret         ; and return to caller");
     }
 
@@ -3360,7 +3348,7 @@ void library() {
     /* *****       R9.0  - exponent           ***** */
     /* *****       R9.1  - sign               ***** */
     /* ******************************************** */
-    Asm("addfp:     ghi     r7           ; save expr stack");
+    Asm("addfpi:    ghi     r7           ; save expr stack");
     Asm("           stxd");
     Asm("           glo     r7");
     Asm("           stxd");
@@ -3517,6 +3505,26 @@ void library() {
     Asm("fpadd_5:   sep     scall        ; normalize the answer");
     Asm("           dw      fpnorm");
     Asm("           lbr     fpret_a      ; write answer and return");
+
+    Asm("addfp:     glo     r7           ; Setup registers for call");
+    Asm("           plo     rf");
+    Asm("           plo     rd");
+    Asm("           ghi     r7");
+    Asm("           phi     rf");
+    Asm("           phi     rd");
+    Asm("           inc     rd");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           sep     scall        ; Call addition");
+    Asm("           dw      addfpi");
+    Asm("           inc     r7           ; Adjust expr stack");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           sep     sret         ; And return");
     }
 
   if (useSubFp) {
@@ -3529,7 +3537,7 @@ void library() {
     /* *****       R9.0  - exponent           ***** */
     /* *****       R9.1  - sign               ***** */
     /* ******************************************** */
-    Asm("subfp:     ghi     r7           ; save expr stack");
+    Asm("subfpi:     ghi     r7           ; save expr stack");
     Asm("           stxd");
     Asm("           glo     r7");
     Asm("           stxd");
@@ -3544,6 +3552,26 @@ void library() {
     Asm("           phi     ra           ; save inverted sign");
     Asm("           ghi     r9");
     Asm("           lbr     fpsub_1      ; now process with add");
+
+    Asm("subfp:     glo     r7           ; Setup registers for call");
+    Asm("           plo     rf");
+    Asm("           plo     rd");
+    Asm("           ghi     r7");
+    Asm("           phi     rf");
+    Asm("           phi     rd");
+    Asm("           inc     rd");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           sep     scall        ; Call addition");
+    Asm("           dw      subfpi");
+    Asm("           inc     r7           ; Adjust expr stack");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           sep     sret         ; And return");
     }
 
   if (useMulFp) {
@@ -3557,7 +3585,7 @@ void library() {
     /* *****       R9.1  - sign               ***** */
     /* *****       RC:RD - first number (aa)  ***** */
     /* ******************************************** */
-    Asm("mulfp:     ghi     r7           ; save expr stack");
+    Asm("mulfpi:    ghi     r7           ; save expr stack");
     Asm("           stxd");
     Asm("           glo     r7");
     Asm("           stxd");
@@ -3706,6 +3734,26 @@ void library() {
     Asm("          ldx");
     Asm("          phi      r7");
     Asm("          sep      sret         ; and return to caller");
+
+    Asm("mulfp:     glo     r7           ; Setup registers for call");
+    Asm("           plo     rf");
+    Asm("           plo     rd");
+    Asm("           ghi     r7");
+    Asm("           phi     rf");
+    Asm("           phi     rd");
+    Asm("           inc     rd");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           sep     scall        ; Call addition");
+    Asm("           dw      mulfpi");
+    Asm("           inc     r7           ; Adjust expr stack");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           sep     sret         ; And return");
     }
 
   if (useDivFp) {
@@ -3721,7 +3769,7 @@ void library() {
     /* *****       R9.1  - sign               ***** */
     /* *****       RC:RD - mask               ***** */
     /* ******************************************** */
-    Asm("divfp:     ghi     r7           ; save expr stack");
+    Asm("divfpi:    ghi     r7           ; save expr stack");
     Asm("           stxd");
     Asm("           glo     r7");
     Asm("           stxd");
@@ -3893,6 +3941,205 @@ void library() {
     Asm("          glo      re           ; see if done");
     Asm("          lbnz     fpdiv_2a     ; loop back if not");
     Asm("          lbr      fpdiv_lp     ; loop for rest of division");
+
+    Asm("divfp:     glo     r7           ; Setup registers for call");
+    Asm("           plo     rf");
+    Asm("           plo     rd");
+    Asm("           ghi     r7");
+    Asm("           phi     rf");
+    Asm("           phi     rd");
+    Asm("           inc     rd");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           inc     rf");
+    Asm("           sep     scall        ; Call addition");
+    Asm("           dw      divfpi");
+    Asm("           inc     r7           ; Adjust expr stack");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           sep     sret         ; And return");
+    }
+
+  if (useAbsFp) {
+    Asm("absfp:    inc      r7           ; move to MSB");
+    Asm("          inc      r7");
+    Asm("          inc      r7");
+    Asm("          inc      r7");
+    Asm("          ldn      r7           ; retrieve it");
+    Asm("          ani      07fh         ; force it positive");
+    Asm("          str      r7           ; and put it back");
+    Asm("          dec      r7           ; move pointer back");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          sep      sret");
+    }
+
+  if (useSgnFp) {
+    Asm("sgnfp:    inc     r7");
+    Asm("          lda     r7");
+    Asm("          str     r2");
+    Asm("          lda     r7");
+    Asm("          or");
+    Asm("          str     r2");
+    Asm("          lda     r7");
+    Asm("          or");
+    Asm("          str     r2");
+    Asm("          ldn     r7");
+    Asm("          shl");
+    Asm("          lbdf    sgnmfp");
+    Asm("          ldn     r7");
+    Asm("          or");
+    Asm("          lbz     sgn0fp");
+    Asm("          ldi     0");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          ldi     1");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    Asm("sgnmfp:   ldi     0ffh");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          str     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    Asm("sgn0fp:   dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          dec     r7");
+    Asm("          sep     sret");
+    }
+
+  if (useEqFp) {
+    Asm("eqfp:       sep     scall");
+    Asm("            dw      subfp");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldx");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     true32");
+    Asm("            lbr     false32");
+    }
+
+  if (useNeFp) {
+    Asm("nefp:       sep     scall");
+    Asm("            dw      subfp");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldx");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbnz    true32");
+    Asm("            lbr     false32");
+    }
+
+  if (useGtFp) {
+    Asm("gtfp:       sep     scall");
+    Asm("            dw      subfp");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldx");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     false32");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbnf    true32");
+    Asm("            lbr     false32");
+    }
+
+  if (useLtFp) {
+    Asm("ltfp:       sep     scall");
+    Asm("            dw      subfp");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldx");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     false32");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbdf    true32");
+    Asm("            lbr     false32");
+    }
+
+  if (useGteFp) {
+    Asm("gtefp:      sep     scall");
+    Asm("            dw      subfp");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldx");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     true32");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbnf    true32");
+    Asm("            lbr     false32");
+    }
+
+  if (useLteFp) {
+    Asm("ltefp:      sep     scall");
+    Asm("            dw      subfp");
+    Asm("            sex     r7");
+    Asm("            irx");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldxa");
+    Asm("            or");
+    Asm("            ldx");
+    Asm("            or");
+    Asm("            sex     r2");
+    Asm("            lbz     true32");
+    Asm("            ldn     r7");
+    Asm("            shl");
+    Asm("            lbdf    true32");
+    Asm("            lbr     false32");
     }
 
   if (useAtoF) {
@@ -3926,28 +4173,32 @@ void library() {
     Asm("          stxd");
     Asm("          glo      rd");
     Asm("          stxd");
+    Asm("          ghi      r9           ; save sign");
+    Asm("          stxd");
     Asm("          sep      scall        ; convert integer portion of number");
     Asm("          dw       atoi32");
-    Asm("          irx                   ; recover destination");
-    Asm("          ldxa");
+    Asm("          irx");
+    Asm("          ldxa                  ; recover sign");
+    Asm("          phi      r9");
+    Asm("          ldxa                  ; recover destination");
     Asm("          plo      rd");
     Asm("          ldx");
     Asm("          phi      rd");
     Asm("          dec      r2           ; and keep on stack");
     Asm("          dec      r2");
     Asm("          lda      rd           ; retrieve integer number");
-    Asm("          plo      r8");
+    Asm("          phi      r7");
     Asm("          str      r2           ; store for zero check");
-    Asm("          lda      rd");
-    Asm("          phi      r8");
-    Asm("          or                    ; combine with zero check");
-    Asm("          str      r2");
     Asm("          lda      rd");
     Asm("          plo      r7");
     Asm("          or                    ; combine with zero check");
     Asm("          str      r2");
     Asm("          lda      rd");
-    Asm("          phi      r7");
+    Asm("          phi      r8");
+    Asm("          or                    ; combine with zero check");
+    Asm("          str      r2");
+    Asm("          lda      rd");
+    Asm("          plo      r8");
     Asm("          or                    ; combine with zero check");
     Asm("          lbz      atof_z       ; jump if integer is zero");
     Asm("          ldi      150          ; initial exponent starts at 150");
@@ -4108,7 +4359,7 @@ void library() {
     Asm("          adci     0");
     Asm("          plo      r7");
     Asm("          lbr      atof_2z      ; done with fractional");
-    Asm("atof_2k   glo      rb           ; combine mask with result");
+    Asm("atof_2k:  glo      rb           ; combine mask with result");
     Asm("          str      r2");
     Asm("          glo      r8");
     Asm("          or");
@@ -4141,16 +4392,16 @@ void library() {
     Asm("          plo      rd");
     Asm("          ldx");
     Asm("          phi      rd");
-    Asm("          glo      r8           ; store answer in destination");
-    Asm("          str      rd");
-    Asm("          inc      rd");
-    Asm("          ghi      r8");
+    Asm("          ghi      r7           ; store answer in destination");
     Asm("          str      rd");
     Asm("          inc      rd");
     Asm("          glo      r7");
     Asm("          str      rd");
     Asm("          inc      rd");
-    Asm("          ghi      r7");
+    Asm("          ghi      r8");
+    Asm("          str      rd");
+    Asm("          inc      rd");
+    Asm("          glo      r8");
     Asm("          str      rd");
     Asm("          dec      rd           ; restore destination pointer");
     Asm("          dec      rd");
@@ -4219,7 +4470,7 @@ void library() {
     Asm("          glo      rc           ; save count");
     Asm("          stxd");
     Asm("          sep      scall        ; multiply result by 10.0");
-    Asm("          dw       fpmul");
+    Asm("          dw       mulfpi");
     Asm("          irx                   ; recover count");
     Asm("          ldx");
     Asm("          plo      rc           ; put back into count");
@@ -4239,7 +4490,7 @@ void library() {
     Asm("          glo      rc           ; save count");
     Asm("          stxd");
     Asm("          sep      scall        ; divide result by 10.0");
-    Asm("          dw       fpdiv");
+    Asm("          dw       divfpi");
     Asm("          irx                   ; recover count");
     Asm("          ldx");
     Asm("          plo      rc           ; put back into count");
@@ -4273,7 +4524,7 @@ void library() {
     Asm("          stxd");
     Asm("          glo      r7");
     Asm("          stxd");
-    Asm("ftoa:     lda      rf           ; retrieve number into R7:R8");
+    Asm("          lda      rf           ; retrieve number into R7:R8");
     Asm("          plo      r8");
     Asm("          lda      rf");
     Asm("          phi      r8");
@@ -4347,7 +4598,7 @@ void library() {
     Asm("          ldi      fp_10.0");
     Asm("          plo      rd");
     Asm("          sep      scall        ; perform the division");
-    Asm("          dw       fpdiv");
+    Asm("          dw       divfpi");
     Asm("          irx                   ; recover E");
     Asm("          ldx");
     Asm("          adi      1            ; increment E");
@@ -4399,7 +4650,7 @@ void library() {
     Asm("          ldi      fp_10.0");
     Asm("          plo      rd");
     Asm("          sep      scall        ; perform the division");
-    Asm("          dw       fpmul");
+    Asm("          dw       mulfpi");
     Asm("          irx                   ; recover E");
     Asm("          ldx");
     Asm("          smi      1            ; decrement E");

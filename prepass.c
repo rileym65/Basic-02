@@ -37,6 +37,7 @@ int prepass(char* filename) {
   useAtoI32 = 0;
   useCmp32 = 0;
   useDiv32 = 0;
+  useEq32 = 0;
   useIComp32 = 0;
   useIComp32 = 0;
   useItoA32 = 0;
@@ -53,9 +54,17 @@ int prepass(char* filename) {
   useSub32 = 0;
   useXor32 = 0;
   useZero32 = 0;
+  useAbsFp = 0;
   useAddFp = 0;
   useDivFp = 0;
+  useEqFp = 0;
+  useGtFp = 0;
+  useGteFp = 0;
+  useLtFp = 0;
+  useLteFp = 0;
   useMulFp = 0;
+  useNeFp = 0;
+  useSgnFp = 0;
   useSubFp = 0;
   useFtoA = 0;
   useAtoF = 0;
@@ -123,6 +132,9 @@ int prepass(char* filename) {
             if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs32 = -1;
             if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd32 = -1;
             }
+          else if (useFp) {
+            if (strncasecmp(currentLine+i,"print",5) == 0) { useItoA32 = -1; useFtoA; }
+            }
           else {
             if (currentLine[i] == '+') useAdd = -1;
             if (currentLine[i] == '-') useSub = -1;
@@ -159,9 +171,6 @@ int prepass(char* filename) {
     }
   fclose(source);
 
-  if (useFp) {
-    useAddFp = useAdd32;
-    }
   if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
   if (useCmp) useSub = -1;
   if (useRnd) useMod = -1;
@@ -201,6 +210,31 @@ int prepass(char* filename) {
   if (useEq32 || useNe32 || useGt32 || useLt32 || useGte32 || useLte32) {
     useCmp32 = -1;
     useComp32 = -1;
+    }
+  if (useFp) {
+    useAbsFp = useAbs32;
+    useAddFp = useAdd32;
+    useEqFp = useEq32;
+    useGtFp = useGt32;
+    useGteFp = useGte32;
+    useLtFp = useLt32;
+    useLteFp = useLte32;
+    useNeFp = useNe32;
+    useSubFp = useSub32;
+    useMulFp = useMul32;
+    useDivFp = useDiv32;
+    useFtoA = useItoA32;
+    useAtoF = useAtoI32;
+    useSgnFp = useSgn32;
+    if (useSubFp) useAddFp = -1;
+    if (useFtoA) {
+      useDivFp = -1;
+      }
+    if (useEqFp || useNeFp || useGtFp || useLtFp || useGteFp || useLteFp) {
+      useSubFp = -1;
+      useAddFp = -1;
+      }
+    if (useFtoA) useMulFp = -1;
     }
   if (lblF_inmsg == 0xffff) {
     useAtoI = 0;

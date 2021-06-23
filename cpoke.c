@@ -3,7 +3,7 @@
 char* cpoke(char* line) {
   int  pos;
   word addr;
-  line = cexpr(line);
+  line = cexpr(line, 0);
   line = trim(line);
   if (*line != ',') {
     showError("Syntax error");
@@ -19,7 +19,7 @@ char* cpoke(char* line) {
     Asm("          inc   r7                      ; Remove high word");
     Asm("          inc   r7");
     }
-  line = cexpr(line);
+  line = cexpr(line, 0);
   Asm("          irx                           ; Recover poke address");
   Asm("          ldxa");
   Asm("          phi   rf");

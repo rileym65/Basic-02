@@ -2,6 +2,7 @@
 
 char* clet(char* line) {
   int  pos;
+  int  fp;
   word addr;
   dword value;
   char varname[256];
@@ -236,11 +237,25 @@ char* clet(char* line) {
     exit(1);
     }
   pos = 0;
+  fp = 0;
   while ((*line >= 'a' && *line <= 'z') ||
          (*line >= 'A' && *line <= 'Z') ||
          (*line >= '0' && *line <= '9') ||
          *line == '_') {
     varname[pos++] = *line++;
+    if (useFp) {
+      if (*line == '!') {
+        varname[pos++] = *line++;
+        fp = -1;
+        if ((*line >= 'a' && *line <= 'z') ||
+            (*line >= 'A' && *line <= 'Z') ||
+            (*line >= '0' && *line <= '9') ||
+            *line == '_') {
+            showError("Invalid variable name");
+            exit(1);
+          }
+        }
+      }
     }
   varname[pos] = 0;
   line = trim(line);
@@ -250,7 +265,8 @@ char* clet(char* line) {
     }
   line++;
   line = trim(line);
-  line = cexpr(line);
+  if (fp) line = cexpr(line, 1);
+    else line = cexpr(line, 0);
   addr = getVariable(varname);
   if (use32Bits) {
     sprintf(buffer,"          ldi   [%s]+3.1                ; Get destination variable address", varname); Asm(buffer);

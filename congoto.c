@@ -9,7 +9,7 @@ char* con(char* line) {
   word lines[256];
   int  lineCount;
   int  pos;
-  line = cexpr(line);
+  line = cexpr(line, 0);
   line = trim(line);
   if (strncasecmp(line,"goto",4) == 0) {
     mode = 'G';

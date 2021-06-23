@@ -3,7 +3,7 @@
 char* cdealloc(char* line) {
   word target;
   line = trim(line);
-  line = cexpr(line);
+  line = cexpr(line, 0);
   Asm("           inc     r7                  ; Get transfer address");
   Asm("           lda     r7");
   Asm("           plo     rf");

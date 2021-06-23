@@ -25,9 +25,118 @@
 #define OP_XOR    0x11
 #define OP_OP     0x08
 #define OP_CP     0x09
-#define OP_NUM    0x00
-int     tokens[64];
-int     numTokens;
+char    opType;
+
+typedef union {
+  dword i;
+  float f;
+  } FPI;
+
+char* isFloatingPointNumber(char* line, char* token) {
+  char  flag;
+  char  dot;
+  char* oline;
+  char *otoken;
+  oline = line;
+  otoken = token;
+  flag = 0;
+  dot = 0;
+  if (*line == '-') *token++ = *line++;
+  while (flag == 0) {
+    if (*line >= '0' && *line <= '9') *token++ = *line++;
+    else if (*line == '.' && dot == 0) {
+      *token++ = *line++;
+      dot = 1;
+      }
+    else if (*line == '.') flag = 1;
+    else flag = 2;
+    }
+  if (*line >= 'a' && *line <= 'z') flag = 1;
+  if (*line >= 'A' && *line <= 'Z') flag = 1;
+  if (dot == 0) flag = 1;
+  if (flag == 1) {
+    line = oline;
+    token = otoken;
+    }
+  *token = 0;
+  return line;
+  }
+
+char* isIntegerNumber(char* line, char* token) {
+  char  flag;
+  char  dot;
+  char* oline;
+  char *otoken;
+  oline = line;
+  otoken = token;
+  flag = 0;
+  dot = 0;
+  if (*line == '-') *token++ = *line++;
+  while (flag == 0) {
+    if (*line >= '0' && *line <= '9') *token++ = *line++;
+    else flag = 2;
+    }
+  if (*line >= 'a' && *line <= 'z') flag = 1;
+  if (*line >= 'A' && *line <= 'Z') flag = 1;
+  if (flag == 1) {
+    line = oline;
+    token = otoken;
+    }
+  *token = 0;
+  return line;
+  }
+
+char* isIntegerVariable(char* line, char* token) {
+  char  flag;
+  char  dot;
+  char* oline;
+  char *otoken;
+  oline = line;
+  otoken = token;
+  flag = 0;
+  dot = 0;
+  while (flag == 0) {
+    if ((*line >= 'a' && *line <= 'z') ||
+        (*line >= 'A' && *line <= 'Z') ||
+        (*line >= '0' && *line <= '9') ||
+         *line == '_') *token++ = *line++;
+    else flag = 2;
+    }
+  if (*line == '!') flag = 1;
+  if (flag == 1) {
+    line = oline;
+    token = otoken;
+    }
+  *token = 0;
+  return line;
+  }
+
+void check2args() {
+  if (tokens[numTokens-1] == tokens[numTokens-4]) {
+    opType = (tokens[numTokens-1] == OP_NUM) ? 'I' : 'F';
+    return;
+    }
+  if (tokens[numTokens-1] == OP_NUMFP && tokens[numTokens-4] == OP_NUM) {
+    Asm("           inc     r7                  ; Convert first number to floating point");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           sep     scall");
+    Asm("           dw      itof");
+    Asm("           dec     r7");
+    Asm("           dec     r7");
+    Asm("           dec     r7");
+    Asm("           dec     r7");
+    tokens[numTokens-4] = OP_NUMFP;
+    opType = 'F';
+    }
+  if (tokens[numTokens-1] == OP_NUM && tokens[numTokens-4] == OP_NUMFP) {
+    Asm("           sep     scall               ; Convert second number to floating point");
+    Asm("           dw      itof");
+    tokens[numTokens-1] = OP_NUMFP;
+    opType = 'F';
+    }
+  }
 
 int reduce(char last) {
   int i;
@@ -39,8 +148,10 @@ int reduce(char last) {
   word addr;
   flag = 0;
   if (numTokens == 0) return 0;
-  if (tokens[numTokens-1] != OP_NUM) return 0;
+  if (tokens[numTokens-1] != OP_NUM && tokens[numTokens-1] != OP_NUMFP) return 0;
+  opType = 'I';
   if (numTokens > 2 && tokens[numTokens-3] >= 0x50) {
+    opType = (tokens[numTokens-1] == OP_NUM) ? 'I' : 'F';
     arg1 = tokens[numTokens-2];
     op   = tokens[numTokens-3];
     numTokens -= 3;
@@ -56,7 +167,9 @@ int reduce(char last) {
     if (last) ret = -1;
     }
   else if (numTokens > 4 && tokens[numTokens-3] >= 0x10 &&
-                            tokens[numTokens-4] == OP_NUM) {
+                            (tokens[numTokens-4] == OP_NUM ||
+                             tokens[numTokens-4] == OP_NUMFP)) {
+    check2args();
     arg2 = tokens[numTokens-2];
     op   = tokens[numTokens-3];
     arg1 = tokens[numTokens-5];
@@ -69,28 +182,38 @@ int reduce(char last) {
   switch (op) {
     case OP_SGN:
          Asm("           sep     scall               ; Perform SGN()");
-         if (use32Bits) Asm("           dw      sgn32");
-           else Asm("           dw      sgn16");
+         if (opType == 'F') Asm("           dw      sgnfp");
+         else if (use32Bits) Asm("           dw      sgn32");
+         else Asm("           dw      sgn16");
+         if (opType == 'F') opType = 'I';
          break;
     case OP_RND:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
          Asm("           sep     scall               ; Perform RND()");
          if (use32Bits) Asm("           dw      rnd32");
            else Asm("           dw      rnd16");
          break;
     case OP_ABS:
          Asm("           sep     scall               ; Perform ABS()");
-         if (use32Bits) Asm("           dw      abs32");
-           else Asm("           dw      abs16");
+         if (opType == 'F') Asm("           dw      absfp");
+         else if (use32Bits) Asm("           dw      abs32");
+         else Asm("           dw      abs16");
          break;
     case OP_MUL:
          Asm("           sep     scall               ; Perform multiplication");
-         if (use32Bits) Asm("           dw      mul32");
-           else Asm("           dw      mul16");
+         if (opType == 'F') Asm("           dw      mulfp");
+         else if (use32Bits) Asm("           dw      mul32");
+         else Asm("           dw      mul16");
          break;
     case OP_DIV:
          Asm("           sep     scall               ; Perform division");
-         if (use32Bits) Asm("           dw      div32");
-           else Asm("           dw      div16");
+         if (opType == 'F') Asm("           dw      divfp");
+         else if (use32Bits) Asm("           dw      div32");
+         else Asm("           dw      div16");
          break;
     case OP_MOD:
          Asm("           sep     scall               ; Perform modulo");
@@ -99,60 +222,118 @@ int reduce(char last) {
          break;
     case OP_ADD:
          Asm("           sep     scall               ; Perform addition");
-         if (use32Bits) Asm("           dw      add32");
-           else Asm("           dw      add16");
+         if (opType == 'F') Asm("           dw      addfp");
+         else if (use32Bits) Asm("           dw      add32");
+         else Asm("           dw      add16");
          break;
     case OP_SUB:
          Asm("           sep     scall               ; Perform subtraction");
-         if (use32Bits) Asm("           dw      sub32");
-           else Asm("           dw      sub16");
+         if (opType == 'F') Asm("           dw      subfp");
+         else if (use32Bits) Asm("           dw      sub32");
+         else Asm("           dw      sub16");
          break;
     case OP_GT :
          Asm("           sep     scall               ; Perform greater than");
-         if (use32Bits) Asm("           dw      gt32");
-           else Asm("           dw      gt16");
+         if (opType == 'F') { Asm("           dw      gtfp"); opType = 'I'; }
+         else if (use32Bits) Asm("           dw      gt32");
+         else Asm("           dw      gt16");
          break;
     case OP_LT :
          Asm("           sep     scall               ; Perform less than");
-         if (use32Bits) Asm("           dw      lt32");
-           else Asm("           dw      lt16");
+         if (opType == 'F') { Asm("           dw      ltfp"); opType = 'I'; }
+         else if (use32Bits) Asm("           dw      lt32");
+         else Asm("           dw      lt16");
          break;
     case OP_GTE:
          Asm("           sep     scall               ; Perform greater or equal");
-         if (use32Bits) Asm("           dw      gte32");
-           else Asm("           dw      gte16");
+         if (opType == 'F') { Asm("           dw      gtefp"); opType = 'I'; }
+         else if (use32Bits) Asm("           dw      gte32");
+         else Asm("           dw      gte16");
          break;
     case OP_LTE:
          Asm("           sep     scall               ; Perform less or equal");
-         if (use32Bits) Asm("           dw      lte32");
-           else Asm("           dw      lte16");
+         if (opType == 'F') { Asm("           dw      ltefp"); opType = 'I'; }
+         else if (use32Bits) Asm("           dw      lte32");
+         else Asm("           dw      lte16");
          break;
     case OP_EQ :
          Asm("           sep     scall               ; Perform equal");
-         if (use32Bits) Asm("           dw      eq32");
-           else Asm("           dw      eq16");
+         if (opType == 'F') { Asm("           dw      eqfp"); opType = 'I'; }
+         else if (use32Bits) Asm("           dw      eq32");
+         else Asm("           dw      eq16");
          break;
     case OP_NE :
          Asm("           sep     scall               ; Perform not equal");
-         if (use32Bits) Asm("           dw      ne32");
-           else Asm("           dw      ne16");
+         if (opType == 'F') { Asm("           dw      nefp"); opType = 'I'; }
+         else if (use32Bits) Asm("           dw      ne32");
+         else Asm("           dw      ne16");
          break;
     case OP_AND:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point arguments to integer");
+           Asm("           dw      ftoi");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           sep     scall");
+           Asm("           dw      ftoi");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           opType = 'I';
+           }
          Asm("           sep     scall               ; Perform AND");
          if (use32Bits) Asm("           dw      and32");
            else Asm("           dw      and16");
          break;
     case OP_OR :
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point arguments to integer");
+           Asm("           dw      ftoi");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           sep     scall");
+           Asm("           dw      ftoi");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           opType = 'I';
+           }
          Asm("           sep     scall               ; Perform OR");
          if (use32Bits) Asm("           dw      or32");
            else Asm("           dw      or16");
          break;
     case OP_XOR:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point arguments to integer");
+           Asm("           dw      ftoi");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           Asm("           sep     scall");
+           Asm("           dw      ftoi");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           Asm("           dec     r7");
+           opType = 'I';
+           }
          Asm("           sep     scall               ; Perform XOR");
          if (use32Bits) Asm("           dw      xor32");
            else Asm("           dw      xor16");
          break;
     case OP_PEEK:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
          Asm("           inc     r7                  ; Retrieve address for peek");
          Asm("           lda     r7");
          Asm("           plo     rf");
@@ -176,6 +357,11 @@ int reduce(char last) {
          Asm("           dec     r7");
          break;
     case OP_DPEEK:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
          Asm("           inc     r7                  ; Retrieve address for peek");
          Asm("           lda     r7");
          Asm("           plo     rf");
@@ -198,6 +384,7 @@ int reduce(char last) {
          Asm("           dec     r7");
          break;
     case OP_FLG:
+         opType = 'I';
          Asm("           inc     r7                  ; FLG needs no args, so remove dummy");
          Asm("           inc     r7");
          if (use32Bits) {
@@ -219,6 +406,7 @@ int reduce(char last) {
          Asm("           dec     r7");
          break;
     case OP_FRE:
+         opType = 'I';
          Asm("           inc     r7                  ; FRE needs no args, so remove dummy");
          Asm("           inc     r7");
          if (use32Bits) {
@@ -287,6 +475,11 @@ int reduce(char last) {
            else Asm("           dw      sub16");
          break;
     case OP_INP:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
          Asm("           ldi     0d3h                ; Push SEP R3 onto stack");
          Asm("           stxd");
          Asm("           inc     r7                  ; Retrieve port");
@@ -318,6 +511,11 @@ int reduce(char last) {
          Asm("           dec     r7");
          break;
     case OP_ALLOC:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
          Asm("           inc     r7                  ; Get size from expr stack");
          Asm("           lda     r7");
          Asm("           plo     rc");
@@ -345,7 +543,7 @@ int reduce(char last) {
          break;
     }
   tokens[numTokens++] = 0;
-  tokens[numTokens++] = OP_NUM;
+  tokens[numTokens++] = (opType == 'I') ? OP_NUM : OP_NUMFP;
   return ret;
   }
 
@@ -360,13 +558,16 @@ void add(int op) {
 
 char* evaluate(char* buffer) {
   int  i;
+  int  fp;
   char abuffer[128];
+  char term;
   int p;
   char token[64];
   int neg;
   int flag;
   int func;
   int parens;
+  FPI fpi;
   dword number;
   parens = 0;
   numTokens = 0;
@@ -455,101 +656,155 @@ char* evaluate(char* buffer) {
          func = -1;
          }
       }
-    if ((*buffer == '-' && *(buffer+1) >= '0' && *(buffer+1) <= '9') |
-        (*buffer >= '0' && *buffer <='9')) {
-      neg = (*buffer == '-') ? -1 : 0;
-      if (*buffer == '-') buffer++;
-      number = 0;
-      while (*buffer >= '0' && *buffer <= '9') {
-        number = number * 10 + (*buffer - '0');
-        buffer++;
-        }
-      if (neg) {
-        number = (number^0xffffffff) + 1;
-        }
-      tokens[numTokens++] = 0;
-      tokens[numTokens++] = OP_NUM;
-      if (use32Bits) {
-        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
+
+    term = 0;
+
+    /* ******************************************* */
+    /* ***** Process floating-point constant ***** */
+    /* ******************************************* */
+    buffer = isFloatingPointNumber(buffer, token);
+    if (strlen(token) > 0) {
+      if (useFp) {
+        fpi.f = atof(token);
+        tokens[numTokens++] = 0;
+        tokens[numTokens++] = OP_NUMFP;
+        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(fpi.i & 0xff000000) >> 24); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
+        sprintf(abuffer,"           ldi     %d",(fpi.i & 0xff0000) >> 16); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
+        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(fpi.i & 0xff00) >> 8); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(abuffer,"           ldi     %d",fpi.i & 0xff); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        term = -1;
         }
-      sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff00) >> 8); Asm(abuffer);
-      Asm("           str     r7");
-      Asm("           dec     r7");
-      sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
-      Asm("           str     r7");
-      Asm("           dec     r7");
+      else {
+        showError("Floating point not allowed in integer mode");
+        exit(1);
+        }
       }
 
-    else if (*buffer == '$' &&
+    /* ************************************ */
+    /* ***** Process integer constant ***** */
+    /* ************************************ */
+    if (term == 0) {
+      buffer = isIntegerNumber(buffer, token);
+      if (strlen(token) > 0) {
+        number = atoi(token);
+        tokens[numTokens++] = 0;
+        tokens[numTokens++] = OP_NUM;
+        if (use32Bits) {
+          sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          }
+        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff00) >> 8); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
+        Asm("           str     r7");
+        Asm("           dec     r7");
+        term = -1;
+        }
+      }
+
+    /* ******************************** */
+    /* ***** Process hex constant ***** */
+    /* ******************************** */
+    if (term == 0) {
+      if (*buffer == '$' &&
              ((*(buffer+1) >= 'a' && *(buffer+1) <= 'f') ||
               (*(buffer+1) >= 'A' && *(buffer+1) <= 'F') ||
               (*(buffer+1) >= '0' && *(buffer+1) <= '9'))) {
-      buffer++;
-      number = 0;
-      while ((*buffer >= '0' && *buffer <= '9') ||
-             (*buffer >= 'a' && *buffer <= 'f') ||
-             (*buffer >= 'A' && *buffer <= 'F')) {
-        if (*buffer >= '0' && *buffer <= '9') number = (number << 4) + (*buffer - '0');
-        if (*buffer >= 'a' && *buffer <= 'f') number = (number << 4) + (*buffer - 'a') + 10;
-        if (*buffer >= 'A' && *buffer <= 'F') number = (number << 4) + (*buffer - 'A') + 10;
         buffer++;
-        }
-      tokens[numTokens++] = 0;
-      tokens[numTokens++] = OP_NUM;
-      if (use32Bits) {
-        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
+        number = 0;
+        while ((*buffer >= '0' && *buffer <= '9') ||
+               (*buffer >= 'a' && *buffer <= 'f') ||
+               (*buffer >= 'A' && *buffer <= 'F')) {
+          if (*buffer >= '0' && *buffer <= '9') number = (number << 4) + (*buffer - '0');
+          if (*buffer >= 'a' && *buffer <= 'f') number = (number << 4) + (*buffer - 'a') + 10;
+          if (*buffer >= 'A' && *buffer <= 'F') number = (number << 4) + (*buffer - 'A') + 10;
+          buffer++;
+          }
+        tokens[numTokens++] = 0;
+        tokens[numTokens++] = OP_NUM;
+        if (use32Bits) {
+          sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
+          Asm("           str     r7");
+          Asm("           dec     r7");
+          }
+        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff00) >> 8); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
+        sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
+        term = -1;
         }
-      sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff00) >> 8); Asm(abuffer);
-      Asm("           str     r7");
-      Asm("           dec     r7");
-      sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
-      Asm("           str     r7");
-      Asm("           dec     r7");
       }
 
-    else if ((*buffer >= 'a' && *buffer <= 'z') ||
-             (*buffer >= 'A' && *buffer <= 'Z')) {
-      p = 0;
-      while ((*buffer >= 'a' && *buffer <= 'z') ||
-             (*buffer >= 'A' && *buffer <= 'Z') ||
-             (*buffer >= '0' && *buffer <= '9') ||
-              *buffer == '_') {
-        token[p++] = *buffer++;
-        }
-      token[p] = 0;
-      tokens[numTokens++] = 0;
-      tokens[numTokens++] = OP_NUM;
-      number = getVariable(token);
-      sprintf(abuffer,"           ldi     [%s].1              ; Push constant onto expr stack",token); Asm(abuffer);
-      Asm("           phi     rf");
-      sprintf(abuffer,"           ldi     [%s].0",token); Asm(abuffer);
-      Asm("           plo     rf");
-      if (use32Bits) {
-        for (i=0; i<4; i++) {
-          Asm("           lda     rf");
-          Asm("           str     r7");
-          Asm("           dec     r7");
+    if (term == 0) {
+      fp = 0;
+      if ((*buffer >= 'a' && *buffer <= 'z') ||
+          (*buffer >= 'A' && *buffer <= 'Z')) {
+        p = 0;
+        while ((*buffer >= 'a' && *buffer <= 'z') ||
+               (*buffer >= 'A' && *buffer <= 'Z') ||
+               (*buffer >= '0' && *buffer <= '9') ||
+                *buffer == '_') {
+          token[p++] = *buffer++;
+          if (useFp) {
+            if (*buffer == '!') {
+              fp = -1;
+              token[p++] = *buffer++;
+              while ((*buffer >= 'a' && *buffer <= 'z') ||
+                     (*buffer >= 'A' && *buffer <= 'Z') ||
+                     (*buffer >= '0' && *buffer <= '9') ||
+                      *buffer == '_') {
+                showError("Invalid variable name");
+                exit(1);
+                }
+              }
+            }
           }
-        }
-      else {
-        for (i=0; i<2; i++) {
-          Asm("           lda     rf");
-          Asm("           str     r7");
-          Asm("           dec     r7");
+        token[p] = 0;
+        tokens[numTokens++] = 0;
+        if (fp) tokens[numTokens++] = OP_NUMFP;
+          else tokens[numTokens++] = OP_NUM;
+        number = getVariable(token);
+        sprintf(abuffer,"           ldi     [%s].1              ; Push constant onto expr stack",token); Asm(abuffer);
+        Asm("           phi     rf");
+        sprintf(abuffer,"           ldi     [%s].0",token); Asm(abuffer);
+        Asm("           plo     rf");
+        if (use32Bits) {
+          for (i=0; i<4; i++) {
+            Asm("           lda     rf");
+            Asm("           str     r7");
+            Asm("           dec     r7");
+            }
           }
+        else {
+          for (i=0; i<2; i++) {
+            Asm("           lda     rf");
+            Asm("           str     r7");
+            Asm("           dec     r7");
+            }
+          }
+        term = -1;
         }
       }
-    else {
+
+    if (term == 0) {
       printf("Expression error: %s\n",buffer);
       return 0;
       }
@@ -583,17 +838,25 @@ char* evaluate(char* buffer) {
   }
 
 
-char* cexpr(char* line) {
+char* cexpr(char* line, int etype) {
   int   i;
   int   pos;
+  int   fp;
   word  num;
   dword num32;
   char  token[128];
   char *temp;
+  char *oline;
   char  neg;
+  char  handled;
+  FPI   fpi;
+  oline = line;
   line = trim(line);
   temp = line;
+  handled = 0;
+  numTokens = 0;
 
+  fp = 0;
   /* ************************************************* */
   /* ***** If expression is just a single number ***** */
   /* ***** then set RC=to that number            ***** */
@@ -628,7 +891,10 @@ char* cexpr(char* line) {
         sprintf(buffer,"           ldi     %d",num32 & 0xff); Asm(buffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        return temp;
+        tokens[numTokens++] = 0;
+        tokens[numTokens++] = OP_NUM;
+        line = temp;
+        handled = -1;
         }
       }
     else {
@@ -648,7 +914,10 @@ char* cexpr(char* line) {
         sprintf(buffer,"           ldi     %d",num%256); Asm(buffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        return temp;
+        line = temp;
+        tokens[numTokens++] = 0;
+        tokens[numTokens++] = OP_NUM;
+        handled = -1;
         }
       }
     }
@@ -667,6 +936,19 @@ char* cexpr(char* line) {
            (*temp >= '0' && *temp <= '9') ||
            *temp == '_') {
       token[pos++] = *temp++;
+      if (useFp) {
+        if (*temp == '!') {
+          fp = -1;
+          token[pos++] = *temp++;
+          while ((*temp >= 'a' && *temp <= 'z') ||
+                 (*temp >= 'A' && *temp <= 'Z') ||
+                 (*temp >= '0' && *temp <= '9') ||
+                 *temp == '_') {
+            showError("Invalid variable name");
+            exit(1);
+            }
+          }
+        }
       }
     token[pos] = 0;
     if (*temp == ',' || *temp == ';' || *temp == 0) {
@@ -689,13 +971,34 @@ char* cexpr(char* line) {
           Asm("           dec     r7");
           }
         }
-      return temp;
+      tokens[numTokens++] = 0;
+      if (fp) tokens[numTokens++] = OP_NUMFP;
+        else tokens[numTokens++] = OP_NUM;
+      line = temp;
+      handled = -1;
       }
     }
 
   /* **************************************** */
   /* ***** Otherwise process expression ***** */
   /* **************************************** */
-  return evaluate(line);
+  if (!handled) line = evaluate(line);
+  if (numTokens != 2) {
+    printf("Expression error: %s\n",oline);
+    exit(1);
+    }
+  if (tokens[1] != OP_NUM && tokens[1] != OP_NUMFP) {
+    printf("Expression error");
+    exit(1);
+    }
+  if (tokens[1] == OP_NUM && etype == 1) {
+    Asm("           sep     scall               ; Convert integer to floating point");
+    Asm("           dw      itof");
+    }
+  if (tokens[1] == OP_NUMFP && etype == 0) {
+    Asm("           sep     scall               ; Convert floating point to integer");
+    Asm("           dw      ftoi");
+    }
+  return line;
   }
 

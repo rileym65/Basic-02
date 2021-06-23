@@ -3,7 +3,7 @@
 char* cdma(char* line) {
   word target;
   line = trim(line);
-  line = cexpr(line);
+  line = cexpr(line, 0);
   Asm("          inc   r7                      ; Set R0 to address");
   Asm("          lda   r7");
   Asm("          plo   r0");

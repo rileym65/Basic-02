@@ -112,7 +112,7 @@ char* cfor(char* line) {
     }
   line++;
   line = trim(line);
-  line = cexpr(line);
+  line = cexpr(line, 0);
   vaddr = getVariable(varname);
 
   if (use32Bits) {
@@ -154,7 +154,7 @@ char* cfor(char* line) {
     }
   line += 2;
   line = trim(line);
-  line = cexpr(line);
+  line = cexpr(line, 0);
   line = trim(line);
   if (use32Bits) {
     Asm("          sep   scall                   ; subtract end from start");
@@ -211,7 +211,7 @@ char* cfor(char* line) {
   else if (strncasecmp(line,"step",4) == 0) {
     line += 4;
     line = trim(line);
-    line = cexpr(line);
+    line = cexpr(line, 0);
     line = trim(line);
     if (*line != ':' && *line != 0) {
       showError("Syntax error");

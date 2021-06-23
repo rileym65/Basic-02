@@ -13,7 +13,7 @@ char* cq(char* line) {
     while (*line != ':' && *line != 0) line++;
     return line;
     }
-  line = cexpr(line);
+  line = cexpr(line, 0);
   Asm("          inc   r7                      ; Recover computed value");
   Asm("          lda   r7");
   if (use32Bits) {
