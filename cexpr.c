@@ -786,17 +786,15 @@ char* evaluate(char* buffer) {
         tokens[numTokens++] = 0;
         tokens[numTokens++] = OP_NUMFP;
         sprintf(abuffer,"           ldi     %d                  ; Push floating-point constant onto expr stack",(fpi.i & 0xff000000) >> 24); Asm(abuffer);
-        Asm("           str     r7");
-        Asm("           dec     r7");
+        Asm("           sex     r7");
+        Asm("           stxd");
         sprintf(abuffer,"           ldi     %d",(fpi.i & 0xff0000) >> 16); Asm(abuffer);
-        Asm("           str     r7");
-        Asm("           dec     r7");
+        Asm("           stxd");
         sprintf(abuffer,"           ldi     %d",(fpi.i & 0xff00) >> 8); Asm(abuffer);
-        Asm("           str     r7");
-        Asm("           dec     r7");
+        Asm("           stxd");
         sprintf(abuffer,"           ldi     %d",fpi.i & 0xff); Asm(abuffer);
-        Asm("           str     r7");
-        Asm("           dec     r7");
+        Asm("           stxd");
+        Asm("           sex     r2");
         term = -1;
         }
       else {
@@ -904,11 +902,12 @@ char* evaluate(char* buffer) {
         sprintf(abuffer,"           ldi     [%s].0",token); Asm(abuffer);
         Asm("           plo     rf");
         if (use32Bits) {
+          Asm("           sex     r7");
           for (i=0; i<4; i++) {
             Asm("           lda     rf");
-            Asm("           str     r7");
-            Asm("           dec     r7");
+            Asm("           stxd");
             }
+          Asm("           sex     r2");
           }
         else {
           for (i=0; i<2; i++) {
