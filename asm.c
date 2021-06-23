@@ -300,6 +300,7 @@ void Asm(char* line) {
   word  value;
   orig = line;
   asmAddress = address;
+// printf("\n>>%s<<\n",line);
   if (passNumber == 2) {
     if (showAsm) printf("%s\n",line);
     if (useAsm) {

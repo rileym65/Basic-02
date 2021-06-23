@@ -46,13 +46,20 @@ Expressions:
   $hexnum
   ABS(expr)
   ALLOC(expr)
+  CINT(expr)
+  COS(expr)
+  CSNG(expr)
   DPEEK(addr)
+  EXP(addr)
   FLG(expr)
   FRE(addr)
   INP(port)
+  LN(expr)
   PEEK(addr)
   RND(range)
   SGN(expr)
+  SIN(expr)
+  TAN(expr)
 
 System variables:
   DATA_        - Address of DATA pointer
@@ -81,7 +88,7 @@ by the colon (:) character.
   Line numbers must be greater than 0 and less than 65536 and must appear
 in order.
 
-  All other numbers are 16-bit signed integers.
+  All other numbers are 16-bit signed integers (unless -32 or -fp is used).
 
   if term=none then PRINT and INPUT will not produce any code, nor will they
 produce errors during compile.

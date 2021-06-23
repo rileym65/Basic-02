@@ -1,5 +1,12 @@
 #include "header.h"
 
+#define OP_EXP    0x60
+#define OP_LN     0x5f
+#define OP_TAN    0x5e
+#define OP_COS    0x5d
+#define OP_SIN    0x5c
+#define OP_CSNG   0x5b
+#define OP_CINT   0x5a
 #define OP_ALLOC  0x59
 #define OP_SGN    0x58
 #define OP_RND    0x57
@@ -159,6 +166,7 @@ int reduce(char last) {
     if (last) ret = -1;
     }
   else if (numTokens > 2 && tokens[numTokens-3] == OP_OP) {
+    opType = (tokens[numTokens-1] == OP_NUM) ? 'I' : 'F';
     arg1 = tokens[numTokens-2];
     op   = tokens[numTokens-3];
     numTokens -= 3;
@@ -541,6 +549,64 @@ int reduce(char last) {
          Asm("           str     r7");
          Asm("           dec     r7");
          break;
+    case OP_CINT:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
+         break;
+    case OP_CSNG:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+    case OP_SIN:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform sin function");
+         Asm("           dw      fpsin");
+         break;
+    case OP_COS:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform cos function");
+         Asm("           dw      fpcos");
+         break;
+    case OP_TAN:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform tan function");
+         Asm("           dw      fptan");
+         break;
+    case OP_LN:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform ln function");
+         Asm("           dw      fpln");
+         break;
+    case OP_EXP:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform exp function");
+         Asm("           dw      fpexp");
+         break;
     }
   tokens[numTokens++] = 0;
   tokens[numTokens++] = (opType == 'I') ? OP_NUM : OP_NUMFP;
@@ -655,6 +721,57 @@ char* evaluate(char* buffer) {
          parens++;
          func = -1;
          }
+      if (useFp) {
+        if (strncasecmp(buffer,"cint(",5) == 0) {
+           tokens[numTokens++] = OP_CINT;
+           tokens[numTokens++] = OP_OP;
+           buffer+=5;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"csng(",5) == 0) {
+           tokens[numTokens++] = OP_CSNG;
+           tokens[numTokens++] = OP_OP;
+           buffer+=5;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"sin(",4) == 0) {
+           tokens[numTokens++] = OP_SIN;
+           tokens[numTokens++] = OP_OP;
+           buffer+=4;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"cos(",4) == 0) {
+           tokens[numTokens++] = OP_COS;
+           tokens[numTokens++] = OP_OP;
+           buffer+=4;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"tan(",4) == 0) {
+           tokens[numTokens++] = OP_TAN;
+           tokens[numTokens++] = OP_OP;
+           buffer+=4;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"ln(",3) == 0) {
+           tokens[numTokens++] = OP_LN;
+           tokens[numTokens++] = OP_OP;
+           buffer+=3;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"exp(",4) == 0) {
+           tokens[numTokens++] = OP_EXP;
+           tokens[numTokens++] = OP_OP;
+           buffer+=4;
+           parens++;
+           func = -1;
+           }
+        }
       }
 
     term = 0;
@@ -668,13 +785,13 @@ char* evaluate(char* buffer) {
         fpi.f = atof(token);
         tokens[numTokens++] = 0;
         tokens[numTokens++] = OP_NUMFP;
-        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(fpi.i & 0xff000000) >> 24); Asm(abuffer);
+        sprintf(abuffer,"           ldi     %d                  ; Push floating-point constant onto expr stack",(fpi.i & 0xff000000) >> 24); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
         sprintf(abuffer,"           ldi     %d",(fpi.i & 0xff0000) >> 16); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
-        sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(fpi.i & 0xff00) >> 8); Asm(abuffer);
+        sprintf(abuffer,"           ldi     %d",(fpi.i & 0xff00) >> 8); Asm(abuffer);
         Asm("           str     r7");
         Asm("           dec     r7");
         sprintf(abuffer,"           ldi     %d",fpi.i & 0xff); Asm(abuffer);
@@ -782,7 +899,7 @@ char* evaluate(char* buffer) {
         if (fp) tokens[numTokens++] = OP_NUMFP;
           else tokens[numTokens++] = OP_NUM;
         number = getVariable(token);
-        sprintf(abuffer,"           ldi     [%s].1              ; Push constant onto expr stack",token); Asm(abuffer);
+        sprintf(abuffer,"           ldi     [%s].1              ; Push variable onto expr stack",token); Asm(abuffer);
         Asm("           phi     rf");
         sprintf(abuffer,"           ldi     [%s].0",token); Asm(abuffer);
         Asm("           plo     rf");

@@ -254,6 +254,7 @@ int main(int argc, char** argv, char** envp) {
   printf("Lines compiled: %d\n",lineCount);
   printf("Runtime size  : %d\n",runtime-programStart);
   printf("Program size  : %d\n",codeGenerated-(runtime-programStart));
+  printf("Total size    : %d\n",codeGenerated);
   printf("Variable RAM  : %04xh\n",variableRAM);
   printf("Ram           : %04xh-%04xh\n",ramStart,ramEnd);
   printf("Rom           : %04xh-%04xh\n",romStart,romEnd);
@@ -348,6 +349,13 @@ int main(int argc, char** argv, char** envp) {
                         printf("  itof       %04x\n",getLabel("itof"));
                         printf("  ftoi       %04x\n",getLabel("ftoi"));
     }
+  if (useTrig != 0) {
+    }
+  if (useCos != 0)      printf("  FpCos      %04x\n",getLabel("fpcos"));
+  if (useExp != 0)      printf("  FpExp      %04x\n",getLabel("fpexp"));
+  if (useLn  != 0)      printf("  FpLn       %04x\n",getLabel("fpln"));
+  if (useSin != 0)      printf("  FpSin      %04x\n",getLabel("fpsin"));
+  if (useTan != 0)      printf("  FpTan      %04x\n",getLabel("fptan"));
 
   printf("\n");
   if (showVariables) {

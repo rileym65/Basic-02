@@ -4935,6 +4935,845 @@ void library() {
     Asm("          sep      sret         ; and return to caller");
     }
 
+  if (useTrig) {
+    Asm("fact:     db       000h, 000h, 000h, 000h");
+    Asm("          db       000h, 000h, 080h, 03fh");
+    Asm("          db       000h, 000h, 000h, 040h");
+    Asm("          db       000h, 000h, 0c0h, 040h");
+    Asm("          db       000h, 000h, 0c0h, 041h");
+    Asm("          db       000h, 000h, 0f0h, 042h");
+    Asm("          db       000h, 000h, 034h, 044h");
+    Asm("          db       000h, 080h, 09dh, 045h");
+    Asm("          db       000h, 080h, 01dh, 047h");
+    Asm("          db       000h, 030h, 0b1h, 048h");
+    Asm("          db       000h, 07ch, 05dh, 04ah");
+    Asm("          db       040h, 045h, 018h, 04ch");
+    Asm("          db       0e0h, 067h, 0e4h, 04dh");
+    Asm("          db       066h, 094h, 0b9h, 04fh");
+    Asm("          db       0d9h, 061h, 0a2h, 051h");
+    Asm("          db       0bbh, 03bh, 098h, 053h");
+    Asm("          db       0bbh, 03bh, 098h, 055h");
+    Asm("          db       077h, 0bfh, 0a1h, 057h");
+    Asm("          db       066h, 0f7h, 0b5h, 059h");
+    Asm("          db       0c9h, 015h, 0d8h, 05bh");
+    Asm("          db       09eh, 00dh, 007h, 05eh");
+    Asm("          db       0dfh, 041h, 031h, 060h");
+    Asm("          db       093h, 0bah, 073h, 062h");
+    Asm("          db       01ah, 02eh, 0afh, 064h");
+    Asm("          db       094h, 062h, 003h, 067h");
+    Asm("          db       007h, 04ah, 04dh, 069h");
+    Asm("          db       026h, 0cch, 0a6h, 06bh");
+    Asm("          db       040h, 0bch, 00ch, 06eh");
+    Asm("          db       070h, 049h, 076h, 070h");
+    Asm("          db       08eh, 032h, 0dfh, 072h");
+    Asm("          db       065h, 03fh, 051h, 075h");
+    Asm("          db       06ah, 0b5h, 0cah, 077h");
+    Asm("          db       06ah, 0b5h, 04ah, 07ah");
+    Asm("          db       015h, 00bh, 0d1h, 07ch");
+    Asm("          db       0c6h, 01bh, 05eh, 07fh");
+
+    Asm("addtows:  irx                   ; retrieve return address");
+    Asm("          ldxa");
+    Asm("          phi      r8");
+    Asm("          ldx");
+    Asm("          plo      r8");
+    Asm("          inc      rd           ; move to msb");
+    Asm("          inc      rd");
+    Asm("          inc      rd");
+    Asm("          ldn      rd           ; retrieve");
+    Asm("          stxd                  ; and place on stack");
+    Asm("          dec      rd");
+    Asm("          ldn      rd           ; retrieve next byte");
+    Asm("          stxd                  ; and place on stack");
+    Asm("          dec      rd");
+    Asm("          ldn      rd           ; retrieve next byte");
+    Asm("          stxd                  ; and place on stack");
+    Asm("          dec      rd");
+    Asm("          ldn      rd           ; retrieve next byte");
+    Asm("          stxd                  ; and place on stack");
+    Asm("          glo      r8           ; put return address back on stack");
+    Asm("          stxd");
+    Asm("          ghi      r8");
+    Asm("          stxd");
+    Asm("          sep      sret         ; return to caller");
+
+    Asm("getargs:  lda      r6           ; get passed argument");
+    Asm("          str      r2           ; store for add");
+    Asm("          glo      r2           ; add stack offset");
+    Asm("          add");
+    Asm("          plo      rf           ; put into first argument");
+    Asm("          ghi      r2           ; high of stack");
+    Asm("          adci     0            ; propagate carry");
+    Asm("          phi      rf           ; rf now has argument address");
+    Asm("          inc      rf           ; remove last call offset");
+    Asm("          inc      rf");
+    Asm("          lda      r6           ; get passed argument");
+    Asm("          str      r2           ; store for add");
+    Asm("          glo      r2           ; add stack offset");
+    Asm("          add");
+    Asm("          plo      rd           ; put into second argument");
+    Asm("          ghi      r2           ; high of stack");
+    Asm("          adci     0            ; propagate carry");
+    Asm("          phi      rd           ; rd now has argument address");
+    Asm("          inc      rd           ; remove last call offset");
+    Asm("          inc      rd");
+    Asm("          sep      sret         ; return to caller");
+    }
+
+  if (useSin) {
+    /* ****************************************************** */
+    /* ***** sin                                        ***** */
+    /* ***** RF - Pointer to floating point number      ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ***** internal:                                  ***** */
+    /* *****       R2+1  R7 - sum                       ***** */
+    /* *****       R2+5  R8 - pwr                       ***** */
+    /* *****       R2+9  R9 - last                      ***** */
+    /* *****       R2+13 RA - fctPos                    ***** */
+    /* *****       R2+17 RB - fct                       ***** */
+    /* *****       R2+21 RC - tmp                       ***** */
+    /* *****       R2+25 RD - sgn                       ***** */
+    /* *****       R2+29    - angle                     ***** */
+    /* ****************************************************** */
+    Asm("fpsin:    ghi      r7           ; save expr stack");
+    Asm("          stxd");
+    Asm("          glo      r7");
+    Asm("          stxd");
+    Asm("          ghi      r7           ; source is expr stack");
+    Asm("          phi      rf");
+    Asm("          glo      r7");
+    Asm("          plo      rf");
+    Asm("          inc      rf");
+    Asm("          ghi      rf           ; angle = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ldi      0            ; sign starts out positive");
+    Asm("          stxd                  ; make space for sgn");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd                  ; make space for tmp");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd                  ; make space for fct");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd                  ; make space for fctPos");
+    Asm("          stxd");
+    Asm("          ldi      fact+12.1    ; position of 3!");
+    Asm("          stxd");
+    Asm("          ldi      fact+12.0");
+    Asm("          stxd");
+    Asm("          ldi      0");
+    Asm("          stxd                  ; make space for last");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          ghi      rf           ; pwr = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ghi      rf           ; sum = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("sincos:   sep      scall        ; angle = angle * angle");
+    Asm("          dw       getargs");
+    Asm("          db       29,29");
+    Asm("          sep      scall        ; angle = angle * angle");
+    Asm("          dw       mulfpi");
+    Asm("sincos_l: sep      scall        ; need to see if sum == last");
+    Asm("          dw       getargs");
+    Asm("          db       9,1");
+    Asm("          ldi      4            ; 4 bytes to check");
+    Asm("          plo      rc");
+    Asm("          ldi      0            ; clear comparison flag");
+    Asm("          plo      re");
+    Asm("sincos_1: ldn      rd           ; get byte from sum");
+    Asm("          str      r2           ; save for comparison");
+    Asm("          ldn      rf           ; get point from last");
+    Asm("          sm                    ; compare them");
+    Asm("          str      r2           ; store to combine with comparison flag");
+    Asm("          glo      re           ; get comparison flag");
+    Asm("          or                    ; combine");
+    Asm("          plo      re           ; put back into comparison");
+    Asm("          ldn      rd           ; get byte from sum");
+    Asm("          str      rf           ; store into last");
+    Asm("          inc      rd           ; increment pointers");
+    Asm("          inc      rf");
+    Asm("          dec      rc           ; decrement count");
+    Asm("          glo      rc           ; see if done");
+    Asm("          lbnz     sincos_1     ; jump if not");
+    Asm("          glo      re           ; get comparison flag");
+    Asm("          lbz      sincos_d     ; jump if done");
+    Asm("          sep      scall        ; pwr = pwr * angle");
+    Asm("          dw       getargs");
+    Asm("          db       5,29");
+    Asm("          sep      scall");
+    Asm("          dw       mulfpi");
+    Asm("          sep      scall        ; fct = facts[fctPos]");
+    Asm("          dw       getargs");
+    Asm("          db       17,13");
+    Asm("          ldn      rd           ; get address of facts[fctPos]");
+    Asm("          plo      r7");
+    Asm("          adi      8            ; and then point two constants up");
+    Asm("          str      rd");
+    Asm("          inc      rd");
+    Asm("          ldn      rd           ; get high byte of address");
+    Asm("          phi      r7");
+    Asm("          adci     0");
+    Asm("          str      rd           ; fctPos now points at next one needed");
+    Asm("          lda      r7           ; read factorial into destination");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      r7");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      r7");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          glo      r2           ; point to sgn");
+    Asm("          adi      25");
+    Asm("          plo      rd");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      rd");
+    Asm("          ldn      rd           ; get sign");
+    Asm("          xri      080h         ; flip it");
+    Asm("          str      rd           ; and put it back");
+    Asm("          str      r2           ; store to combine with fct");
+    Asm("          lda      r7");
+    Asm("          or                    ; set sign");
+    Asm("          str      rf");
+    Asm("          sep      scall        ; tmp = pwr");
+    Asm("          dw       getargs");
+    Asm("          db       21,5");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm(";          sep      scall        ; tmp = tmp * pwr");
+    Asm(";          dw       getargs");
+    Asm(";          db       21,29");
+    Asm(";          sep      scall");
+    Asm(";          dw       fpmul");
+    Asm("          sep      scall        ; tmp = tmp / fct");
+    Asm("          dw       getargs");
+    Asm("          db       21,17");
+    Asm("          sep      scall");
+    Asm("          dw       divfpi");
+    Asm("          sep      scall        ; sum = sum + tmp");
+    Asm("          dw       getargs");
+    Asm("          db       1,21");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("          lbr      sincos_l     ; loop until done");
+    Asm("sincos_d: irx                   ; recover answer");
+    Asm("          ldxa");
+    Asm("          plo      r8");
+    Asm("          ldxa");
+    Asm("          phi      r8");
+    Asm("          ldxa");
+    Asm("          plo      ra");
+    Asm("          ldx");
+    Asm("          phi      ra");
+    Asm("          glo      r2           ; clean workspace off stack");
+    Asm("          adi      28");
+    Asm("          plo      r2");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      r2");
+    Asm("          irx                   ; recover expr stack");
+    Asm("          ldxa");
+    Asm("          plo      r7");
+    Asm("          ldx");
+    Asm("          phi      r7");
+    Asm("          inc      r7");
+    Asm("          glo      r8           ; store answer");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      r8");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          glo      ra");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      ra");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          sep      sret         ; and return to caller");
+    }
+
+  if (useCos) {
+    /* ****************************************************** */
+    /* ***** cos                                        ***** */
+    /* ***** RF - Pointer to floating point number      ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ***** internal:                                  ***** */
+    /* *****       R2+1  R7 - sum                       ***** */
+    /* *****       R2+5  R8 - pwr                       ***** */
+    /* *****       R2+9  R9 - last                      ***** */
+    /* *****       R2+13 RA - fctPos                    ***** */
+    /* *****       R2+17 RB - fct                       ***** */
+    /* *****       R2+21 RC - tmp                       ***** */
+    /* *****       R2+25 RD - sgn                       ***** */
+    /* *****       R2+29    - angle                     ***** */
+    /* ****************************************************** */
+    Asm("fpcos:    ghi      r7           ; save expr stack");
+    Asm("          stxd");
+    Asm("          glo      r7");
+    Asm("          stxd");
+    Asm("          ghi      r7           ; source is expr stack");
+    Asm("          phi      rf");
+    Asm("          glo      r7");
+    Asm("          plo      rf");
+    Asm("          inc      rf");
+    Asm("          ghi      rf           ; angle = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ldi      0            ; sign starts out positive");
+    Asm("          stxd                  ; make space for sgn");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd                  ; make space for tmp");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd                  ; make space for fct");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd                  ; make space for fctPos");
+    Asm("          stxd");
+    Asm("          ldi      fact+8.1     ; position of 2!");
+    Asm("          stxd");
+    Asm("          ldi      fact+8.0");
+    Asm("          stxd");
+    Asm("          ldi      0");
+    Asm("          stxd                  ; make space for last");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          ldi      fp_1.1       ; pwr = 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ldi      fp_1.1       ; pwr = 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          lbr      sincos       ; now compute");
+    }
+
+  if (useTan) {
+    /* ****************************************************** */
+    /* ***** tan                                        ***** */
+    /* ***** RF - Pointer to floating point number      ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ***** internal:                                  ***** */
+    /* *****       R2+1     - s                         ***** */
+    /* *****       R2+5     - c                         ***** */
+    /* ****************************************************** */
+    Asm("fptan:    ghi      r7           ; save expr stack");
+    Asm("          stxd");
+    Asm("          glo      r7");
+    Asm("          stxd");
+    Asm("          ghi      r7           ; source is expr stack");
+    Asm("          phi      rf");
+    Asm("          glo      r7");
+    Asm("          plo      rf");
+    Asm("          inc      rf");
+    Asm("          ghi      rf           ; s = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ghi      rf           ; c = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          glo      r2           ; setup for computing sin");
+    Asm("          plo      r7");
+    Asm("          ghi      r2");
+    Asm("          phi      r7");
+    Asm("          sep      scall        ; compute sin");
+    Asm("          dw       fpsin");
+    Asm("          glo      r2           ; setup to compute cos");
+    Asm("          adi      4");
+    Asm("          plo      r7");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      r7");
+    Asm("          sep      scall        ; compute cos");
+    Asm("          dw       fpcos");
+    Asm("          sep      scall        ; get arguments for division");
+    Asm("          dw       getargs");
+    Asm("          db       1,5");
+    Asm("          sep      scall        ; s = s / c");
+    Asm("          dw       divfpi");
+    Asm("          irx                   ; recover answer");
+    Asm("          ldxa");
+    Asm("          plo      r8");
+    Asm("          ldxa");
+    Asm("          phi      r8");
+    Asm("          ldxa");
+    Asm("          plo      ra");
+    Asm("          ldxa");
+    Asm("          phi      ra");
+    Asm("          irx                   ; move past c");
+    Asm("          irx");
+    Asm("          irx");
+    Asm("          irx                   ; recover expr stack");
+    Asm("          ldxa");
+    Asm("          plo      r7");
+    Asm("          ldx");
+    Asm("          phi      r7");
+    Asm("          inc      r7");
+    Asm("          glo      r8           ; store answer");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      r8");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          glo      ra");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      ra");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          sep      sret         ; and return to caller");
+    }
+
+  if (useLn) {
+    /* ****************************************************** */
+    /* ***** Natural logarithm                          ***** */
+    /* ***** RF - Pointer to floating point number      ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ***** internal:                                  ***** */
+    /* *****       R2+1     - sum                       ***** */
+    /* *****       R2+5     - last                      ***** */
+    /* *****       R2+9     - k                         ***** */
+    /* *****       R2+13    - pwr                       ***** */
+    /* *****       R2+17    - tmp                       ***** */
+    /* *****       R2+21    - n                         ***** */
+    /* ****************************************************** */
+    Asm("fpln:     ghi      r7           ; save expr stack");
+    Asm("          stxd");
+    Asm("          glo      r7");
+    Asm("          stxd");
+    Asm("          ghi      r7           ; source is expr stack");
+    Asm("          phi      rf");
+    Asm("          glo      r7");
+    Asm("          plo      rf");
+    Asm("          inc      rf");
+    Asm("          ghi      rf           ; n = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          ghi      rf           ; tmp = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          stxd                  ; reserve space for pwr");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          ldi      fp_1.1       ; k = 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ldi      fp_1.1       ; last = 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; add to workspace");
+    Asm("          dw       addtows");
+    Asm("          ldi      0            ; sum = 0");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          glo      r2           ; point to tmp");
+    Asm("          adi      17");
+    Asm("          plo      rf");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      rf");
+    Asm("          ldi      fp_1.1       ; point to 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; compute n+1");
+    Asm("          dw       addfpi");
+    Asm("          glo      r2           ; point to n");
+    Asm("          adi      21");
+    Asm("          plo      rf");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      rf");
+    Asm("          ldi      fp_1.1       ; point to 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall        ; compute n-1");
+    Asm("          dw       subfpi");
+    Asm("          sep      scall        ; compute (n-1)/(n+1)");
+    Asm("          dw       getargs");
+    Asm("          db       21,17");
+    Asm("          sep      scall");
+    Asm("          dw       divfpi");
+    Asm("          sep      scall        ; pwr = n");
+    Asm("          dw       getargs");
+    Asm("          db       13,21");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          sep      scall        ; n = n * n");
+    Asm("          dw       getargs");
+    Asm("          db       21,21");
+    Asm("          sep      scall");
+    Asm("          dw       mulfpi");
+    Asm("fplog_l:  sep      scall        ; need to see if sum == last");
+    Asm("          dw       getargs");
+    Asm("          db       5,1");
+    Asm("          ldi      4            ; 4 bytes to check");
+    Asm("          plo      rc");
+    Asm("          ldi      0            ; clear comparison flag");
+    Asm("          plo      re");
+    Asm("fplog_1:  ldn      rd           ; get byte from sum");
+    Asm("          str      r2           ; save for comparison");
+    Asm("          ldn      rf           ; get point from last");
+    Asm("          sm                    ; compare them");
+    Asm("          str      r2           ; store to combine with comparison flag");
+    Asm("          glo      re           ; get comparison flag");
+    Asm("          or                    ; combine");
+    Asm("          plo      re           ; put back into comparison");
+    Asm("          ldn      rd           ; get byte from sum");
+    Asm("          str      rf           ; store into last");
+    Asm("          inc      rd           ; increment pointers");
+    Asm("          inc      rf");
+    Asm("          dec      rc           ; decrement count");
+    Asm("          glo      rc           ; see if done");
+    Asm("          lbnz     fplog_1      ; jump if not");
+    Asm("          glo      re           ; get comparison flag");
+    Asm("          lbz      fplog_d      ; jump if done");
+    Asm("          sep      scall        ; tmp = pwr");
+    Asm("          dw       getargs");
+    Asm("          db       17,13");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          sep      scall        ; tmp = tmp / k");
+    Asm("          dw       getargs");
+    Asm("          db       17,9");
+    Asm("          sep      scall");
+    Asm("          dw       divfpi");
+    Asm("          sep      scall        ; sum = sum + tmp");
+    Asm("          dw       getargs");
+    Asm("          db       1,17");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("          sep      scall        ; pwr = pwr * n");
+    Asm("          dw       getargs");
+    Asm("          db       13,21");
+    Asm("          sep      scall");
+    Asm("          dw       mulfpi");
+    Asm("          glo      r2           ; k = k + 2");
+    Asm("          adi      9");
+    Asm("          plo      rf");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      rf");
+    Asm("          ldi      fp_2.1       ; point to 2.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_2.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("          lbr      fplog_l      ; loop until done");
+    Asm("fplog_d:  sep      scall        ; sum = sum + sum");
+    Asm("          dw       getargs");
+    Asm("          db       1,1");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("          irx                   ; recover answer");
+    Asm("          ldxa    ");
+    Asm("          plo      r8");
+    Asm("          ldxa");
+    Asm("          phi      r8");
+    Asm("          ldxa");
+    Asm("          plo      ra");
+    Asm("          ldx");
+    Asm("          phi      ra");
+    Asm("          glo      r2           ; clean up the stack");
+    Asm("          adi      20");
+    Asm("          plo      r2");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      r2");
+    Asm("          irx                   ; recover expr stack");
+    Asm("          ldxa");
+    Asm("          plo      r7");
+    Asm("          ldx");
+    Asm("          phi      r7");
+    Asm("          inc      r7");
+    Asm("          glo      r8           ; store answer");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      r8");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          glo      ra");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      ra");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          sep      sret         ; and return to caller");
+    }
+
+  if (useExp) {
+    /* ****************************************************** */
+    /* ***** Natural exp                                ***** */
+    /* ***** RF - Pointer to floating point number      ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ***** internal:                                  ***** */
+    /* *****       R2+1     - sum                       ***** */
+    /* *****       R2+5     - last                      ***** */
+    /* *****       R2+9     - fct                       ***** */
+    /* *****       R2+13    - fctCount                  ***** */
+    /* *****       R2+17    - pwr                       ***** */
+    /* *****       R2+21    - tmp                       ***** */
+    /* *****       R2+25    - n                         ***** */
+    /* ****************************************************** */
+    Asm("fpexp:    ghi      r7           ; save expr stack");
+    Asm("          stxd");
+    Asm("          glo      r7");
+    Asm("          stxd");
+    Asm("          ghi      r7           ; source is expr stack");
+    Asm("          phi      rf");
+    Asm("          glo      r7");
+    Asm("          plo      rf");
+    Asm("          inc      rf");
+    Asm("          ghi      rf           ; n = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          stxd                  ; space for tmp");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          stxd");
+    Asm("          ghi      rf           ; pwr = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          ldi      fp_2.1       ; fctCount = 2.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_2.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          ldi      fp_1.1       ; fct = 1.0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          ldi      fp_0.1       ; last = 0");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_0.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          ghi      rf           ; sum = argument");
+    Asm("          phi      rd");
+    Asm("          glo      rf");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addtows");
+    Asm("          ghi      r2           ; sum = sum + 1");
+    Asm("          phi      rf");
+    Asm("          glo      r2");
+    Asm("          plo      rf");
+    Asm("          inc      rf");
+    Asm("          ldi      fp_1.1");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("fpexp_l:  sep      scall        ; need to see if sum == last");
+    Asm("          dw       getargs");
+    Asm("          db       5,1");
+    Asm("          ldi      4            ; 4 bytes to check");
+    Asm("          plo      rc");
+    Asm("          ldi      0            ; clear comparison flag");
+    Asm("          plo      re");
+    Asm("fpexp_1:  ldn      rd           ; get byte from sum");
+    Asm("          str      r2           ; save for comparison");
+    Asm("          ldn      rf           ; get point from last");
+    Asm("          sm                    ; compare them");
+    Asm("          str      r2           ; store to combine with comparison flag");
+    Asm("          glo      re           ; get comparison flag");
+    Asm("          or                    ; combine");
+    Asm("          plo      re           ; put back into comparison");
+    Asm("          ldn      rd           ; get byte from sum");
+    Asm("          str      rf           ; store into last");
+    Asm("          inc      rd           ; increment pointers");
+    Asm("          inc      rf");
+    Asm("          dec      rc           ; decrement count");
+    Asm("          glo      rc           ; see if done");
+    Asm("          lbnz     fpexp_1      ; jump if not");
+    Asm("          glo      re           ; get comparison flag");
+    Asm("          lbz      fpexp_d      ; jump if done");
+    Asm("          sep      scall        ; pwr = pwr * n");
+    Asm("          dw       getargs");
+    Asm("          db       17,25");
+    Asm("          sep      scall");
+    Asm("          dw       mulfpi");
+    Asm("          sep      scall        ; fct = fct * fctCount");
+    Asm("          dw       getargs");
+    Asm("          db       9,13");
+    Asm("          sep      scall");
+    Asm("          dw       mulfpi");
+    Asm("          glo      r2           ; fctCount = fctCount + 1");
+    Asm("          adi      13");
+    Asm("          plo      rf");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      rf");
+    Asm("          ldi      fp_1.1");
+    Asm("          phi      rd");
+    Asm("          ldi      fp_1.0");
+    Asm("          plo      rd");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("          sep      scall        ; tmp = pwr");
+    Asm("          dw       getargs");
+    Asm("          db       21,17");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          inc      rf");
+    Asm("          lda      rd");
+    Asm("          str      rf");
+    Asm("          sep      scall        ; tmp = tmp / fct");
+    Asm("          dw       getargs");
+    Asm("          db       21,9");
+    Asm("          sep      scall");
+    Asm("          dw       divfpi");
+    Asm("          sep      scall        ; sum = sum + tmp");
+    Asm("          dw       getargs");
+    Asm("          db       1,21");
+    Asm("          sep      scall");
+    Asm("          dw       addfpi");
+    Asm("          lbr      fpexp_l      ; loop until done");
+    Asm("fpexp_d:  irx                   ; recover answer");
+    Asm("          ldxa");
+    Asm("          plo      r8");
+    Asm("          ldxa");
+    Asm("          phi      r8");
+    Asm("          ldxa");
+    Asm("          plo      ra");
+    Asm("          ldx");
+    Asm("          phi      ra");
+    Asm("          glo      r2           ; clean workspace off stack");
+    Asm("          adi      24");
+    Asm("          plo      r2");
+    Asm("          ghi      r2");
+    Asm("          adci     0");
+    Asm("          phi      r2");
+    Asm("          irx                   ; recover expr stack");
+    Asm("          ldxa");
+    Asm("          plo      r7");
+    Asm("          ldx");
+    Asm("          phi      r7");
+    Asm("          inc      r7");
+    Asm("          glo      r8           ; store answer");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      r8");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          glo      ra");
+    Asm("          str      r7");
+    Asm("          inc      r7");
+    Asm("          ghi      ra");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          sep      sret         ; and return to caller");
+    }
+
   if (passNumber == 1) lblStart = address;
   if (useStg) {
     Asm("start:      ghi  r6");

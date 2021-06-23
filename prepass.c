@@ -68,6 +68,12 @@ int prepass(char* filename) {
   useSubFp = 0;
   useFtoA = 0;
   useAtoF = 0;
+  useCos = 0;
+  useExp = 0;
+  useLn = 0;
+  useSin = 0;
+  useTan = 0;
+  useTrig = 0;
 
   lblAtoI = 0;
   lblAbs = 0;
@@ -108,6 +114,13 @@ int prepass(char* filename) {
       for (i=0; i<strlen(currentLine); i++) {
         if (currentLine[i] == '"') qt = 1-qt;
         if (qt == 0) {
+          if (useFp) {
+            if (strncasecmp(currentLine+i,"cos(",4) == 0) { useCos = -1; useSin = -1; useTrig = -1; }
+            if (strncasecmp(currentLine+i,"exp(",4) == 0) { useExp = -1; useTrig = -1; }
+            if (strncasecmp(currentLine+i,"ln(",3) == 0) { useLn = -1; useTrig = -1; }
+            if (strncasecmp(currentLine+i,"sin(",4) == 0) { useSin = -1; useTrig = -1; }
+            if (strncasecmp(currentLine+i,"tan(",4) == 0) { useTan = -1; useCos = -1; useSin = -1; useTrig = -1; }
+            }
           if (use32Bits) {
             if (currentLine[i] == '+') useAdd32 = -1;
             if (currentLine[i] == '-') useSub32 = -1;
@@ -212,6 +225,12 @@ int prepass(char* filename) {
     useComp32 = -1;
     }
   if (useFp) {
+    if (useTrig) {
+      useMulFp = -1;
+      useDivFp = -1;
+      useAddFp = -1;
+      useSubFp = -1;
+      }
     useAbsFp = useAbs32;
     useAddFp = useAdd32;
     useEqFp = useEq32;
