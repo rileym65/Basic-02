@@ -321,7 +321,6 @@ int main(int argc, char** argv, char** envp) {
   if (useSgn32 != 0)    printf("  Sgn32      %04x\n",getLabel("sgn32"));
   if (useShl32 != 0)    printf("  Shl32      %04x\n",getLabel("shl32"));
   if (useShr32 != 0)    printf("  Shr32      %04x\n",getLabel("shr32"));
-  if (useStep32 != 0)   printf("  Step32     %04x\n",getLabel("step32"));
   if (useSub32 != 0)    printf("  Sub32      %04x\n",getLabel("sub32"));
   if (useXor32 != 0)    printf("  Xor32      %04x\n",getLabel("xor32"));
   if (useZero32 != 0)   printf("  Zero32     %04x\n",getLabel("zero32"));
