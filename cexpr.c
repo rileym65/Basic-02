@@ -931,6 +931,7 @@ char* evaluate(char* buffer) {
       while (reduce(0)) ;
       buffer++;
       }
+    while (*buffer == ' ') buffer++;
 
     if (*buffer == '+') { add(OP_ADD); buffer++; }
     else if (*buffer == '-') { add(OP_SUB); buffer++; }
