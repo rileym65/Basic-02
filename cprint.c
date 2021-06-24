@@ -60,6 +60,9 @@ char* cprint(char* line) {
           Asm("          plo   rf");
           Asm("          sep   scall");
           Asm("          dw    f_msg");
+          Asm("          inc   r7                      ; Remove expression result");
+          Asm("          inc   r7");
+          Asm("          inc   r7");
           }
         else if (tokens[1] == OP_NUMFP) {
           Asm("          inc   r7                      ; Point to expression result");
@@ -79,6 +82,9 @@ char* cprint(char* line) {
           Asm("          plo   rf");
           Asm("          sep   scall");
           Asm("          dw    f_msg");
+          Asm("          inc   r7                      ; Remove expression result");
+          Asm("          inc   r7");
+          Asm("          inc   r7");
           }
         else {
 printf("Expression error\n");
@@ -103,6 +109,9 @@ exit(1);
         Asm("          plo   rf");
         Asm("          sep   scall");
         Asm("          dw    f_msg");
+        Asm("          inc   r7                      ; Remove expression result");
+        Asm("          inc   r7");
+        Asm("          inc   r7");
         }
       else {
         Asm("          inc   r7                      ; Recover expression result");

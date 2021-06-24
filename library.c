@@ -5823,11 +5823,7 @@ void library() {
     /* *****       R2+9     - p                         ***** */
     /* *****       R2+13    - arg                       ***** */
     /* ****************************************************** */
-    Asm("fpsqrt:   ghi      r7           ; save expr stack");
-    Asm("          stxd");
-    Asm("          glo      r7");
-    Asm("          stxd");
-    Asm("          ghi      r7           ; source is expr stack");
+    Asm("fpsqrt:   ghi      r7           ; argument is on expr stack");
     Asm("          phi      rf");
     Asm("          glo      r7");
     Asm("          plo      rf");
