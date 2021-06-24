@@ -354,6 +354,7 @@ int main(int argc, char** argv, char** envp) {
   if (useExp != 0)      printf("  FpExp      %04x\n",getLabel("fpexp"));
   if (useLn  != 0)      printf("  FpLn       %04x\n",getLabel("fpln"));
   if (useSin != 0)      printf("  FpSin      %04x\n",getLabel("fpsin"));
+  if (useSqrt != 0)     printf("  FpSqrt     %04x\n",getLabel("fpsqrt"));
   if (useTan != 0)      printf("  FpTan      %04x\n",getLabel("fptan"));
 
   printf("\n");

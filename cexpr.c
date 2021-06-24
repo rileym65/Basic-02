@@ -1,5 +1,6 @@
 #include "header.h"
 
+#define OP_SQRT   0x61
 #define OP_EXP    0x60
 #define OP_LN     0x5f
 #define OP_TAN    0x5e
@@ -607,6 +608,15 @@ int reduce(char last) {
          Asm("           sep     scall               ; Perform exp function");
          Asm("           dw      fpexp");
          break;
+    case OP_SQRT:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform sqrt function");
+         Asm("           dw      fpsqrt");
+         break;
     }
   tokens[numTokens++] = 0;
   tokens[numTokens++] = (opType == 'I') ? OP_NUM : OP_NUMFP;
@@ -768,6 +778,13 @@ char* evaluate(char* buffer) {
            tokens[numTokens++] = OP_EXP;
            tokens[numTokens++] = OP_OP;
            buffer+=4;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"sqrt(",5) == 0) {
+           tokens[numTokens++] = OP_SQRT;
+           tokens[numTokens++] = OP_OP;
+           buffer+=5;
            parens++;
            func = -1;
            }

@@ -5774,6 +5774,67 @@ void library() {
     Asm("          sep      sret         ; and return to caller");
     }
 
+  if (usePow) {
+    /* ****************************************************** */
+    /* ***** Power x^y                                  ***** */
+    /* ***** RF - Pointer to floating point number x    ***** */
+    /* ***** RC - Pointer to floating point number y    ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ***** internal:                                  ***** */
+    /* *****       R2+1     - x                         ***** */
+    /* *****       R2+5     - y                         ***** */
+    /* ****************************************************** */
+    Asm("fppow:    inc      r7           ; x = log(x)");
+    Asm("          inc      r7");
+    Asm("          inc      r7");
+    Asm("          inc      r7");
+    Asm("          sep      scall");
+    Asm("          dw       fpln");
+    Asm("          dec      r7           ; now x = x * y");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          dec      r7");
+    Asm("          sep      scall");
+    Asm("          dw       mulfp");
+    Asm("          sep      scall        ; x = exp(x)");
+    Asm("          dw       fpexp");
+    Asm("          sep      sret         ; and return to caller");
+    }
+
+  if (useSqrt) {
+    /* ****************************************************** */
+    /* ***** Square root                                ***** */
+    /* ***** RF - Pointer to floating point number x    ***** */
+    /* ***** RD - Pointer to floating point destination ***** */
+    /* ****************************************************** */
+    Asm("fpsqrt:   sep      scall        ; x = log(x)");
+    Asm("          dw       fpln");
+    Asm("          ldi      fpdot5+3.1   ; now x = x * .5");
+    Asm("          phi      rf");
+    Asm("          ldi      fpdot5+3.0");
+    Asm("          plo      rf");
+    Asm("          ldn      rf");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      rf");
+    Asm("          ldn      rf");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      rf");
+    Asm("          ldn      rf");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          dec      rf");
+    Asm("          ldn      rf");
+    Asm("          str      r7");
+    Asm("          dec      r7");
+    Asm("          sep      scall");
+    Asm("          dw       mulfp");
+    Asm("          sep      scall        ; x = exp(x)");
+    Asm("          dw       fpexp");
+    Asm("          sep      sret");
+    }
+
   if (passNumber == 1) lblStart = address;
   if (useStg) {
     Asm("start:      ghi  r6");

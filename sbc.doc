@@ -59,6 +59,7 @@ Expressions:
   RND(range)
   SGN(expr)
   SIN(expr)
+  SQRT(expr)
   TAN(expr)
 
 System variables:
