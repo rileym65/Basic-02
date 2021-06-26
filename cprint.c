@@ -134,6 +134,7 @@ exit(1);
         }
       last = ' ';
       }
+    line=trim(line);
     }
   if (last != ';' && last != ',') {
     Asm("          sep   scall                   ; Display cr/lf");

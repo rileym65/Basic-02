@@ -938,8 +938,8 @@ char* evaluate(char* buffer) {
       }
 
     if (term == 0) {
-      printf("Expression error: %s\n",buffer);
-      return 0;
+      showError("Expression error");
+      exit(1);
       }
 
     while (*buffer == ' ') buffer++;
@@ -967,7 +967,10 @@ char* evaluate(char* buffer) {
     else flag = 0;
     }
   while (reduce(-1));
-  if (numTokens != 2) printf("Expression error\n");
+  if (numTokens != 2) {
+    showError("Expression error\n");
+    exit(1);
+    }
   return buffer;
   }
 
@@ -1118,11 +1121,11 @@ char* cexpr(char* line, int etype) {
   /* **************************************** */
   if (!handled) line = evaluate(line);
   if (numTokens != 2) {
-    printf("Expression error: %s\n",oline);
+    showError("Expression error");
     exit(1);
     }
   if (tokens[1] != OP_NUM && tokens[1] != OP_NUMFP) {
-    printf("Expression error");
+    showError("Expression error");
     exit(1);
     }
   if (tokens[1] == OP_NUM && etype == 1) {
