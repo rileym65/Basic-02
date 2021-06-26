@@ -66,6 +66,9 @@ char* cinput(char* line) {
       exit(1);
       }
     addr = getVariable(name);
+    Asm("          sep   scall                   ; display question mark");
+    Asm("          dw    f_inmsg");
+    Asm("          db    '? ',0");
     Asm("          ldi   [iobuffer].1            ; Point to keyboard buffer");
     Asm("          phi   rf");
     Asm("          ldi   [iobuffer].0");
