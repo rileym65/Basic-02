@@ -56,7 +56,10 @@ char* isFloatingPointNumber(char* line, char* token) {
       *token++ = *line++;
       dot = 1;
       }
-    else if (*line == '.') flag = 1;
+    else if (*line == '.') {
+      showError("Syntax error");
+      exit(1);
+      }
     else flag = 2;
     }
   if (*line >= 'a' && *line <= 'z') flag = 1;
