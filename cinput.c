@@ -79,7 +79,7 @@ char* cinput(char* line) {
     Asm("          phi   rf");
     Asm("          ldi   [iobuffer].0");
     Asm("          plo   rf");
-    if (useFp) {
+    if (fp) {
       sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rd");
       sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
