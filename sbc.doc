@@ -46,6 +46,9 @@ Expressions:
   $hexnum
   ABS(expr)
   ALLOC(expr)
+  ACOS(expr)
+  ASIN(expr)
+  ATAN(expr)
   CINT(expr)
   COS(expr)
   CSNG(expr)
