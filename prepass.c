@@ -68,6 +68,7 @@ int prepass(char* filename) {
   useSubFp = 0;
   useFtoA = 0;
   useAtoF = 0;
+  useAtan = 0;
   useCos = 0;
   useExp = 0;
   useLn = 0;
@@ -123,6 +124,7 @@ int prepass(char* filename) {
             if (strncasecmp(currentLine+i,"sin(",4) == 0) { useSin = -1; useTrig = -1; }
             if (strncasecmp(currentLine+i,"sqrt(",5) == 0) { useSqrt = -1; usePow = -1; useLn = -1; useExp = -1; useTrig = -1; }
             if (strncasecmp(currentLine+i,"tan(",4) == 0) { useTan = -1; useCos = -1; useSin = -1; useTrig = -1; }
+            if (strncasecmp(currentLine+i,"atan(",5) == 0) { useAtan = -1; useTrig = -1; }
             }
           if (use32Bits) {
             if (currentLine[i] == '+') useAdd32 = -1;
@@ -187,6 +189,13 @@ int prepass(char* filename) {
     }
   fclose(source);
 
+  if (useAtan) {
+    useAddFp = -1;
+    useMulFp = -1;
+    useDivFp = -1;
+    useSqrt = -1;
+    }
+    
   if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
   if (useCmp) useSub = -1;
   if (useRnd) useMod = -1;
