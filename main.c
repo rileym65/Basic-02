@@ -208,11 +208,13 @@ int main(int argc, char** argv, char** envp) {
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);
-  addLabel("f_type",lblF_type);
-  addLabel("f_setbd",lblF_setbd);
-  addLabel("f_inmsg",lblF_inmsg);
-  addLabel("f_input",lblF_input);
-  addLabel("f_msg",lblF_msg);
+  if (useSelfTerm == 0) {
+    addLabel("f_type",lblF_type);
+    addLabel("f_setbd",lblF_setbd);
+    addLabel("f_inmsg",lblF_inmsg);
+    addLabel("f_input",lblF_input);
+    addLabel("f_msg",lblF_msg);
+    }
   passNumber = 1;
   pass(sourceFile);
   keyBuffer = address;
@@ -262,6 +264,7 @@ int main(int argc, char** argv, char** envp) {
   printf("Expr. Stack   : %04xh\n",estack);
   if (useHeap)
     printf("Heap          : %04xh\n",heap);
+  printf("Program start : %04xh\n",getLabel("start"));
   printf("\n");
   printf("Included in runtime:\n");
   if (useAbs != 0)      printf("  Abs        %04x\n",getLabel("abs16"));

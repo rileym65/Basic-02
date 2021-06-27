@@ -28,7 +28,7 @@ void library() {
     Asm("            plo  r3");
     }
   lblReturn = address;
-  Asm("return:     sep  r3");
+  Asm("            sep  r3");
   if (passNumber == 1) lblScall = address;
   Asm("call:       plo     re");
   Asm("            ghi     r6");
@@ -59,6 +59,7 @@ void library() {
   Asm("            phi     r6");
   Asm("            glo     re");
   Asm("            br      ret-1");
+  Asm("return:     sep  sret");
 
   if (useEf) {
     if (passNumber == 1) lblEf = address;
@@ -107,9 +108,15 @@ void library() {
     Asm("          plo     rd");
     Asm("          adi     0");
     Asm("sendlp:   bdf     sendnb              ; jump if no bit");
-    Asm("          SERSEQ");
+    if (SERSEQ == SEQ)
+      Asm("          seq");
+    else
+      Asm("          req");
     Asm("          br      sendct");
-    Asm("sendnb:   SERREQ");
+    if (SERREQ == REQ)
+      Asm("sendnb:   req");
+    else
+      Asm("sendnb:   seq");
     Asm("          br      sendct");
     Asm("sendct:   sep     rd                  ; perform bit delay");
     Asm("          sex r2");
@@ -120,7 +127,10 @@ void library() {
     Asm("          dec     rf");
     Asm("          glo     rf");
     Asm("          bnz     sendlp");
-    Asm("          SERREQ");
+    if (SERREQ == REQ)
+      Asm("          req");
+    else
+      Asm("          seq");
     Asm("          sep     rd");
     Asm("          sep     rd");
     Asm("          irx");
@@ -154,7 +164,14 @@ void library() {
     Asm("          shr");
     Asm("          shr");
     Asm("          phi     re");
-    Asm("          SERP    $");
+    if (SERP == B1)  Asm("          b1      $");
+    if (SERP == B2)  Asm("          b2      $");
+    if (SERP == B3)  Asm("          b3      $");
+    if (SERP == B4)  Asm("          b4      $");
+    if (SERP == BN1) Asm("          bn1     $");
+    if (SERP == BN2) Asm("          bn2     $");
+    if (SERP == BN3) Asm("          bn3     $");
+    if (SERP == BN4) Asm("          bn4     $");
     Asm("          sep     rd");
     Asm("          ghi     rf");
     Asm("          phi     re");
@@ -163,7 +180,14 @@ void library() {
     Asm("          bdf     recvlpe");
     Asm("recvlp:   ghi     rf");
     Asm("          shr");
-    Asm("          SERN    recvlp0");
+    if (SERN == B1)  Asm("          b1      recvlp0");
+    if (SERN == B2)  Asm("          b2      recvlp0");
+    if (SERN == B3)  Asm("          b3      recvlp0");
+    if (SERN == B4)  Asm("          b4      recvlp0");
+    if (SERN == BN1) Asm("          bn1     recvlp0");
+    if (SERN == BN2) Asm("          bn2     recvlp0");
+    if (SERN == BN3) Asm("          bn3     recvlp0");
+    if (SERN == BN4) Asm("          bn4     recvlp0");
     Asm("          ori     128");
     Asm("recvlp1:  phi     rf");
     Asm("          sep     rd");
@@ -172,7 +196,10 @@ void library() {
     Asm("          nop");
     Asm("          glo     rf");
     Asm("          bnz     recvlp");
-    Asm("recvdone: SERREQ");
+    if (SERREQ == REQ)
+      Asm("recvdone: req");
+    else
+      Asm("recvdone: seq");
     Asm("          ghi     rf");
     Asm("          plo     re");
     Asm("          irx");
@@ -189,9 +216,19 @@ void library() {
     Asm("recvlp0:  br      recvlp1");
     Asm("recvlpe:  ghi     rf");
     Asm("          shr");
-    Asm("          SERN    recvlpe0");
+    if (SERN == B1)  Asm("          b1      recvlpe0");
+    if (SERN == B2)  Asm("          b2      recvlpe0");
+    if (SERN == B3)  Asm("          b3      recvlpe0");
+    if (SERN == B4)  Asm("          b4      recvlpe0");
+    if (SERN == BN1) Asm("          bn1     recvlpe0");
+    if (SERN == BN2) Asm("          bn2     recvlpe0");
+    if (SERN == BN3) Asm("          bn3     recvlpe0");
+    if (SERN == BN4) Asm("          bn4     recvlpe0");
     Asm("          ori     128");
-    Asm("          SERREQ");
+    if (SERREQ == REQ)
+      Asm("          req");
+    else
+      Asm("          seq");
     Asm("recvlpe1: phi     rf");
     Asm("          sep     rd");
     Asm("          dec     rf");
@@ -200,27 +237,68 @@ void library() {
     Asm("          glo     rf");
     Asm("          bnz     recvlpe");
     Asm("          br      recvdone");
-    Asm("recvlpe0: SERSEQ");
+    if (SERSEQ == SEQ)
+      Asm("recvlpe0: seq");
+    else
+      Asm("recvlpe0: req");
     Asm("          br      recvlpe1");
 
     if (passNumber == 1) lblF_setbd = address;
-    Asm("f_setbd:  SERREQ");
+    if (SERREQ == REQ)
+      Asm("f_setbd:  req");
+    else
+      Asm("f_setbd:  seq");
     Asm("          ldi     0");
     Asm("          phi     rc");
     Asm("          plo     rc");
     Asm("          phi     rb");
     Asm("          plo     rb");
-    Asm("timalc_o: SERP    $");
-    Asm("end_sb:   SERN    $");
-    Asm("          SERP    $");
+    if (SERP == B1)  Asm("timalc_o: b1      $");
+    if (SERP == B2)  Asm("timalc_o: b2      $");
+    if (SERP == B3)  Asm("timalc_o: b3      $");
+    if (SERP == B4)  Asm("timalc_o: b4      $");
+    if (SERP == BN1) Asm("timalc_o: bn1     $");
+    if (SERP == BN2) Asm("timalc_o: bn2     $");
+    if (SERP == BN3) Asm("timalc_o: bn3     $");
+    if (SERP == BN4) Asm("timalc_o: bn4     $");
+    if (SERN == B1)  Asm("end_sb:   b1      $");
+    if (SERN == B2)  Asm("end_sb:   b2      $");
+    if (SERN == B3)  Asm("end_sb:   b3      $");
+    if (SERN == B4)  Asm("end_sb:   b4      $");
+    if (SERN == BN1) Asm("end_sb:   bn1     $");
+    if (SERN == BN2) Asm("end_sb:   bn2     $");
+    if (SERN == BN3) Asm("end_sb:   bn3     $");
+    if (SERN == BN4) Asm("end_sb:   bn4     $");
+    if (SERP == B1)  Asm("          b1      $");
+    if (SERP == B2)  Asm("          b2      $");
+    if (SERP == B3)  Asm("          b3      $");
+    if (SERP == B4)  Asm("          b4      $");
+    if (SERP == BN1) Asm("          bn1     $");
+    if (SERP == BN2) Asm("          bn2     $");
+    if (SERP == BN3) Asm("          bn3     $");
+    if (SERP == BN4) Asm("          bn4     $");
     Asm("setbd1:   inc     rc");
     Asm("          sex     r2");
     Asm("          sex     r2");
-    Asm("          SERN    setbd1");
+    if (SERN == B1)  Asm("          b1      setbd1");
+    if (SERN == B2)  Asm("          b2      setbd1");
+    if (SERN == B3)  Asm("          b3      setbd1");
+    if (SERN == B4)  Asm("          b4      setbd1");
+    if (SERN == BN1) Asm("          bn1     setbd1");
+    if (SERN == BN2) Asm("          bn2     setbd1");
+    if (SERN == BN3) Asm("          bn3     setbd1");
+    if (SERN == BN4) Asm("          bn4     setbd1");
     Asm("setbd2:   inc     rb");
     Asm("          sex     r2");
     Asm("          sex     r2");
-    Asm("          SERP    setbd2");
+    if (SERP == B1)  Asm("          b1      setbd2");
+    if (SERP == B2)  Asm("          b2      setbd2");
+    if (SERP == B3)  Asm("          b3      setbd2");
+    if (SERP == B4)  Asm("          b4      setbd2");
+    if (SERP == BN1) Asm("          bn1     setbd2");
+    if (SERP == BN2) Asm("          bn2     setbd2");
+    if (SERP == BN3) Asm("          bn3     setbd2");
+    if (SERP == BN4) Asm("          bn4     setbd2");
     Asm("setbd4:   glo     rb");
     Asm("          shr");
     Asm("          shr");
@@ -243,6 +321,8 @@ void library() {
     Asm("          shlc");
     Asm("          phi     re");
     Asm("timalc_rt: sep     sret");
+
+    Asm("f_tty:    lbr     f_type");
 
     if (passNumber == 1) lblF_inmsg = address;
     Asm("f_inmsg:  lda     r6");
@@ -6021,11 +6101,11 @@ void library() {
     Asm("          str  rf");
     Asm("          inc  rf");
     }
-  output(LDI); output(t1/256);                                   //           LDI  freemem.1
-  output(STR+RF);                                                //           STR  RF
-  output(INC+RF);                                                //           INC  RF
-  output(LDI); output(t1%256);                                   //           LDI  freemem.0
-  output(STR+RF);                                                //           STR  RF
+  sprintf(buffer,"          ldi  %d",t1/256); Asm(buffer);
+  Asm("          str  rf");
+  Asm("          inc  rf");
+  sprintf(buffer,"          ldi  %d",t1%256); Asm(buffer);
+  Asm("          str  rf");
   if (useData) {
     a = getVariable("DATA_");
     output(LDI); output(a/256); output(PHI+RF);

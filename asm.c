@@ -186,13 +186,16 @@ word processArgs(char* args) {
   }
 
 void processDb(char* args,char typ) {
+  int  qt;
   int  pos;
   word num;
   char token[256];
   args = trim(args);
   while (*args != 0) {
     pos = 0;
-    while (*args != 0 && *args != ',') {
+    qt = 0;
+    while (*args != 0 && (*args != ',' || qt != 0)) {
+      if (*args == '\'') qt = (qt) ? 0 : 1;
       token[pos++] = *args++;
       }
     token[pos] = 0;
