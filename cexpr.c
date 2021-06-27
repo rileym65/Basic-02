@@ -1,5 +1,7 @@
 #include "header.h"
 
+#define OP_ACOS   0x64
+#define OP_ASIN   0x63
 #define OP_ATAN   0x62
 #define OP_SQRT   0x61
 #define OP_EXP    0x60
@@ -630,6 +632,24 @@ int reduce(char last) {
          Asm("           sep     scall               ; Perform atan function");
          Asm("           dw      fpatan");
          break;
+    case OP_ACOS:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform acos function");
+         Asm("           dw      fpacos");
+         break;
+    case OP_ASIN:
+         if (opType == 'I') {
+           Asm("           sep     scall               ; Convert integer argument to floating-point");
+           Asm("           dw      itof");
+           opType = 'F';
+           }
+         Asm("           sep     scall               ; Perform asin function");
+         Asm("           dw      fpasin");
+         break;
     }
   tokens[numTokens++] = 0;
   tokens[numTokens++] = (opType == 'I') ? OP_NUM : OP_NUMFP;
@@ -803,6 +823,20 @@ char* evaluate(char* buffer) {
            }
         if (strncasecmp(buffer,"atan(",5) == 0) {
            tokens[numTokens++] = OP_ATAN;
+           tokens[numTokens++] = OP_OP;
+           buffer+=5;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"asin(",5) == 0) {
+           tokens[numTokens++] = OP_ASIN;
+           tokens[numTokens++] = OP_OP;
+           buffer+=5;
+           parens++;
+           func = -1;
+           }
+        if (strncasecmp(buffer,"acos(",5) == 0) {
+           tokens[numTokens++] = OP_ACOS;
            tokens[numTokens++] = OP_OP;
            buffer+=5;
            parens++;

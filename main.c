@@ -359,6 +359,9 @@ int main(int argc, char** argv, char** envp) {
   if (useSin != 0)      printf("  FpSin      %04x\n",getLabel("fpsin"));
   if (useSqrt != 0)     printf("  FpSqrt     %04x\n",getLabel("fpsqrt"));
   if (useTan != 0)      printf("  FpTan      %04x\n",getLabel("fptan"));
+  if (useAtan != 0)     printf("  FpAtan     %04x\n",getLabel("fpatan"));
+  if (useAsin != 0)     printf("  FpAsin     %04x\n",getLabel("fpasin"));
+  if (useAcos != 0)     printf("  FpAcos     %04x\n",getLabel("fpacos"));
 
   printf("\n");
   if (showVariables) {

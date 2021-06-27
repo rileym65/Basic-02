@@ -301,6 +301,8 @@ LINK byte   useMulFp;
 LINK byte   useNeFp;
 LINK char   useSgnFp;
 LINK byte   useSubFp;
+LINK byte   useAcos;
+LINK byte   useAsin;
 LINK byte   useAtan;
 LINK byte   useCos;
 LINK byte   useExp;

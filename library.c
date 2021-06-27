@@ -6266,6 +6266,80 @@ void library() {
     Asm("           sep      sret         ; and return to caller");
     }
 
+  if (useAsin) {
+    /* ****************************************************** */
+    /* ***** Compute arcsin                             ***** */
+    /* ****************************************************** */
+    Asm("fpasin:    inc     r7           ; retrieve x");
+    Asm("           lda     r7");
+    Asm("           plo     r8");
+    Asm("           lda     r7");
+    Asm("           phi     r8");
+    Asm("           lda     r7");
+    Asm("           plo     r9");
+    Asm("           ldn     r7");
+    Asm("           phi     r9");
+    Asm("           dec     r7           ; keep x on the expr stack");
+    Asm("           dec     r7");
+    Asm("           dec     r7");
+    Asm("           dec     r7");
+    Asm("           sex     r7           ; now place 2 1.0s");
+    Asm("           ldi     03fh");
+    Asm("           stxd");
+    Asm("           ldi     080h");
+    Asm("           stxd");
+    Asm("           ldi     000h");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           ldi     03fh");
+    Asm("           stxd");
+    Asm("           ldi     080h");
+    Asm("           stxd");
+    Asm("           ldi     000h");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           ghi     r9           ; Put x back on the stack twice");
+    Asm("           stxd");
+    Asm("           glo     r9");
+    Asm("           stxd");
+    Asm("           ghi     r8");
+    Asm("           stxd");
+    Asm("           glo     r8");
+    Asm("           stxd");
+    Asm("           ghi     r9");
+    Asm("           stxd");
+    Asm("           glo     r9");
+    Asm("           stxd");
+    Asm("           ghi     r8");
+    Asm("           stxd");
+    Asm("           glo     r8");
+    Asm("           stxd");
+    Asm("           sex     r2");
+    Asm("           sep     scall        ; x * x");
+    Asm("           dw      mulfp");
+    Asm("           sep     scall        ; subtract from 1.0");
+    Asm("           dw      subfp");
+    Asm("           sep     scall        ; take square root");
+    Asm("           dw      fpsqrt");
+    Asm("           sep     scall        ; add 1.0");
+    Asm("           dw      addfp");
+    Asm("           sep     scall        ; divide into x");
+    Asm("           dw      divfp");
+    Asm("           sep     scall        ; and then atan");
+    Asm("           dw      fpatan");
+    Asm("           sex     r7           ; multiply result by 2.0");
+    Asm("           ldi     040h");
+    Asm("           stxd");
+    Asm("           ldi     000h");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           sex     r2");
+    Asm("           sep     scall");
+    Asm("           dw      mulfp");
+    Asm("           sep     sret");
+    }
+
   if (passNumber == 1) lblStart = address;
   if (useStg) {
     Asm("start:      ghi  r6");
