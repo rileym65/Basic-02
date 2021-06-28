@@ -197,6 +197,7 @@ int prepass(char* filename) {
   if (useAcos) useAtan = -1;
   if (useAtan) {
     useAddFp = -1;
+    useSubFp = -1;
     useMulFp = -1;
     useDivFp = -1;
     useSqrt = -1;
