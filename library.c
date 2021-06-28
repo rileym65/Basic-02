@@ -6440,6 +6440,194 @@ void library() {
     Asm("           sep     sret");
     }
 
+  if (useStrcpy) {
+    /* *********************************** */
+    /* ***** Copy string             ***** */
+    /* ***** RD - destination string ***** */
+    /* ***** RF - source string      ***** */
+    /* *********************************** */
+    Asm("strcpy:    lda     rf           ; get byte from source string");
+    Asm("           str     rd           ; store into destination");
+    Asm("           inc     rd");
+    Asm("           lbnz    strcpy       ; loop back until terminator copied");
+    Asm("           sep     sret         ; return to caller");
+    }
+
+  if (useStrcat) {
+    /* *********************************** */
+    /* ***** Concatenate string      ***** */
+    /* ***** RD - destination string ***** */
+    /* ***** RF - source string      ***** */
+    /* *********************************** */
+    Asm("strcat:    lda     rd           ; look for terminator");
+    Asm("           lbnz    strcat       ; loop back until terminator found");
+    Asm("           dec     rd           ; move back to terminator");
+    Asm("           lbr     strcpy       ; and then copy source string to end");
+    }
+
+  if (useStrlen) {
+    /* ********************************** */
+    /* ***** String length          ***** */
+    /* ***** RF - pointer to string ***** */
+    /* ***** Returns: RC - length   ***** */
+    /* ********************************** */
+    Asm("strlen:    ldi     0            ; set count to zero");
+    Asm("           plo     rc");
+    Asm("           phi     rc");
+    Asm("strlen_1:  lda     rf           ; get byte from string");
+    Asm("           lbz     strlen_2     ; jump if terminator found");
+    Asm("           inc     rc           ; otherwise increment count");
+    Asm("           lbr     strlen_1     ; and keep looking");
+    Asm("strlen_2:  sep     sret         ; return to caller");
+    }
+
+  if (useLeft) {
+    /* ***************************************** */
+    /* ***** Left portion of string        ***** */
+    /* ***** RF - pointer to source string ***** */
+    /* ***** RD - pointer to destination   ***** */
+    /* ***** RC - Count of characters      ***** */
+    /* ***************************************** */
+    Asm("left:      glo     rc           ; see if characters left");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           or");
+    Asm("           lbz     left_dn      ; jump if not");
+    Asm("           dec     rc           ; decrement count");
+    Asm("           lda     rf           ; get byte from source");
+    Asm("           str     rd           ; write into destination");
+    Asm("           inc     rd");
+    Asm("           lbnz    left_1       ; jump if terminator not found");
+    Asm("left_rt:   sep     sret         ; otherwise return to caller");
+    Asm("left_dn:   ldi     0            ; write terminator to destination");
+    Asm("           str     rd");
+    Asm("           lbr     left_rt      ; then return");
+    }
+
+  if (useMid) {
+    /* ***************************************** */
+    /* ***** Middle portion of string      ***** */
+    /* ***** RF - pointer to source string ***** */
+    /* ***** RD - pointer to destination   ***** */
+    /* ***** RB - Starting point           ***** */
+    /* ***** RC - Count of characters      ***** */
+    /* ***************************************** */
+    Asm("mid:       glo     rb           ; see if starting position found");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           or");
+    Asm("           lbz     mid_2        ; use left to copy characters");
+    Asm("           dec     rb           ; decrement count");
+    Asm("           lda     rf           ; get byte from source string");
+    Asm("           lbz     mid_dn       ; jump if terminator found, will be empty destination");
+    Asm("           lbr     mid_1        ; keep looping until start point");
+    Asm("mid_dn:    ldi     0            ; write terminator to destination");
+    Asm("           str     rd");
+    Asm("           sep     sret         ; and return");
+    Asm("mid_2:     sep     scall        ; call left to copy characters");
+    Asm("           dw      left");
+    Asm("           sep     sret         ; and return to caller");
+    }
+
+  if (useRight) {
+    /* ***************************************** */
+    /* ***** Right portion of string       ***** */
+    /* ***** RF - pointer to source string ***** */
+    /* ***** RD - pointer to destination   ***** */
+    /* ***** RC - Count of characters      ***** */
+    /* ***************************************** */
+    Asm("right:     ldi     0            ; zero counter");
+    Asm("           plo     rb");
+    Asm("           phi     rb");
+    Asm("right_1:   lda     rf           ; get byte from source");
+    Asm("           lbz     right_2      ; jump if terminator found");
+    Asm("           inc     rb           ; increment length");
+    Asm("           lbr     right_1      ; keep looking for terminator");
+    Asm("right_2:   dec     rf           ; point back to previous character");
+    Asm("           glo     rb           ; check RB counter");
+    Asm("           str     r2");
+    Asm("           ghi     rb");
+    Asm("           or");
+    Asm("           lbz     right_dn     ; start found, so now just copy");
+    Asm("           glo     rc           ; check rc counter");
+    Asm("           str     r2");
+    Asm("           ghi     rc");
+    Asm("           or");
+    Asm("           lbz     right_dn     ; start found, so now just copy");
+    Asm("           dec     rb           ; decrement counters");
+    Asm("           dec     rc");
+    Asm("           lbr     right_2      ; keep looking for start point");
+    Asm("right_dn:  sep     scall        ; call strcpy to copy the string");
+    Asm("           dw      strcpy");
+    Asm("           sep     sret         ; and return");
+    }
+
+  if (useLower) {
+    /* *************************************** */
+    /* ***** Convert string to lowercase ***** */
+    /* ***** RF - Pointer to string      ***** */
+    /* *************************************** */
+    Asm("lower:     ldn     rf           ; get byte from buffer");
+    Asm("           lbz     return       ; jump if terminator found");
+    Asm("           smi     'A'          ; Check for lower range");
+    Asm("           lbnf    lowernxt     ; jump if below range");
+    Asm("           smi     26           ; check for above range");
+    Asm("           lbdf    lowernxt     ; jump if above range");
+    Asm("           ldn     rf           ; get character");
+    Asm("           adi     32           ; convert to lowercvase");
+    Asm("           str     rf           ; and put it back");
+    Asm("lowernxt:  inc     rf           ; point to next character");
+    Asm("           lbr     lower        ; process rest of string");
+    }
+
+  if (useUpper) {
+    /* *************************************** */
+    /* ***** Convert string to uppercase ***** */
+    /* ***** RF - Pointer to string      ***** */
+    /* *************************************** */
+    Asm("upper:     ldn     rf           ; get byte from buffer");
+    Asm("           lbz     return       ; jump if terminator found");
+    Asm("           smi     'a'          ; Check for lower range");
+    Asm("           lbnf    uppernxt     ; jump if below range");
+    Asm("           smi     26           ; check for above range");
+    Asm("           lbdf    uppernxt     ; jump if above range");
+    Asm("           ldn     rf           ; get character");
+    Asm("           smi     32           ; convert to lowercvase");
+    Asm("           str     rf           ; and put it back");
+    Asm("uppernxt:  inc     rf           ; point to next character");
+    Asm("           lbr     upper_1      ; process rest of string");
+    }
+
+  if (useStrcmp) {
+    /* ********************************************* */
+    /* ***** String compare                    ***** */
+    /* ***** RF - string1                      ***** */
+    /* ***** RD - string2                      ***** */
+    /* ***** Returns: DF=0 - strings unequal   ***** */
+    /* *****          DF=1 - strings equal     ***** */
+    /* *****          D=1  - string1 > string2 ***** */
+    /* *****          D=0  - string1 < string2 ***** */
+    /* ********************************************* */
+    Asm("strcmp:    lda     rf           ; get byte from string1");
+    Asm("           str     r2");
+    Asm("           lbnz    strcmp_1     ; jump if terminator not found");
+    Asm("           lda     rd           ; get byte from second string");
+    Asm("           lbz     strcmp_eq    ; jump if strings are equal");
+    Asm("           lbr     strcmp_lt    ; jump if string1 is smaller");
+    Asm("strcmp_1:  lda     rd           ; get byte from second string");
+    Asm("           lbz     strcmp_gt    ; jump if string2 is lower");
+    Asm("           sd                   ; subtract from first string");
+    Asm("           lbz     strcmp_2     ; loop to check remaining bytes");
+    Asm("           lbdf    strcmp_gt    ; jump if");
+    Asm("strcmp_lt: ldi     0            ; signal string 1 is lower");
+    Asm("           lbr     strcmp_rt");
+    Asm("strcmp_eq: ldi     1            ; signal strings equal");
+    Asm("           lbr     strcmp_rt");
+    Asm("strcmp_gt: ldi     2            ; signal string 2 is lower");
+    Asm("strcmp_rt: shr");
+    Asm("           sep     sret");
+    }
+
   if (passNumber == 1) lblStart = address;
   if (useStg) {
     Asm("start:      ghi  r6");

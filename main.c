@@ -362,6 +362,15 @@ int main(int argc, char** argv, char** envp) {
   if (useAtan != 0)     printf("  FpAtan     %04x\n",getLabel("fpatan"));
   if (useAsin != 0)     printf("  FpAsin     %04x\n",getLabel("fpasin"));
   if (useAcos != 0)     printf("  FpAcos     %04x\n",getLabel("fpacos"));
+  if (useStrcat != 0)   printf("  strcat     %04x\n",getLabel("strcat"));
+  if (useStrcpy != 0)   printf("  strcpy     %04x\n",getLabel("strcpy"));
+  if (useStrlen != 0)   printf("  strlen     %04x\n",getLabel("strlen"));
+  if (useStrcmp != 0)   printf("  strcmp     %04x\n",getLabel("strcmp"));
+  if (useLeft != 0)     printf("  left       %04x\n",getLabel("left"));
+  if (useMid != 0)      printf("  mid        %04x\n",getLabel("mid"));
+  if (useRight != 0)    printf("  right      %04x\n",getLabel("right"));
+  if (useLower != 0)    printf("  lower      %04x\n",getLabel("lower"));
+  if (useUpper != 0)    printf("  upper      %04x\n",getLabel("upper"));
 
   printf("\n");
   if (showVariables) {

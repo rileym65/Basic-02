@@ -311,6 +311,15 @@ LINK byte   usePow;
 LINK byte   useSin;
 LINK byte   useSqrt;
 LINK byte   useTan;
+LINK byte   useStrcat;
+LINK byte   useStrcpy;
+LINK byte   useStrlen;
+LINK byte   useLeft;
+LINK byte   useMid;
+LINK byte   useRight;
+LINK byte   useLower;
+LINK byte   useUpper;
+LINK byte   useStrcmp;
 LINK char **variableNames;
 LINK word  *variableAddresses;
 LINK word   variableRAM;
@@ -370,6 +379,7 @@ extern void  showError(char* msg);
 extern char* trim(char* line);
 
 extern void  writeAsm(char* line,char* rem);
+extern word getLabel(char* label);
 
 #endif
 

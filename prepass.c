@@ -79,6 +79,15 @@ int prepass(char* filename) {
   useSqrt = 0;
   useTan = 0;
   useTrig = 0;
+  useStrcat = 0;
+  useStrcpy = 0;
+  useStrlen = 0;
+  useLeft = 0;
+  useMid = 0;
+  useRight = 0;
+  useLower = 0;
+  useUpper = 0;
+  useStrcmp = 0;
 
   lblAtoI = 0;
   lblAbs = 0;
