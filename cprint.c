@@ -21,8 +21,14 @@ char* cprint(char* line) {
       strcpy(buffer,"          db    '");
       line++;
       while (*line != '"' && *line != 0) {
-        buffer[strlen(buffer)+1] = 0;
-        buffer[strlen(buffer)] = *line++;
+        if (*line == '\'') {
+          strcat(buffer,"',39,'");
+          line++;
+          }
+        else {
+          buffer[strlen(buffer)+1] = 0;
+          buffer[strlen(buffer)] = *line++;
+          }
         }
       strcat(buffer,"',0"); Asm(buffer);
       if (*line == '"') line++;
