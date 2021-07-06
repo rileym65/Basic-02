@@ -1,6 +1,7 @@
 #include "header.h"
 
 char* casm(char* line) {
+  int  i;
   char flag;
   char aline[2048];
   char *pline;
@@ -13,7 +14,7 @@ char* casm(char* line) {
   while (flag) {
     if (fgets(aline, 1023, source) == NULL) flag = 0;
     else {
-      while (strlen(aline) > 0 && aline[strlen(aline)-1] < 32) aline[strlen(aline)-1] = 0;
+      while (strlen(aline) > 0 && aline[strlen(aline)-1] <= 32) aline[strlen(aline)-1] = 0;
       pline = aline;
       pline = trim(pline);
       if (strcasecmp(pline,"end") == 0) flag = 0;

@@ -199,6 +199,7 @@ void processDb(char* args,char typ) {
       token[pos++] = *args++;
       }
     token[pos] = 0;
+    while (strlen(token) > 0 && token[strlen(token)-1] <= ' ') token[strlen(token)-1] = 0;
     if (token[0] >= '0' && token[0] <= '9') {
       if (token[strlen(token)-1] == 'h' ||
           token[strlen(token)-1] == 'H') {
