@@ -9,117 +9,13 @@ int prepass(char* filename) {
     printf("Could not open %s\n",filename);
     exit(1);
     }
-  useAbs = 0;
-  useAdd = 0;
-  useSub = 0;
-  useMul = 0;
-  useDiv = 0;
-  useMod = 0;
-  useAnd = 0;
-  useOr = 0;
-  useXor = 0;
-  useAtoI = 0;
-  useItoA = 0;
-  useCmp = 0;
-  useEq = 0;
-  useNe = 0;
-  useGt = 0;
-  useLt = 0;
-  useEf = 0;
-  useRnd = 0;
-  useNext = 0;
   useStep = 0;
   useData = 0;
-  useHeap = 0;
-  useAbs32 = 0;
-  useAdd32 = 0;
-  useAnd32 = 0;
-  useAtoI32 = 0;
-  useCmp32 = 0;
-  useDiv32 = 0;
-  useEq32 = 0;
-  useIComp32 = 0;
-  useIComp32 = 0;
-  useItoA32 = 0;
-  useMul32 = 0;
-  useNeg32 = 0;
-  useNext32 = 0;
-  useNull32 = 0;
-  useOr32 = 0;
-  useRnd32 = 0;
-  useSgn32 = 0;
-  useShl32 = 0;
-  useShr32 = 0;
   useStep32 = 0;
-  useSub32 = 0;
-  useXor32 = 0;
-  useZero32 = 0;
-  useAbsFp = 0;
-  useAddFp = 0;
-  useDivFp = 0;
-  useEqFp = 0;
-  useGtFp = 0;
-  useGteFp = 0;
-  useLtFp = 0;
-  useLteFp = 0;
-  useMulFp = 0;
-  useNeFp = 0;
-  useSgnFp = 0;
-  useSubFp = 0;
-  useFtoA = 0;
-  useAtoF = 0;
-  useAcos = 0;
-  useAsin = 0;
-  useAtan = 0;
-  useCos = 0;
-  useExp = 0;
-  useLn = 0;
-  usePow = 0;
-  useSin = 0;
-  useSqrt = 0;
-  useTan = 0;
   useTrig = 0;
-  useStrcat = 0;
-  useStrcpy = 0;
-  useStrlen = 0;
-  useLeft = 0;
-  useMid = 0;
-  useRight = 0;
-  useLower = 0;
-  useUpper = 0;
-  useStrcmp = 0;
+  useStrings = 0;
 
-  lblAtoI = 0;
-  lblAbs = 0;
-  lblAdd = 0;
-  lblAnd = 0;
-  lblCmp = 0;
-  lblDiv = 0;
-  lblEf = 0;
-  lblEq = 0;
-  lblFalse = 0;
-  lblGt = 0;
-  lblGte = 0;
-  lblItoA = 0;
-  lblToBcd = 0;
-  lblLt = 0;
-  lblLte = 0;
-  lblMdNorm = 0;
-  lblMod = 0;
-  lblMul = 0;
-  lblNe = 0;
-  lblNext = 0;
-  lblNextVar = 0;
-  lblOr = 0;
-  lblReturn = 0;
-  lblRnd = 0;
-  lblScall = 0;
-  lblSgn = 0;
-  lblSret = 0;
   lblStart = 0;
-  lblSub = 0;
-  lblTrue = 0;
-  lblXor = 0;
 
   while (fgets(currentLine, 1023, source) != NULL) {
     while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] < 32) currentLine[strlen(currentLine)-1] = 0;
@@ -129,165 +25,190 @@ int prepass(char* filename) {
         if (currentLine[i] == '"') qt = 1-qt;
         if (qt == 0) {
           if (useFp) {
-            if (strncasecmp(currentLine+i,"cos(",4) == 0) { useCos = -1; useSin = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"exp(",4) == 0) { useExp = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"ln(",3) == 0) { useLn = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"sin(",4) == 0) { useSin = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"sqrt(",5) == 0) { useSqrt = -1; usePow = -1; useLn = -1; useExp = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"tan(",4) == 0) { useTan = -1; useCos = -1; useSin = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"atan(",5) == 0) { useAtan = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"asin(",5) == 0) { useAsin = -1; useTrig = -1; }
-            if (strncasecmp(currentLine+i,"acos(",5) == 0) { useAcos = -1; useTrig = -1; }
+            if (strncasecmp(currentLine+i,"cos(",4) == 0) { addDefine("COSFP",1,1); addDefine("SINFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"exp(",4) == 0) { addDefine("EXPFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"ln(",3) == 0) { addDefine("LNFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"sin(",4) == 0) { addDefine("SINFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"sqrt(",5) == 0) { addDefine("SQRTFP",1,1); addDefine("POWFP",1,1); addDefine("LNFP",1,1); addDefine("EXPFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"tan(",4) == 0) { addDefine("TANFP",1,1); addDefine("COSFP",1,1); addDefine("SINFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"atan(",5) == 0) { addDefine("ATANFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"asin(",5) == 0) { addDefine("ASINFP",1,1); useTrig = -1; }
+            if (strncasecmp(currentLine+i,"acos(",5) == 0) { addDefine("ACOSFP",1,1); useTrig = -1; }
             }
           if (use32Bits) {
-            if (currentLine[i] == '+') useAdd32 = -1;
-            if (currentLine[i] == '-') useSub32 = -1;
-            if (currentLine[i] == '*') useMul32 = -1;
-            if (currentLine[i] == '/') useDiv32 = -1;
-            if (currentLine[i] == '%') useMod32 = -1;
-            if (currentLine[i] == '&') useAnd32 = -1;
-            if (currentLine[i] == '|') useOr32 = -1;
-            if (currentLine[i] == '^') useXor32 = -1;
-            if (currentLine[i] == '=') useEq32 = -1;
-            if (currentLine[i] == '<' && currentLine[i+1] == '>') useNe32 = -1;
-            if (currentLine[i] == '<' && currentLine[i+1] == '=') useLte32 = -1;
-            if (currentLine[i] == '>' && currentLine[i+1] == '=') useGte32 = -1;
-            if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt32 = -1;
-            if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt32 = -1;
-            if (strncasecmp(currentLine+i,"print",5) == 0) useItoA32 = -1;
-            if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI32 = -1;
-            if (strncasecmp(currentLine+i,"next",4) == 0) useNext32 = -1;
+            if (currentLine[i] == '+') addDefine("ADD32",1,1);
+            if (currentLine[i] == '-') addDefine("SUB32",1,1);
+            if (currentLine[i] == '*') addDefine("MUL32",1,1);
+            if (currentLine[i] == '/') addDefine("DIV32",1,1);
+            if (currentLine[i] == '%') addDefine("MOD32",1,1);
+            if (currentLine[i] == '&') addDefine("AND32",1,1);
+            if (currentLine[i] == '|') addDefine("OR32",1,1);
+            if (currentLine[i] == '^') addDefine("XOR32",1,1);
+            if (currentLine[i] == '=') addDefine("EQ32",1,1);
+            if (currentLine[i] == '<' && currentLine[i+1] == '>') addDefine("NE32",1,1);
+            if (currentLine[i] == '<' && currentLine[i+1] == '=') addDefine("LTE32",1,1);
+            if (currentLine[i] == '>' && currentLine[i+1] == '=') addDefine("GTE32",1,1);
+            if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') addDefine("LT32",1,1);
+            if (currentLine[i] == '>' && currentLine[i+1] != '=') addDefine("GT32",1,1);
+            if (strncasecmp(currentLine+i,"print",5) == 0) addDefine("ITOA32",1,1);
+            if (strncasecmp(currentLine+i,"input",5) == 0) addDefine("ATOI32",1,1);
+            if (strncasecmp(currentLine+i,"next",4) == 0) addDefine("NEXT32",1,1);
             if (strncasecmp(currentLine+i,"step",4) == 0) useStep32 = -1;
-            if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub32 = -1;
-            if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn32 = -1;
-            if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs32 = -1;
-            if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd32 = -1;
+            if (strncasecmp(currentLine+i,"fre(",4) == 0) addDefine("SUB32",1,1);
+            if (strncasecmp(currentLine+i,"sgn(",4) == 0) addDefine("SGN32",1,1);
+            if (strncasecmp(currentLine+i,"abs(",4) == 0) addDefine("ABS32",1,1);
+            if (strncasecmp(currentLine+i,"rnd(",4) == 0) addDefine("RND32",1,1);
             }
           else if (useFp) {
-            if (strncasecmp(currentLine+i,"print",5) == 0) { useItoA32 = -1; useFtoA; }
+            if (strncasecmp(currentLine+i,"print",5) == 0) { addDefine("ITOA32",1,1); addDefine("FTOA",1,1); }
             }
           else {
-            if (currentLine[i] == '+') useAdd = -1;
-            if (currentLine[i] == '-') useSub = -1;
-            if (currentLine[i] == '*') useMul = -1;
-            if (currentLine[i] == '/') useDiv = -1;
-            if (currentLine[i] == '%') useMod = -1;
-            if (currentLine[i] == '&') useAnd = -1;
-            if (currentLine[i] == '|') useOr = -1;
-            if (currentLine[i] == '^') useXor = -1;
-            if (currentLine[i] == '=') useEq = -1;
-            if (currentLine[i] == '<' && currentLine[i+1] == '>') useNe = -1;
-            if (currentLine[i] == '<' && currentLine[i+1] == '=') useLte = -1;
-            if (currentLine[i] == '>' && currentLine[i+1] == '=') useGte = -1;
-            if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') useLt = -1;
-            if (currentLine[i] == '>' && currentLine[i+1] != '=') useGt = -1;
-            if (strncasecmp(currentLine+i,"print",5) == 0) useItoA = -1;
-            if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
-            if (strncasecmp(currentLine+i,"next",4) == 0) useNext = -1;
+            if (currentLine[i] == '+') addDefine("ADD16",1,1);
+            if (currentLine[i] == '-') addDefine("SUB16",1,1);
+            if (currentLine[i] == '*') addDefine("MUL16",1,1);
+            if (currentLine[i] == '/') addDefine("DIV16",1,1);
+            if (currentLine[i] == '%') addDefine("MOD16",1,1);
+            if (currentLine[i] == '&') addDefine("AND16",1,1);
+            if (currentLine[i] == '|') addDefine("OR16",1,1);
+            if (currentLine[i] == '^') addDefine("XOR16",1,1);
+            if (currentLine[i] == '=') addDefine("EQ16",1,1);
+            if (currentLine[i] == '<' && currentLine[i+1] == '>') addDefine("NE16",1,1);
+            if (currentLine[i] == '<' && currentLine[i+1] == '=') addDefine("LTE16",1,1);
+            if (currentLine[i] == '>' && currentLine[i+1] == '=') addDefine("GTE16",1,1);
+            if (currentLine[i] == '<' && currentLine[i+1] != '>' && currentLine[i+1] != '=') addDefine("LT16",1,1);
+            if (currentLine[i] == '>' && currentLine[i+1] != '=') addDefine("GT16",1,1);
+            if (strncasecmp(currentLine+i,"print",5) == 0) addDefine("ITOA16",1,1);
+            if (strncasecmp(currentLine+i,"input",5) == 0) addDefine("ATOI16",1,1);
+            if (strncasecmp(currentLine+i,"next",4) == 0) addDefine("NEXT16",1,1);
             if (strncasecmp(currentLine+i,"step",4) == 0) useStep = -1;
-            if (strncasecmp(currentLine+i,"fre(",4) == 0) useSub = -1;
-            if (strncasecmp(currentLine+i,"sgn(",4) == 0) useSgn = -1;
-            if (strncasecmp(currentLine+i,"abs(",4) == 0) useAbs = -1;
-            if (strncasecmp(currentLine+i,"rnd(",4) == 0) useRnd = -1;
+            if (strncasecmp(currentLine+i,"fre(",4) == 0) addDefine("SUB16",1,1);
+            if (strncasecmp(currentLine+i,"sgn(",4) == 0) addDefine("SGN16",1,1);
+            if (strncasecmp(currentLine+i,"abs(",4) == 0) addDefine("ABS16",1,1);
+            if (strncasecmp(currentLine+i,"rnd(",4) == 0) addDefine("RND16",1,1);
             }
-          if (strncasecmp(currentLine+i,"dealloc",7) == 0) useHeap = -1;
-          if (strncasecmp(currentLine+i,"locate",6) == 0) useItoA = -1;
-          if (strncasecmp(currentLine+i,"input",5) == 0) useAtoI = -1;
+          if (strncasecmp(currentLine+i,"dealloc",7) == 0) addDefine("HEAP",1,1);
+          if (strncasecmp(currentLine+i,"locate",6) == 0) addDefine("ITOA16",1,1);
           if (strncasecmp(currentLine+i,"read",4) == 0) useData = -1;
-          if (strncasecmp(currentLine+i,"flg(",4) == 0) useEf = -1;
-          if (strncasecmp(currentLine+i,"alloc(",6) == 0) useHeap = -1;
+          if (strncasecmp(currentLine+i,"flg(",4) == 0) addDefine("USEEF",1,1);
+          if (strncasecmp(currentLine+i,"alloc(",6) == 0) addDefine("HEAP",1,1);
           }
         }
       }
     }
   fclose(source);
 
-  if (useAsin) useAtan = -1;
-  if (useAcos) useAtan = -1;
-  if (useAtan) {
-    useAddFp = -1;
-    useSubFp = -1;
-    useMulFp = -1;
-    useDivFp = -1;
-    useSqrt = -1;
+  if (useFp) addDefine("USEFP",1,1);
+  if (useTrig) addDefine("USETRIG",1,1);
+  if (useSelfTerm) addDefine("SELFTERM",1,1);
+
+  if (getDefine("ASINFP")) addDefine("ATANFP",1,1);
+  if (getDefine("ACOSFP")) addDefine("ATANFP",1,1);
+  if (getDefine("ATANFP")) {
+    addDefine("ADDFP",1,1);
+    addDefine("SUBFP",1,1);
+    addDefine("MULFP",1,1);
+    addDefine("DIVFP",1,1);
+    addDefine("SQRTFP",1,1);
     }
     
-  if (useEq || useNe || useGt || useLt || useGte || useLte) useCmp = -1;
-  if (useCmp) useSub = -1;
-  if (useRnd) useMod = -1;
-  if (useRnd32) useMod32 = -1;
-  if (useMod) useDiv = -1;
-  if (useNext) {
-    useSub = -1;
-    useAbs = -1;
+  if (getDefine("EQ16") || getDefine("NE16") || getDefine("GT16") ||
+      getDefine("LT16") || getDefine("GTE16") || getDefine("LTE16")) addDefine("CMP16",1,1);
+  if (getDefine("CMP16")) addDefine("SUB16",1,1);
+  if (getDefine("RND16")) {
+    addDefine("MOD16",1,1);
+    addDefine("LFSR",1,1);
+    }
+  if (getDefine("RND32")) {
+    addDefine("MOD32",1,1);
+    addDefine("LFSR",1,1);
+    }
+  if (getDefine("MOD16")) addDefine("DIV16",1,1);
+  if (getDefine("NEXT16")) {
+    addDefine("SUB16",1,1);
+    addDefine("ABS16",1,1);
     }
   if (useStep) {
-    useDiv = -1;
+    addDefine("DIV16",1,1);
     }
+  if (getDefine("MUL16")) addDefine("MULDIV16",1,1);
+  if (getDefine("DIV16")) addDefine("MULDIV16",1,1);
   if (useStep32) {
-    useDiv32 = -1;
+    addDefine("DIV32",1,1);
     }
-  if (useMul32) {
-    useAdd32 = -1;
-    useZero32 = -1;
-    useShl32 = -1;
-    useShr32 = -1;
+  if (getDefine("MUL32")) {
+    addDefine("ADD32",1,1);
+    addDefine("ZERO32",1,1);
+    addDefine("SHL32",1,1);
+    addDefine("SHR32",1,1);
     }
-  if (useMod32) useDiv32 = -1;
-  if (useDiv32) {
-    useSub32 = -1;
-    useNeg32 = -1;
-    useComp32 = -1;
-    useIComp32 = -1;
-    useAdd32 = -1;
-    useZero32 = -1;
-    useShl32 = -1;
-    useShr32 = -1;
+  if (getDefine("MOD32")) addDefine("DIV32",1,1);
+  if (getDefine("DIV32")) {
+    addDefine("SUB32",1,1);
+    addDefine("NEG32",1,1);
+    addDefine("COMP32",1,1);
+    addDefine("ICOMP32",1,1);
+    addDefine("ADD32",1,1);
+    addDefine("ZERO32",1,1);
+    addDefine("SHL32",1,1);
+    addDefine("SHR32",1,1);
     }
-  if (useNext32) {
-    useSub32 = -1;
-    useAbs32 = -1;
+  if (getDefine("NEXT32")) {
+    addDefine("SUB32",1,1);
+    addDefine("ABS32",1,1);
     }
-  if (useEq32 || useNe32 || useGt32 || useLt32 || useGte32 || useLte32) {
-    useCmp32 = -1;
-    useComp32 = -1;
+  if (getDefine("EQ32") || getDefine("NE32") || getDefine("GT32") ||
+      getDefine("LT32") || getDefine("GTE32") || getDefine("LTE32")) {
+    addDefine("CMP32",1,1);
+    addDefine("COMP32",1,1);
     }
   if (useFp) {
     if (useTrig) {
-      useMulFp = -1;
-      useDivFp = -1;
-      useAddFp = -1;
-      useSubFp = -1;
+      addDefine("MULFP",1,1);
+      addDefine("DIVFP",1,1);
+      addDefine("ADDFP",1,1);
+      addDefine("SUBFP",1,1);
       }
-    useAbsFp = useAbs32;
-    useAddFp = useAdd32;
-    useEqFp = useEq32;
-    useGtFp = useGt32;
-    useGteFp = useGte32;
-    useLtFp = useLt32;
-    useLteFp = useLte32;
-    useNeFp = useNe32;
-    useSubFp = useSub32;
-    useMulFp = useMul32;
-    useDivFp = useDiv32;
-    useFtoA = useItoA32;
-    useAtoF = useAtoI32;
-    useSgnFp = useSgn32;
-    if (useSubFp) useAddFp = -1;
-    if (useFtoA) {
-      useDivFp = -1;
+    addDefine("ABSFP", getDefine("ABS32"), 1);
+    addDefine("ADDFP", getDefine("ADD32"), 1);
+    addDefine("EQFP", getDefine("EQ32"), 1);
+    addDefine("GTFP", getDefine("GT32"), 1);
+    addDefine("GTEFP", getDefine("GTE32"), 1);
+    addDefine("LTFP", getDefine("LT32"), 1);
+    addDefine("LTEFP", getDefine("LTE32"), 1);
+    addDefine("NEFP", getDefine("NE32"), 1);
+    addDefine("SUBFP", getDefine("SUB32"), 1);
+    addDefine("MULFP", getDefine("MUL32"), 1);
+    addDefine("DIVFP", getDefine("DIV32"), 1);
+    addDefine("FTOA", getDefine("ITOA32"), 1);
+    addDefine("ATOF", getDefine("ATOI32"), 1);
+    addDefine("SGNFP", getDefine("SGN32"), 1);
+    if (getDefine("SUBFP")) addDefine("ADDFP",1,1);
+    if (getDefine("FTOA")) {
+      addDefine("DIVFP",1,1);
       }
-    if (useEqFp || useNeFp || useGtFp || useLtFp || useGteFp || useLteFp) {
-      useSubFp = -1;
-      useAddFp = -1;
+    if (getDefine("EQFP") || getDefine("NEFP") || getDefine("GTFP") ||
+        getDefine("LTFP") || getDefine("GTEFP") || getDefine("LTEFP")) {
+      addDefine("SUBFP",1,1);
+      addDefine("ADDFP",1,1);
       }
-    if (useFtoA) useMulFp = -1;
+    if (getDefine("FTOA")) addDefine("MULFP",1,1);
     }
   if (lblF_inmsg == 0xffff) {
-    useAtoI = 0;
-    useItoA = 0;
+    addDefine("ATOI16",0,1);
+    addDefine("ITOA16",0,1);
     }
-  if (useAtoI == 0 && useItoA == 0) useSelfTerm = 0;
+  if (getDefine("ATOI16") == 0 && getDefine("ITOA16") == 0) useSelfTerm = 0;
+
+  if (SERSEQ == REQ) addDefine("INVQ",1,1);
+  if (SERP == B1) addDefine("SEREF1",1,1);
+  if (SERP == B2) addDefine("SEREF2",1,1);
+  if (SERP == B3) addDefine("SEREF3",1,1);
+  if (SERP == B4) addDefine("SEREF4",1,1);
+  if (SERP == BN1) addDefine("SEREF1I",1,1);
+  if (SERP == BN2) addDefine("SEREF2I",1,1);
+  if (SERP == BN3) addDefine("SEREF3I",1,1);
+  if (SERP == BN4) addDefine("SEREF4I",1,1);
+
   printf("\n");
   }
 

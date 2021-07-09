@@ -76,7 +76,7 @@ int pass(char* filename) {
     if (strlen(buffer) > 16) Asm(buffer);
     if (passNumber == 2 && showCompiler) printf("\n");
     }
-  if (useAtoI) {
+  if (getDefine("ATOI16")) {
     Asm("iobuffer:   db   0");
     }
   }

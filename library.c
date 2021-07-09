@@ -11,9 +11,10 @@ void library() {
   Asm("scall:      equ  r4");
   Asm("sret:       equ  r5");
   if (useElfos) {
-    output(programStart/256); output(programStart%256);
-    output((highest-programStart+1)/256); output((highest-programStart+1)%256);
-    output(programStart/256); output(programStart%256);
+    t1 = programStart;
+    t2 = (highest - programStart + 1);
+    t3 = programStart;
+    sprintf(buffer,"          dw   %d,%d,%d",t1,t2,t3); Asm(buffer);
     }
   if (useElfos || useStg) {
     Asm("init:       lbr  start");
@@ -27,9 +28,7 @@ void library() {
     Asm("            ldi  start.0");
     Asm("            plo  r3");
     }
-  lblReturn = address;
   Asm("            sep  r3");
-  if (passNumber == 1) lblScall = address;
   Asm("call:       plo     re");
   Asm("            ghi     r6");
   Asm("            stxd");
@@ -46,7 +45,6 @@ void library() {
   Asm("            glo     re");
   Asm("            br      call-1");
   Asm("            sep     r3");
-  if (passNumber == 1) lblSret = address;
   Asm("ret:        plo     re");
   Asm("            ghi     r6");
   Asm("            phi     r3");
@@ -61,8 +59,7 @@ void library() {
   Asm("            br      ret-1");
   Asm("return:     sep  sret");
 
-  if (useEf) {
-    if (passNumber == 1) lblEf = address;
+    Asm("#ifdef USEEF");
     Asm("readef:     ldi     0");
     Asm("            bn1     ef1");
     Asm("            ori     1");
@@ -73,12 +70,10 @@ void library() {
     Asm("ef3:        bn4     ef4");
     Asm("            ori     8");
     Asm("ef4:        sep     sret");
-    }
+    Asm("#endif");
 
-  if (useSelfTerm) {
-    t1 = address;
+    Asm("#ifdef SELFTERM");
     Asm("          sep     r3");
-    if (passNumber == 1) lblF_delay = address;
     Asm("delay:    ghi     re");
     Asm("          shr");
     Asm("          plo     re");
@@ -88,7 +83,6 @@ void library() {
     Asm("          bz      delay-1");
     Asm("          br      delay1");
 
-    if (passNumber == 1) lblF_type = address;
     Asm("f_type:   plo     re");
     Asm("          ghi     rf");
     Asm("          stxd");
@@ -108,15 +102,17 @@ void library() {
     Asm("          plo     rd");
     Asm("          adi     0");
     Asm("sendlp:   bdf     sendnb              ; jump if no bit");
-    if (SERSEQ == SEQ)
-      Asm("          seq");
-    else
-      Asm("          req");
+    Asm("#ifdef INVQ");
+    Asm("          req");
+    Asm("#else");
+    Asm("          seq");
+    Asm("#endif");
     Asm("          br      sendct");
-    if (SERREQ == REQ)
-      Asm("sendnb:   req");
-    else
-      Asm("sendnb:   seq");
+    Asm("#ifdef INVQ");
+    Asm("sendnb:   seq");
+    Asm("#else");
+    Asm("sendnb:   req");
+    Asm("#endif");
     Asm("          br      sendct");
     Asm("sendct:   sep     rd                  ; perform bit delay");
     Asm("          sex r2");
@@ -127,10 +123,11 @@ void library() {
     Asm("          dec     rf");
     Asm("          glo     rf");
     Asm("          bnz     sendlp");
-    if (SERREQ == REQ)
-      Asm("          req");
-    else
-      Asm("          seq");
+    Asm("#ifdef INVQ");
+    Asm("          seq");
+    Asm("#else");
+    Asm("          req");
+    Asm("#endif");
     Asm("          sep     rd");
     Asm("          sep     rd");
     Asm("          irx");
@@ -144,7 +141,6 @@ void library() {
     Asm("          phi     rf");
     Asm("          sep     sret");
 
-    if (passNumber == 1) lblF_read = address;
     Asm("f_read:   ghi     rf");
     Asm("          stxd");
     Asm("          glo     rf");
@@ -164,14 +160,40 @@ void library() {
     Asm("          shr");
     Asm("          shr");
     Asm("          phi     re");
-    if (SERP == B1)  Asm("          b1      $");
-    if (SERP == B2)  Asm("          b2      $");
-    if (SERP == B3)  Asm("          b3      $");
-    if (SERP == B4)  Asm("          b4      $");
-    if (SERP == BN1) Asm("          bn1     $");
-    if (SERP == BN2) Asm("          bn2     $");
-    if (SERP == BN3) Asm("          bn3     $");
-    if (SERP == BN4) Asm("          bn4     $");
+
+    Asm("#ifdef SEREF1");
+    Asm("          b1      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("          b2      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("          b3      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("          b4      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("          bn1     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("          bn2     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("          bn3     $");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("          bn4     $");
+    Asm("#endif");
+//    if (SERP == B1)  Asm("          b1      $");
+//    if (SERP == B2)  Asm("          b2      $");
+//    if (SERP == B3)  Asm("          b3      $");
+//    if (SERP == B4)  Asm("          b4      $");
+//    if (SERP == BN1) Asm("          bn1     $");
+//    if (SERP == BN2) Asm("          bn2     $");
+//    if (SERP == BN3) Asm("          bn3     $");
+//    if (SERP == BN4) Asm("          bn4     $");
+
     Asm("          sep     rd");
     Asm("          ghi     rf");
     Asm("          phi     re");
@@ -180,14 +202,40 @@ void library() {
     Asm("          bdf     recvlpe");
     Asm("recvlp:   ghi     rf");
     Asm("          shr");
-    if (SERN == B1)  Asm("          b1      recvlp0");
-    if (SERN == B2)  Asm("          b2      recvlp0");
-    if (SERN == B3)  Asm("          b3      recvlp0");
-    if (SERN == B4)  Asm("          b4      recvlp0");
-    if (SERN == BN1) Asm("          bn1     recvlp0");
-    if (SERN == BN2) Asm("          bn2     recvlp0");
-    if (SERN == BN3) Asm("          bn3     recvlp0");
-    if (SERN == BN4) Asm("          bn4     recvlp0");
+
+    Asm("#ifdef SEREF1");
+    Asm("          bn1     recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("          bn2     recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("          bn3     recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("          bn4     recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("          b1      recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("          b2      recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("          b3      recvlp0");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("          b4      recvlp0");
+    Asm("#endif");
+//    if (SERN == B1)  Asm("          b1      recvlp0");
+//    if (SERN == B2)  Asm("          b2      recvlp0");
+//    if (SERN == B3)  Asm("          b3      recvlp0");
+//    if (SERN == B4)  Asm("          b4      recvlp0");
+//    if (SERN == BN1) Asm("          bn1     recvlp0");
+//    if (SERN == BN2) Asm("          bn2     recvlp0");
+//    if (SERN == BN3) Asm("          bn3     recvlp0");
+//    if (SERN == BN4) Asm("          bn4     recvlp0");
+
     Asm("          ori     128");
     Asm("recvlp1:  phi     rf");
     Asm("          sep     rd");
@@ -196,10 +244,11 @@ void library() {
     Asm("          nop");
     Asm("          glo     rf");
     Asm("          bnz     recvlp");
-    if (SERREQ == REQ)
-      Asm("recvdone: req");
-    else
-      Asm("recvdone: seq");
+    Asm("#ifdef INVQ");
+    Asm("recvdone: seq");
+    Asm("#else");
+    Asm("recvdone: req");
+    Asm("#endif");
     Asm("          ghi     rf");
     Asm("          plo     re");
     Asm("          irx");
@@ -216,19 +265,46 @@ void library() {
     Asm("recvlp0:  br      recvlp1");
     Asm("recvlpe:  ghi     rf");
     Asm("          shr");
-    if (SERN == B1)  Asm("          b1      recvlpe0");
-    if (SERN == B2)  Asm("          b2      recvlpe0");
-    if (SERN == B3)  Asm("          b3      recvlpe0");
-    if (SERN == B4)  Asm("          b4      recvlpe0");
-    if (SERN == BN1) Asm("          bn1     recvlpe0");
-    if (SERN == BN2) Asm("          bn2     recvlpe0");
-    if (SERN == BN3) Asm("          bn3     recvlpe0");
-    if (SERN == BN4) Asm("          bn4     recvlpe0");
+
+    Asm("#ifdef SEREF1");
+    Asm("          bn1     recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("          bn2     recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("          bn3     recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("          bn4     recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("          b1      recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("          b2      recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("          b3      recvlpe0");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("          b4      recvlpe0");
+    Asm("#endif");
+//    if (SERN == B1)  Asm("          b1      recvlpe0");
+//    if (SERN == B2)  Asm("          b2      recvlpe0");
+//    if (SERN == B3)  Asm("          b3      recvlpe0");
+//    if (SERN == B4)  Asm("          b4      recvlpe0");
+//    if (SERN == BN1) Asm("          bn1     recvlpe0");
+//    if (SERN == BN2) Asm("          bn2     recvlpe0");
+//    if (SERN == BN3) Asm("          bn3     recvlpe0");
+//    if (SERN == BN4) Asm("          bn4     recvlpe0");
+
     Asm("          ori     128");
-    if (SERREQ == REQ)
-      Asm("          req");
-    else
-      Asm("          seq");
+    Asm("#ifdef INVQ");
+    Asm("          seq");
+    Asm("#else");
+    Asm("          req");
+    Asm("#endif");
     Asm("recvlpe1: phi     rf");
     Asm("          sep     rd");
     Asm("          dec     rf");
@@ -237,68 +313,196 @@ void library() {
     Asm("          glo     rf");
     Asm("          bnz     recvlpe");
     Asm("          br      recvdone");
-    if (SERSEQ == SEQ)
-      Asm("recvlpe0: seq");
-    else
-      Asm("recvlpe0: req");
+    Asm("#ifdef INVQ");
+    Asm("recvlpe0: req");
+    Asm("#else");
+    Asm("recvlpe0: seq");
+    Asm("#endif");
     Asm("          br      recvlpe1");
 
-    if (passNumber == 1) lblF_setbd = address;
-    if (SERREQ == REQ)
-      Asm("f_setbd:  req");
-    else
-      Asm("f_setbd:  seq");
+    Asm("#ifdef INVQ");
+    Asm("f_setbd:  seq");
+    Asm("#else");
+    Asm("f_setbd:  req");
+    Asm("#endif");
     Asm("          ldi     0");
     Asm("          phi     rc");
     Asm("          plo     rc");
     Asm("          phi     rb");
     Asm("          plo     rb");
-    if (SERP == B1)  Asm("timalc_o: b1      $");
-    if (SERP == B2)  Asm("timalc_o: b2      $");
-    if (SERP == B3)  Asm("timalc_o: b3      $");
-    if (SERP == B4)  Asm("timalc_o: b4      $");
-    if (SERP == BN1) Asm("timalc_o: bn1     $");
-    if (SERP == BN2) Asm("timalc_o: bn2     $");
-    if (SERP == BN3) Asm("timalc_o: bn3     $");
-    if (SERP == BN4) Asm("timalc_o: bn4     $");
-    if (SERN == B1)  Asm("end_sb:   b1      $");
-    if (SERN == B2)  Asm("end_sb:   b2      $");
-    if (SERN == B3)  Asm("end_sb:   b3      $");
-    if (SERN == B4)  Asm("end_sb:   b4      $");
-    if (SERN == BN1) Asm("end_sb:   bn1     $");
-    if (SERN == BN2) Asm("end_sb:   bn2     $");
-    if (SERN == BN3) Asm("end_sb:   bn3     $");
-    if (SERN == BN4) Asm("end_sb:   bn4     $");
-    if (SERP == B1)  Asm("          b1      $");
-    if (SERP == B2)  Asm("          b2      $");
-    if (SERP == B3)  Asm("          b3      $");
-    if (SERP == B4)  Asm("          b4      $");
-    if (SERP == BN1) Asm("          bn1     $");
-    if (SERP == BN2) Asm("          bn2     $");
-    if (SERP == BN3) Asm("          bn3     $");
-    if (SERP == BN4) Asm("          bn4     $");
+
+    Asm("#ifdef SEREF1");
+    Asm("timalc_o: b1      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("timalc_o: b2      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("timalc_o: b3      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("timalc_o: b4      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("timalc_o: bn1     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("timalc_o: bn2     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("timalc_o: bn3     $");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("timalc_o: bn4     $");
+    Asm("#endif");
+//    if (SERP == B1)  Asm("timalc_o: b1      $");
+//    if (SERP == B2)  Asm("timalc_o: b2      $");
+//    if (SERP == B3)  Asm("timalc_o: b3      $");
+//    if (SERP == B4)  Asm("timalc_o: b4      $");
+//    if (SERP == BN1) Asm("timalc_o: bn1     $");
+//    if (SERP == BN2) Asm("timalc_o: bn2     $");
+//    if (SERP == BN3) Asm("timalc_o: bn3     $");
+//    if (SERP == BN4) Asm("timalc_o: bn4     $");
+
+    Asm("#ifdef SEREF1");
+    Asm("end_sb:   bn1     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("end_sb:   bn2     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("end_sb:   bn3     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("end_sb:   bn4     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("end_sb:   b1      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("end_sb:   b2      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("end_sb:   b3      $");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("end_sb:   b4      $");
+    Asm("#endif");
+//    if (SERN == B1)  Asm("end_sb:   b1      $");
+//    if (SERN == B2)  Asm("end_sb:   b2      $");
+//    if (SERN == B3)  Asm("end_sb:   b3      $");
+//    if (SERN == B4)  Asm("end_sb:   b4      $");
+//    if (SERN == BN1) Asm("end_sb:   bn1     $");
+//    if (SERN == BN2) Asm("end_sb:   bn2     $");
+//    if (SERN == BN3) Asm("end_sb:   bn3     $");
+//    if (SERN == BN4) Asm("end_sb:   bn4     $");
+
+    Asm("#ifdef SEREF1");
+    Asm("          b1      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("          b2      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("          b3      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("          b4      $");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("          bn1     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("          bn2     $");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("          bn3     $");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("          bn4     $");
+    Asm("#endif");
+//    if (SERP == B1)  Asm("          b1      $");
+//    if (SERP == B2)  Asm("          b2      $");
+//    if (SERP == B3)  Asm("          b3      $");
+//    if (SERP == B4)  Asm("          b4      $");
+//    if (SERP == BN1) Asm("          bn1     $");
+//    if (SERP == BN2) Asm("          bn2     $");
+//    if (SERP == BN3) Asm("          bn3     $");
+//    if (SERP == BN4) Asm("          bn4     $");
+
     Asm("setbd1:   inc     rc");
     Asm("          sex     r2");
     Asm("          sex     r2");
-    if (SERN == B1)  Asm("          b1      setbd1");
-    if (SERN == B2)  Asm("          b2      setbd1");
-    if (SERN == B3)  Asm("          b3      setbd1");
-    if (SERN == B4)  Asm("          b4      setbd1");
-    if (SERN == BN1) Asm("          bn1     setbd1");
-    if (SERN == BN2) Asm("          bn2     setbd1");
-    if (SERN == BN3) Asm("          bn3     setbd1");
-    if (SERN == BN4) Asm("          bn4     setbd1");
+
+    Asm("#ifdef SEREF1");
+    Asm("          bn1     setbd1");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("          bn2     setbd1");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("          bn3     setbd1");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("          bn4     setbd1");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("          b1      setbd1");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("          b2      setbd1");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("          b3      setbd1");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("          b4      setbd1");
+    Asm("#endif");
+//    if (SERN == B1)  Asm("          b1      setbd1");
+//    if (SERN == B2)  Asm("          b2      setbd1");
+//    if (SERN == B3)  Asm("          b3      setbd1");
+//    if (SERN == B4)  Asm("          b4      setbd1");
+//    if (SERN == BN1) Asm("          bn1     setbd1");
+//    if (SERN == BN2) Asm("          bn2     setbd1");
+//    if (SERN == BN3) Asm("          bn3     setbd1");
+//    if (SERN == BN4) Asm("          bn4     setbd1");
+
     Asm("setbd2:   inc     rb");
     Asm("          sex     r2");
     Asm("          sex     r2");
-    if (SERP == B1)  Asm("          b1      setbd2");
-    if (SERP == B2)  Asm("          b2      setbd2");
-    if (SERP == B3)  Asm("          b3      setbd2");
-    if (SERP == B4)  Asm("          b4      setbd2");
-    if (SERP == BN1) Asm("          bn1     setbd2");
-    if (SERP == BN2) Asm("          bn2     setbd2");
-    if (SERP == BN3) Asm("          bn3     setbd2");
-    if (SERP == BN4) Asm("          bn4     setbd2");
+
+    Asm("#ifdef SEREF1");
+    Asm("          b1      setbd2");
+    Asm("#endif");
+    Asm("#ifdef SEREF2");
+    Asm("          b2      setbd2");
+    Asm("#endif");
+    Asm("#ifdef SEREF3");
+    Asm("          b3      setbd2");
+    Asm("#endif");
+    Asm("#ifdef SEREF4");
+    Asm("          b4      setbd2");
+    Asm("#endif");
+    Asm("#ifdef SEREF1I");
+    Asm("          bn1     setbd2");
+    Asm("#endif");
+    Asm("#ifdef SEREF2I");
+    Asm("          bn2     setbd2");
+    Asm("#endif");
+    Asm("#ifdef SEREF3I");
+    Asm("          bn3     setbd2");
+    Asm("#endif");
+    Asm("#ifdef SERPBN4I");
+    Asm("          bn4     setbd2");
+    Asm("#endif");
+//    if (SERP == B1)  Asm("          b1      setbd2");
+//    if (SERP == B2)  Asm("          b2      setbd2");
+//    if (SERP == B3)  Asm("          b3      setbd2");
+//    if (SERP == B4)  Asm("          b4      setbd2");
+//    if (SERP == BN1) Asm("          bn1     setbd2");
+//    if (SERP == BN2) Asm("          bn2     setbd2");
+//    if (SERP == BN3) Asm("          bn3     setbd2");
+//    if (SERP == BN4) Asm("          bn4     setbd2");
     Asm("setbd4:   glo     rb");
     Asm("          shr");
     Asm("          shr");
@@ -324,21 +528,18 @@ void library() {
 
     Asm("f_tty:    lbr     f_type");
 
-    if (passNumber == 1) lblF_inmsg = address;
     Asm("f_inmsg:  lda     r6");
     Asm("          lbz     return");
     Asm("          sep     scall");
     Asm("          dw      f_type");
     Asm("          lbr     f_inmsg");
 
-    if (passNumber == 1) lblF_msg = address;
     Asm("f_msg:    lda     rf");
     Asm("          lbz     return");
     Asm("          sep     scall");
     Asm("          dw      f_type");
     Asm("          lbr     f_msg");
 
-    if (passNumber == 1) lblF_inmsg = address;
     Asm("f_input:  ldi     0");
     Asm("          plo     ra");
     Asm("inplp:    sep     scall");
@@ -385,12 +586,11 @@ void library() {
     Asm("nobs:     inc     ra");
     Asm("          dec     rc");
     Asm("          lbr     inplp");
-    }
+    Asm("#endif");
 
 
 
-  if (useMul || useDiv) {
-    if (passNumber == 1) lblMdNorm = address;
+    Asm("#ifdef MULDIV16");
     Asm("mdnorm:     ghi     rc");
     Asm("            str     r2");
     Asm("            ghi     rd");
@@ -421,10 +621,9 @@ void library() {
     Asm("            inc     rd");
     Asm("mdnorm3:    glo     re");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useMul) {
-    if (passNumber == 1) lblMul = address;
+    Asm("#ifdef MUL16");
     Asm("mul16:    sex     r7");
     Asm("          irx");
     Asm("          ldxa");
@@ -487,10 +686,9 @@ void library() {
     Asm("          shlc");
     Asm("          phi     rc");
     Asm("          lbr     mulloop");
-    }
+    Asm("#endif");
 
-  if (useDiv) {
-    if (passNumber == 1) lblDiv = address;
+    Asm("#ifdef DIV16");
     Asm("div16:      sex     r7");
     Asm("            irx");
     Asm("            ldxa");
@@ -602,10 +800,9 @@ void library() {
     Asm("            plo     r8");
     Asm("            lbdf    divret");
     Asm("            lbr     divst");
-    }
+    Asm("#endif");
 
-  if (useMod) {
-    if (passNumber == 1) lblMod = address;
+    Asm("#ifdef MOD16");
     Asm("mod16:      sep     scall");
     Asm("            dw      div16");
     Asm("            inc     r7");
@@ -617,10 +814,9 @@ void library() {
     Asm("            str     r7");
     Asm("            dec     r7");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useAdd) {
-    if (passNumber == 1) lblAdd = address;
+    Asm("#ifdef ADD16");
     Asm("add16:      sex     r7");
     Asm("            irx");
     Asm("            ldxa");
@@ -634,10 +830,9 @@ void library() {
     Asm("            dec     r7");
     Asm("            sex     r2");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useSub) {
-    if (passNumber == 1) lblSub = address;
+    Asm("#ifdef SUB16");
     Asm("sub16:      sex     r7");
     Asm("            irx");
     Asm("            ldxa");
@@ -651,10 +846,9 @@ void library() {
     Asm("            dec     r7");
     Asm("            sex     r2");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useAnd) {
-    if (passNumber == 1) lblAnd = address;
+    Asm("#ifdef AND16");
     Asm("and16:      sex     r7");
     Asm("            irx");
     Asm("            ldxa");
@@ -668,10 +862,9 @@ void library() {
     Asm("            dec     r7");
     Asm("            sex     r2");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useOr) {
-    if (passNumber == 1) lblOr = address;
+    Asm("#ifdef OR16");
     Asm("or16:       sex     r7");
     Asm("            irx");
     Asm("            ldxa");
@@ -685,10 +878,9 @@ void library() {
     Asm("            dec     r7");
     Asm("            sex     r2");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useXor) {
-    if (passNumber == 1) lblXor = address;
+    Asm("#ifdef XOR16");
     Asm("xor16:      sex     r7");
     Asm("            irx");
     Asm("            ldxa");
@@ -702,10 +894,9 @@ void library() {
     Asm("            dec     r7");
     Asm("            sex     r2");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useCmp) {
-    if (passNumber == 1) lblTrue = address;
+    Asm("#ifdef CMP16");
     Asm("true:       ldi     0ffh");
     Asm("            sex     r7");
     Asm("            stxd");
@@ -713,17 +904,15 @@ void library() {
     Asm("            sex     r2");
     Asm("            sep     sret");
 
-    if (passNumber == 1) lblFalse = address;
     Asm("false:      ldi     000h");
     Asm("            sex     r7");
     Asm("            stxd");
     Asm("            stxd");
     Asm("            sex     r2");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useEq) {
-    if (passNumber == 1) lblEq = address;
+    Asm("#ifdef EQ16");
     Asm("eq16:       sep     scall");
     Asm("            dw      sub16");
     Asm("            sex     r7");
@@ -733,10 +922,9 @@ void library() {
     Asm("            sex     r2");
     Asm("            lbz     true");
     Asm("            lbr     false");
-    }
+    Asm("#endif");
 
-  if (useNe) {
-    if (passNumber == 1) lblNe = address;
+    Asm("#ifdef NE16");
     Asm("ne16:       sep     scall");
     Asm("            dw      sub16");
     Asm("            sex     r7");
@@ -746,10 +934,9 @@ void library() {
     Asm("            sex     r2");
     Asm("            lbnz    true");
     Asm("            lbr     false");
-    }
+    Asm("#endif");
 
-  if (useGt) {
-    if (passNumber == 1) lblGt = address;
+    Asm("#ifdef GT16");
     Asm("gt16:       sep     scall");
     Asm("            dw      sub16");
     Asm("            sex     r7");
@@ -762,10 +949,9 @@ void library() {
     Asm("            shl");
     Asm("            lbnf    true");
     Asm("            lbr     false");
-    }
+    Asm("#endif");
 
-  if (useLt) {
-    if (passNumber == 1) lblLt = address;
+    Asm("#ifdef LT16");
     Asm("lt16:       sep     scall");
     Asm("            dw      sub16");
     Asm("            sex     r7");
@@ -778,10 +964,9 @@ void library() {
     Asm("            shl");
     Asm("            lbdf    true");
     Asm("            lbr     false");
-    }
+    Asm("#endif");
 
-  if (useGte) {
-    if (passNumber == 1) lblGte = address;
+    Asm("#ifdef GTE16");
     Asm("gte16:      sep     scall");
     Asm("            dw      sub16");
     Asm("            sex     r7");
@@ -794,10 +979,9 @@ void library() {
     Asm("            shl");
     Asm("            lbnf    true");
     Asm("            lbr     false");
-    }
+    Asm("#endif");
 
-  if (useLte) {
-    if (passNumber == 1) lblLte = address;
+    Asm("#ifdef LTE16");
     Asm("lte16:      sep     scall");
     Asm("            dw      sub16");
     Asm("            sex     r7");
@@ -810,10 +994,9 @@ void library() {
     Asm("            shl");
     Asm("            lbdf    true");
     Asm("            lbr     false");
-    }
+    Asm("#endif");
 
-  if (useAbs) {
-    if (passNumber == 1) lblAbs = address;
+    Asm("#ifdef ABS16");
     Asm("abs16:    inc     r7");
     Asm("          inc     r7");
     Asm("          ldn     r7");
@@ -832,10 +1015,9 @@ void library() {
     Asm("absrt:    dec     r7");
     Asm("          dec     r7");
     Asm("          sep     sret");
-    }
+    Asm("#endif");
 
-  if (useSgn) {
-    if (passNumber == 1) lblSgn = address;
+    Asm("#ifdef SGN16");
     Asm("sgn16:    inc     r7");
     Asm("          lda     r7");
     Asm("          str     r2");
@@ -861,9 +1043,9 @@ void library() {
     Asm("sgn0:     dec     r7");
     Asm("          dec     r7");
     Asm("          sep     sret");
-    }
+    Asm("#endif");
 
-  if (useRnd || useRnd32) {
+    Asm("#ifdef LFSR");
     Asm("lfsr_lp:  ldi     [LFSR_].1");
     Asm("          phi     r9");
     Asm("          ldi     [LFSR_].0");
@@ -928,10 +1110,9 @@ void library() {
     Asm("          glo     rc");
     Asm("          lbnz    lfsr_lp");
     Asm("          sep     sret");
-    }
+    Asm("#endif");
 
-  if (useRnd) {
-    if (passNumber == 1) lblRnd = address;
+    Asm("#ifdef RND16");
     Asm("rnd16:    ldi     16");
     Asm("          plo     rc");
     Asm("          sep     scall         ; Shift the register");
@@ -963,10 +1144,9 @@ void library() {
     Asm("          str     r7");
     Asm("          dec     r7");
     Asm("          lbr     mod16");
-    }
+    Asm("#endif");
 
-  if (useNext) {
-    if (passNumber == 1) lblNextVar = address;
+    Asm("#ifdef NEXT16");
     Asm("nextvar:  irx          ; move to varAddr");
     Asm("          ldxa");
     Asm("          plo     rd");
@@ -998,7 +1178,6 @@ void library() {
     Asm("          glo     rd");
     Asm("          stxd");
     Asm("          lbr     nextvar");
-    if (passNumber == 1) lblNext = address;
     Asm("next:     glo     r2");
     Asm("          plo     ra");
     Asm("          ghi     r2");
@@ -1053,15 +1232,14 @@ void library() {
     Asm("          ghi     r9");
     Asm("          phi     r6");
     Asm("          sep     sret ; and then return");
-    }
+    Asm("#endif");
 
-  if (useAtoI) {
+    Asm("#ifdef ATOI16");
     /* **************************************** */
     /* ***** Convert ASCII to integer     ***** */
     /* ***** RF - Pointer to ASCII number ***** */
     /* ***** Returns: RC - 16-bit integer ***** */
     /* **************************************** */
-    if (passNumber == 1) lblAtoI = address;
     Asm("atoi:     ldi     0");
     Asm("          plo     rc");
     Asm("          phi     rc");
@@ -1114,12 +1292,12 @@ void library() {
     Asm("          adci    0");
     Asm("          phi     rc");
     Asm("          lbr     atoi_0_1");
-    }
-  if (useItoA) {
+    Asm("#endif");
+
+    Asm("#ifdef ITOA16");
     /* ************************************** */
     /* ***** Convert RC to bcd in M[RF] ***** */
     /* ************************************** */
-    if (passNumber == 1) lblToBcd = address;
     Asm("tobcd:    ghi     rf");
     Asm("          stxd");
     Asm("          glo     rf");
@@ -1207,7 +1385,6 @@ void library() {
     /* ***** RC - 16-bit integer                     ***** */
     /* ***** RD - Buffer for output                  ***** */
     /* *************************************************** */
-    if (passNumber == 1) lblItoA = address;
     Asm("itoa:     glo     r2");
     Asm("          smi     6");
     Asm("          plo     r2");
@@ -1269,16 +1446,15 @@ void library() {
     Asm("          smi     1");
     Asm("          phi     r8");
     Asm("          lbr     itoa3");
-    }
+    Asm("#endif");
 
 
-  if (useHeap) {
+    Asm("#ifdef HEAP");
     /* ******************************************* */
     /* ***** Allocate memory                 ***** */
     /* ***** RC - requested size             ***** */
     /* ***** Returns: RF - Address of memory ***** */
     /* ******************************************* */
-    if (passNumber == 1) lblAlloc = address;
     Asm("alloc:     ldi     [HEAP_].0           ; get heap address");
     Asm("           plo     r9");
     Asm("           ldi     [HEAP_].1");
@@ -1417,7 +1593,6 @@ void library() {
     /* ***** Deallocate memory          ***** */
     /* ***** RF - address to deallocate ***** */
     /* ************************************** */
-    if (passNumber == 1) lblDealloc = address;
     Asm("dealloc:   dec     rf                  ; move to flags byte");
     Asm("           dec     rf");
     Asm("           dec     rf");
@@ -1594,9 +1769,9 @@ void library() {
     Asm("           dw      f_inmsg");
     Asm("           db      'Out of memory: ',0");
     Asm("           lbr     $                   ; show line of error and exit");
-    }
+    Asm("#endif");
 
-  if (useAdd32) {
+    Asm("#ifdef ADD32");
     /* ************************************************ */
     /* ***** 32-bit Add.    M[RF]=M[RF]+M[RD]     ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -1648,9 +1823,9 @@ void library() {
     Asm("         inc      r7");
     Asm("         inc      r7");
     Asm("         sep      sret              ; Return to caller");
-    }
+    Asm("#endif");
 
-  if (useSub32) {
+    Asm("#ifdef ADD32");
     /* ************************************************ */
     /* ***** 32-bit subtract.  M[RF]=M[RF]-M[RD]  ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -1702,9 +1877,9 @@ void library() {
     Asm("         inc      r7");
     Asm("         inc      r7");
     Asm("         sep      sret              ; Return to caller");
-    }
+    Asm("#endif");
 
-  if (useMul32) {
+    Asm("#ifdef MUL32");
     /* ************************************************ */
     /* ***** 32-bit multiply. M[RF]=M[RF]*M[RD]   ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -1798,9 +1973,9 @@ void library() {
     Asm("         inc      r7");
     Asm("         inc      r7");
     Asm("         sep      sret              ; Return to caller");
-    }
+    Asm("#endif");
 
-  if (useDiv32) {
+    Asm("#ifdef DIV32");
     /* ************************************************ */
     /* ***** 32-bit division. M[RF]=M[RF]/M[RD]   ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -1997,9 +2172,9 @@ void library() {
     Asm("         inc      r7");
     Asm("         inc      r7");
     Asm("         sep      sret              ; Return to caller");
-    }
+    Asm("#endif");
 
-  if (useMod32) {
+    Asm("#ifdef MOD32");
     Asm("mod32:      sep     scall");
     Asm("            dw      div32");
     Asm("            inc     r7");
@@ -2019,9 +2194,9 @@ void library() {
     Asm("            str     r7");
     Asm("            dec     r7");
     Asm("            sep     sret");
-    }
+    Asm("#endif");
 
-  if (useRnd32) {
+    Asm("#ifdef RND32");
     Asm("rnd32:    ldi     32");
     Asm("          plo     rc");
     Asm("          sep     scall         ; Shift the register");
@@ -2068,9 +2243,9 @@ void library() {
     Asm("          str     r7");
     Asm("          dec     r7");
     Asm("          lbr     mod32          ; and perform modulo");
-    }
+    Asm("#endif");
 
-  if (useComp32) {
+    Asm("#ifdef COMP32");
     /* ************************************************ */
     /* ***** 32-bit cmp.  M[RF]-M[RD]             ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2113,9 +2288,9 @@ void library() {
     Asm("         dec      rd");
     Asm("         dec      rd");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useIComp32) {
+    Asm("#ifdef ICOMP32");
     /* ************************************************ */
     /* ***** 32-bit cmp.  M[RD]-M[RF]             ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2158,9 +2333,9 @@ void library() {
     Asm("         dec      rd");
     Asm("         dec      rd");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useNull32) {
+    Asm("#ifdef NULL32");
     /* *************************************** */
     /* ***** M[RA] = 0                   ***** */
     /* *************************************** */
@@ -2176,9 +2351,9 @@ void library() {
     Asm("         dec      rA");
     Asm("         dec      rA");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useNeg32) {
+    Asm("#ifdef NEG32");
     /* ********************************************* */
     /* ***** 2s compliment the number in M[RA] ***** */
     /* ********************************************* */
@@ -2205,9 +2380,9 @@ void library() {
     Asm("         dec      ra");
     Asm("         dec      ra");
     Asm("         sep      sret              ; return");
-    }
+    Asm("#endif");
 
-  if (useShl32) {
+    Asm("#ifdef SHL32");
     /* ************************************************ */
     /* ***** 32-bit shift left.  M[RA]=M[RA]<<1   ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2231,9 +2406,9 @@ void library() {
     Asm("         dec      ra");
     Asm("         dec      ra");
     Asm("         sep      sret              ; and return");
-    }
+    Asm("#endif");
 
-  if (useShr32) {
+    Asm("#ifdef SHR32");
     /* ************************************************ */
     /* ***** 32-bit shift right. M[RA]=M[RA]>>1   ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2257,9 +2432,9 @@ void library() {
     Asm("         shrc                       ; shift it");
     Asm("         str      ra                ; put it back");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useZero32) {
+    Asm("#ifdef ZERO32");
 /* *************************************** */
 /* ***** is zero check               ***** */
 /* ***** returnss: DF=1 if M[RA]=0   ***** */
@@ -2280,10 +2455,10 @@ void library() {
     Asm("         sep      sret              ; and return");
     Asm("notzero: adi      0                 ; clear df");
     Asm("         sep      sret              ; and return");
-    }
+    Asm("#endif");
 
 
-  if (useAnd32) {
+    Asm("#ifdef AND32");
     /* ************************************************ */
     /* ***** 32-bit And expr stack                ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2315,9 +2490,9 @@ void library() {
     Asm("         str      rf                ; store");
     Asm("         sex      r2                ; Set x back to R2");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useOr32) {
+    Asm("#ifdef OR32");
     /* ************************************************ */
     /* ***** 32-bit Or.  expr stack               ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2349,9 +2524,9 @@ void library() {
     Asm("         str      rf                ; store");
     Asm("         sex      r2                ; Set x back to R2");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useXor32) {
+    Asm("#ifdef XOR32");
     /* ************************************************ */
     /* ***** 32-bit Xor. expr stack               ***** */
     /* ***** Numbers in memory stored LSB first   ***** */
@@ -2383,9 +2558,9 @@ void library() {
     Asm("         str      rf                ; store");
     Asm("         sex      r2                ; Set x back to R2");
     Asm("         sep      sret              ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useCmp32) {
+    Asm("#ifdef CMP32");
     Asm("true32:     ldi     0ffh");
     Asm("            sex     r7");
     Asm("            stxd");
@@ -2427,56 +2602,55 @@ void library() {
     Asm("         inc      r7");
     Asm("         inc      r7");
     Asm("         sep      sret              ; Return to caller");
-    }
+    Asm("#endif");
 
-  if (useEq32) {
+    Asm("#ifdef EQ32");
     Asm("eq32:    sep      scall             ; compare numbers");
     Asm("         dw       cmp32");
     Asm("         lbnz     false32           ; fails if numbers were unequal");
     Asm("         lbr      true32            ; true if A=B");
-    }
+    Asm("#endif");
 
-  if (useNe32) {
+    Asm("#ifdef NE32");
     Asm("ne32:    sep      scall             ; compare numbers");
     Asm("         dw       cmp32");
     Asm("         lbz      false32           ; fails if numbers were equal");
     Asm("         lbr      true32            ; true if A<>B");
-    }
+    Asm("#endif");
 
-  if (useLt32) {
+    Asm("#ifdef LT32");
     Asm("lt32:    sep      scall             ; compare numbers");
     Asm("         dw       cmp32");
     Asm("         lbz      false32           ; fails if numbers were equal");
     Asm("         lbdf     true32            ; true if A<B");
     Asm("         lbr      false32           ; otherwise false");
-    }
+    Asm("#endif");
 
-  if (useGt32) {
+    Asm("#ifdef GT32");
     Asm("gt32:    sep      scall             ; compare numbers");
     Asm("         dw       cmp32");
     Asm("         lbz      false32           ; fails if numbers were equal");
     Asm("         lbnf     true32            ; true if A>B");
     Asm("         lbr      false32           ; otherwise false");
-    }
+    Asm("#endif");
 
-  if (useLte32) {
+    Asm("#ifdef LTE32");
     Asm("lte32:   sep      scall             ; compare numbers");
     Asm("         dw       cmp32");
     Asm("         lbz      true32            ; true if numbers were equal");
     Asm("         lbdf     true32            ; true if A<B");
     Asm("         lbr      false32           ; otherwise false");
-    }
+    Asm("#endif");
 
-  if (useGte32) {
+    Asm("#ifdef GTE32");
     Asm("gte32:   sep      scall             ; compare numbers");
     Asm("         dw       cmp32");
     Asm("         lbz      true32            ; true if numbers were equal");
     Asm("         lbnf     true32            ; true if A>B");
     Asm("         lbr      false32           ; otherwise false");
-    }
+    Asm("#endif");
 
-  if (useAbs32) {
-    if (passNumber == 1) lblAbs = address;
+    Asm("#ifdef ABS32");
     Asm("abs32:    inc     r7");
     Asm("          inc     r7");
     Asm("          inc     r7");
@@ -2511,9 +2685,9 @@ void library() {
     Asm("          dec     r7");
     Asm("          dec     r7");
     Asm("          sep     sret");
-    }
+    Asm("#endif");
 
-  if (useSgn32) {
+    Asm("#ifdef SGN32");
     Asm("sgn32:    inc     r7");
     Asm("          lda     r7");
     Asm("          str     r2");
@@ -2555,9 +2729,9 @@ void library() {
     Asm("          dec     r7");
     Asm("          dec     r7");
     Asm("          sep     sret");
-    }
+    Asm("#endif");
 
-  if (useItoA32) {
+    Asm("#ifdef ITOA32");
     /* ***************************************** */
     /* ***** Convert RA:RB to bcd in M[RF] ***** */
     /* ***************************************** */
@@ -2722,9 +2896,9 @@ void library() {
     Asm("           adci    0");
     Asm("           phi     ra");
     Asm("           lbr     itoa321        ; now convert/show number");
-    }
+    Asm("#endif");
 
-  if (useAtoI32) {
+    Asm("#ifdef ATOI32");
     /* **************************************************** */
     /* ***** Convert ascii to int32                   ***** */
     /* ***** RF - buffer to ascii                     ***** */
@@ -2856,9 +3030,9 @@ void library() {
     Asm("            dec     rd");
     Asm("            dec     rd");
     Asm("            sep     sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useNext32) {
+    Asm("#ifdef NEXT32");
     Asm("nextvar32:  irx            ; move to varAddr");
     Asm("            ldxa           ; keep scall return address");
     Asm("            plo     rd");
@@ -2967,9 +3141,9 @@ void library() {
     Asm("            ghi     r9");
     Asm("            phi     r6");
     Asm("            sep     sret   ; and then return");
-    }
+    Asm("#endif");
 
-  if (useFp) {
+    Asm("#ifdef USEFP");
     Asm("fpdot1:    db      0cdh, 0cch, 0cch, 03dh");
     Asm("fp_0:      db      00,00,00,00");
     Asm("fp_1:      db      00,00,080h,03fh");
@@ -3434,9 +3608,9 @@ void library() {
     Asm("          dec      r7           ; move destination pointer back");
     Asm("          adi      0            ; signal no ovelow");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useAddFp) {
+    Asm("#ifdef ADDFP");
     /* ******************************************** */
     /* ***** Floating point addition          ***** */
     /* ***** RF - pointer to first fp number  ***** */
@@ -3623,9 +3797,9 @@ void library() {
     Asm("           inc     r7");
     Asm("           inc     r7");
     Asm("           sep     sret         ; And return");
-    }
+    Asm("#endif");
 
-  if (useSubFp) {
+    Asm("#ifdef SUBFP");
     /* ******************************************** */
     /* ***** Floating point subtraction       ***** */
     /* ***** RF - pointer to first fp number  ***** */
@@ -3670,9 +3844,9 @@ void library() {
     Asm("           inc     r7");
     Asm("           inc     r7");
     Asm("           sep     sret         ; And return");
-    }
+    Asm("#endif");
 
-  if (useMulFp) {
+    Asm("#ifdef MULFP");
     /* ******************************************** */
     /* ***** Floating point multiplication    ***** */
     /* ***** RF - pointer to first fp number  ***** */
@@ -3852,9 +4026,9 @@ void library() {
     Asm("           inc     r7");
     Asm("           inc     r7");
     Asm("           sep     sret         ; And return");
-    }
+    Asm("#endif");
 
-  if (useDivFp) {
+    Asm("#ifdef MULFP");
     /* ******************************************** */
     /* ***** Floating point division          ***** */
     /* ***** RF - pointer to first fp number  ***** */
@@ -4059,9 +4233,9 @@ void library() {
     Asm("           inc     r7");
     Asm("           inc     r7");
     Asm("           sep     sret         ; And return");
-    }
+    Asm("#endif");
 
-  if (useAbsFp) {
+    Asm("#ifdef ABSFP");
     Asm("absfp:    inc      r7           ; move to MSB");
     Asm("          inc      r7");
     Asm("          inc      r7");
@@ -4074,9 +4248,9 @@ void library() {
     Asm("          dec      r7");
     Asm("          dec      r7");
     Asm("          sep      sret");
-    }
+    Asm("#endif");
 
-  if (useSgnFp) {
+    Asm("#ifdef SGNFP");
     Asm("sgnfp:    inc     r7");
     Asm("          lda     r7");
     Asm("          str     r2");
@@ -4118,9 +4292,9 @@ void library() {
     Asm("          dec     r7");
     Asm("          dec     r7");
     Asm("          sep     sret");
-    }
+    Asm("#endif");
 
-  if (useEqFp) {
+    Asm("#ifdef EQFP");
     Asm("eqfp:       sep     scall");
     Asm("            dw      subfp");
     Asm("            sex     r7");
@@ -4136,9 +4310,9 @@ void library() {
     Asm("            sex     r2");
     Asm("            lbz     true32");
     Asm("            lbr     false32");
-    }
+    Asm("#endif");
 
-  if (useNeFp) {
+    Asm("#ifdef NEFP");
     Asm("nefp:       sep     scall");
     Asm("            dw      subfp");
     Asm("            sex     r7");
@@ -4154,9 +4328,9 @@ void library() {
     Asm("            sex     r2");
     Asm("            lbnz    true32");
     Asm("            lbr     false32");
-    }
+    Asm("#endif");
 
-  if (useGtFp) {
+    Asm("#ifdef GTFP");
     Asm("gtfp:       sep     scall");
     Asm("            dw      subfp");
     Asm("            sex     r7");
@@ -4175,9 +4349,9 @@ void library() {
     Asm("            shl");
     Asm("            lbnf    true32");
     Asm("            lbr     false32");
-    }
+    Asm("#endif");
 
-  if (useLtFp) {
+    Asm("#ifdef LTFP");
     Asm("ltfp:       sep     scall");
     Asm("            dw      subfp");
     Asm("            sex     r7");
@@ -4196,9 +4370,9 @@ void library() {
     Asm("            shl");
     Asm("            lbdf    true32");
     Asm("            lbr     false32");
-    }
+    Asm("#endif");
 
-  if (useGteFp) {
+    Asm("#ifdef GTEFP");
     Asm("gtefp:      sep     scall");
     Asm("            dw      subfp");
     Asm("            sex     r7");
@@ -4217,9 +4391,9 @@ void library() {
     Asm("            shl");
     Asm("            lbnf    true32");
     Asm("            lbr     false32");
-    }
+    Asm("#endif");
 
-  if (useLteFp) {
+    Asm("#ifdef LTEFP");
     Asm("ltefp:      sep     scall");
     Asm("            dw      subfp");
     Asm("            sex     r7");
@@ -4238,9 +4412,9 @@ void library() {
     Asm("            shl");
     Asm("            lbdf    true32");
     Asm("            lbr     false32");
-    }
+    Asm("#endif");
 
-  if (useAtoF) {
+    Asm("#ifdef ATOF");
     /* ******************************************** */
     /* ***** Convert ASCII to floating point  ***** */
     /* ***** RF - Pointer to ASCII string     ***** */
@@ -4604,9 +4778,9 @@ void library() {
     Asm("          ldx");
     Asm("          phi      r7");
     Asm("          lbr      atof_dn      ; and return result");
-    }
+    Asm("#endif");
 
-  if (useFtoA) {
+    Asm("#ifdef FTOA");
     /* ************************************************* */
     /* ***** Convert floating point to ASCII       ***** */
     /* ***** RF - pointer to floating point number ***** */
@@ -5027,9 +5201,9 @@ void library() {
     Asm("          ldx");
     Asm("          phi      r7");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useTrig) {
+    Asm("#ifdef USETRIG");
     Asm("fact:     db       000h, 000h, 000h, 000h");
     Asm("          db       000h, 000h, 080h, 03fh");
     Asm("          db       000h, 000h, 000h, 040h");
@@ -5125,9 +5299,9 @@ void library() {
     Asm("          inc      rd           ; remove last call offset");
     Asm("          inc      rd");
     Asm("          sep      sret         ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useSin) {
+    Asm("#ifdef SINFP");
     /* ****************************************************** */
     /* ***** sin                                        ***** */
     /* ***** RF - Pointer to floating point number      ***** */
@@ -5328,9 +5502,9 @@ void library() {
     Asm("          dec      r7");
     Asm("          dec      r7");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useCos) {
+    Asm("#ifdef COSFP");
     /* ****************************************************** */
     /* ***** cos                                        ***** */
     /* ***** RF - Pointer to floating point number      ***** */
@@ -5397,9 +5571,9 @@ void library() {
     Asm("          sep      scall        ; add to workspace");
     Asm("          dw       addtows");
     Asm("          lbr      sincos       ; now compute");
-    }
+    Asm("#endif");
 
-  if (useTan) {
+    Asm("#ifdef TANFP");
     /* ****************************************************** */
     /* ***** tan                                        ***** */
     /* ***** RF - Pointer to floating point number      ***** */
@@ -5482,9 +5656,9 @@ void library() {
     Asm("          dec      r7");
     Asm("          dec      r7");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useLn) {
+    Asm("#ifdef LNFP");
     /* ****************************************************** */
     /* ***** Natural logarithm                          ***** */
     /* ***** RF - Pointer to floating point number      ***** */
@@ -5695,9 +5869,9 @@ void library() {
     Asm("          dec      r7");
     Asm("          dec      r7");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useExp) {
+    Asm("#ifdef EXPFP");
     /* ****************************************************** */
     /* ***** Natural exp                                ***** */
     /* ***** RF - Pointer to floating point number      ***** */
@@ -5879,9 +6053,9 @@ void library() {
     Asm("          dec      r7");
     Asm("          dec      r7");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (usePow) {
+    Asm("#ifdef POWFP");
     /* ****************************************************** */
     /* ***** Power x^y                                  ***** */
     /* ***** RF - Pointer to floating point number x    ***** */
@@ -5906,9 +6080,9 @@ void library() {
     Asm("          sep      scall        ; x = exp(x)");
     Asm("          dw       fpexp");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useSqrt) {
+    Asm("#ifdef SQRTFP");
     /* ****************************************************** */
     /* ***** Square root                                ***** */
     /* ***** RF - Pointer to floating point number x    ***** */
@@ -6050,9 +6224,9 @@ void library() {
     Asm("          dec      r7");
     Asm("          dec      r7");
     Asm("          sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useAtan) {
+    Asm("#ifdef ATANFP");
     /* ****************************************************** */
     /* ***** Compute arctangent                         ***** */
     /* ***** internal:                                  ***** */
@@ -6264,9 +6438,9 @@ void library() {
     Asm("           dec      r7");
     Asm("           dec      r7");
     Asm("           sep      sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useAsin) {
+    Asm("#ifdef ASINFP");
     /* ****************************************************** */
     /* ***** Compute arcsin                             ***** */
     /* ****************************************************** */
@@ -6338,9 +6512,9 @@ void library() {
     Asm("           sep     scall");
     Asm("           dw      mulfp");
     Asm("           sep     sret");
-    }
+    Asm("#endif");
 
-  if (useAcos) {
+    Asm("#ifdef ACOSFP");
     /* ****************************************************** */
     /* ***** Compute arcsin                             ***** */
     /* ****************************************************** */
@@ -6438,9 +6612,9 @@ void library() {
     Asm("           sep     scall");
     Asm("           dw      mulfp");
     Asm("           sep     sret");
-    }
+    Asm("#endif");
 
-  if (useStrcpy) {
+    Asm("#ifdef STRCPY");
     /* *********************************** */
     /* ***** Copy string             ***** */
     /* ***** RD - destination string ***** */
@@ -6451,9 +6625,9 @@ void library() {
     Asm("           inc     rd");
     Asm("           lbnz    strcpy       ; loop back until terminator copied");
     Asm("           sep     sret         ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useStrcat) {
+    Asm("#ifdef STRCAT");
     /* *********************************** */
     /* ***** Concatenate string      ***** */
     /* ***** RD - destination string ***** */
@@ -6463,9 +6637,9 @@ void library() {
     Asm("           lbnz    strcat       ; loop back until terminator found");
     Asm("           dec     rd           ; move back to terminator");
     Asm("           lbr     strcpy       ; and then copy source string to end");
-    }
+    Asm("#endif");
 
-  if (useStrlen) {
+    Asm("#ifdef STRLEN");
     /* ********************************** */
     /* ***** String length          ***** */
     /* ***** RF - pointer to string ***** */
@@ -6479,9 +6653,9 @@ void library() {
     Asm("           inc     rc           ; otherwise increment count");
     Asm("           lbr     strlen_1     ; and keep looking");
     Asm("strlen_2:  sep     sret         ; return to caller");
-    }
+    Asm("#endif");
 
-  if (useLeft) {
+    Asm("#ifdef LEFT");
     /* ***************************************** */
     /* ***** Left portion of string        ***** */
     /* ***** RF - pointer to source string ***** */
@@ -6502,9 +6676,9 @@ void library() {
     Asm("left_dn:   ldi     0            ; write terminator to destination");
     Asm("           str     rd");
     Asm("           lbr     left_rt      ; then return");
-    }
+    Asm("#endif");
 
-  if (useMid) {
+    Asm("#ifdef MID");
     /* ***************************************** */
     /* ***** Middle portion of string      ***** */
     /* ***** RF - pointer to source string ***** */
@@ -6527,9 +6701,9 @@ void library() {
     Asm("mid_2:     sep     scall        ; call left to copy characters");
     Asm("           dw      left");
     Asm("           sep     sret         ; and return to caller");
-    }
+    Asm("#endif");
 
-  if (useRight) {
+    Asm("#ifdef RIGHT");
     /* ***************************************** */
     /* ***** Right portion of string       ***** */
     /* ***** RF - pointer to source string ***** */
@@ -6560,9 +6734,9 @@ void library() {
     Asm("right_dn:  sep     scall        ; call strcpy to copy the string");
     Asm("           dw      strcpy");
     Asm("           sep     sret         ; and return");
-    }
+    Asm("#endif");
 
-  if (useLower) {
+    Asm("#ifdef LOWER");
     /* *************************************** */
     /* ***** Convert string to lowercase ***** */
     /* ***** RF - Pointer to string      ***** */
@@ -6578,9 +6752,9 @@ void library() {
     Asm("           str     rf           ; and put it back");
     Asm("lowernxt:  inc     rf           ; point to next character");
     Asm("           lbr     lower        ; process rest of string");
-    }
+    Asm("#endif");
 
-  if (useUpper) {
+    Asm("#ifdef UPPER");
     /* *************************************** */
     /* ***** Convert string to uppercase ***** */
     /* ***** RF - Pointer to string      ***** */
@@ -6596,9 +6770,9 @@ void library() {
     Asm("           str     rf           ; and put it back");
     Asm("uppernxt:  inc     rf           ; point to next character");
     Asm("           lbr     upper_1      ; process rest of string");
-    }
+    Asm("#endif");
 
-  if (useStrcmp) {
+    Asm("#ifdef STRCMP");
     /* ********************************************* */
     /* ***** String compare                    ***** */
     /* ***** RF - string1                      ***** */
@@ -6626,7 +6800,7 @@ void library() {
     Asm("strcmp_gt: ldi     2            ; signal string 2 is lower");
     Asm("strcmp_rt: shr");
     Asm("           sep     sret");
-    }
+    Asm("#endif");
 
   if (passNumber == 1) lblStart = address;
   if (useStg) {
@@ -6664,7 +6838,8 @@ void library() {
     Asm("          ldi  ret.0");
     Asm("          plo  r5");
     }
-  t1 = variableRAM + (2 * numberOfVariables);
+//   t1 = variableRAM + (2 * numberOfVariables);
+  t1 = variableNextAddress;
   t2 = getVariable("FREE_");
   Asm("          ldi  [free_].1");
   Asm("          phi  rf");
@@ -6684,19 +6859,29 @@ void library() {
   Asm("          str  rf");
   if (useData) {
     a = getVariable("DATA_");
-    output(LDI); output(a/256); output(PHI+RF);
-    output(LDI); output(a%256); output(PLO+RF);
-    output(LDI); output(dataAddress/256); output(STR+RF); output(INC+RF);
-    output(LDI); output(dataAddress%256); output(STR+RF);
+    sprintf(buffer,"          ldi  %d",a/256); Asm(buffer);
+    Asm("          phi  rf");
+    sprintf(buffer,"          ldi  %d",a%256); Asm(buffer);
+    Asm("          plo  rf");
+    sprintf(buffer,"          ldi  %d",dataAddress/256); Asm(buffer);
+    Asm("          str  rf");
+    Asm("          inc  rf");
+    sprintf(buffer,"          ldi  %d",dataAddress%256); Asm(buffer);
+    Asm("          str  rf");
     }
-  if (useHeap) {
+  if (getDefine("HEAP")) {
     a = getVariable("HEAP_");
-    output(LDI); output(a/256); output(PHI+RF);
-    output(LDI); output(a%256); output(PLO+RF);
-    output(LDI); output(heap/256); output(STR+RF); output(INC+RF);
-    output(LDI); output(heap%256); output(STR+RF);
+    sprintf(buffer,"          ldi  %d",a/256); Asm(buffer);
+    Asm("          phi  rf");
+    sprintf(buffer,"          ldi  %d",a%256); Asm(buffer);
+    Asm("          plo  rf");
+    sprintf(buffer,"          ldi  %d",heap/256); Asm(buffer);
+    Asm("          str  rf");
+    Asm("          inc  rf");
+    sprintf(buffer,"          ldi  %d",heap%256); Asm(buffer);
+    Asm("          str  rf");
     }
-  if ((useItoA || useAtoI || useItoA32 || useAtoI32) && useElfos == 0) {
+  if ((getDefine("ITOA16") || getDefine("ATOI16") || getDefine("ITOA32") || getDefine("ATOI32")) && useElfos == 0) {
     Asm("          sep  scall");
     Asm("          dw   f_setbd");
     }

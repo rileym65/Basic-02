@@ -38,6 +38,7 @@ OBJS = \
 	crestore.o \
 	creturn.o \
 	findline.o \
+	findvariable.o \
 	gethex.o \
 	getnumber.o \
 	getvariable.o \
@@ -93,6 +94,7 @@ crem.o:          header.h crem.c
 crestore.o:      header.h crestore.c
 creturn.o:       header.h creturn.c
 findline.o:      header.h findline.c
+findvariable.o:  header.h findvariable.c
 gethex.o:        header.h gethex.c
 getnumber.o:     header.h getnumber.c
 getvariable.o:   header.h getvariable.c

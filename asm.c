@@ -1,5 +1,40 @@
 #include "header.h"
 
+void addDefine(char* define, int value, int redefine) {
+  int i;
+  if (passNumber == 2) return;
+  for (i=0; i<numDefines; i++)
+    if (strcasecmp(define, defines[i]) == 0) {
+      if (redefine) {
+        defineValues[i] = value;
+        return;
+        }
+      printf("<ASM>Duplicate define: %s\n",define);
+      exit(1);
+      }
+  numDefines++;
+  if (numDefines == 1) {
+    defines = (char**)malloc(sizeof(char*));
+    defineValues = (int*)malloc(sizeof(int));
+    }
+  else {
+    defines = (char**)realloc(defines, sizeof(char*) * numDefines);
+    defineValues = (int*)realloc(defineValues, sizeof(int) * numDefines);
+    }
+  defines[numDefines-1] = (char*)malloc(strlen(define) + 1);
+  strcpy(defines[numDefines-1], define);
+  defineValues[numDefines-1] = value;
+  }
+
+int getDefine(char* define) {
+  int i;
+  for (i=0; i<numDefines; i++)
+    if (strcasecmp(define, defines[i]) == 0) {
+      return defineValues[i];
+      }
+  return 0;
+  }
+
 void addLabel(char* label, word value) {
   int i;
   if (passNumber == 2) return;
@@ -302,9 +337,57 @@ void Asm(char* line) {
   char  opcode[32];
   char  args[128];
   word  value;
+  int   i;
   orig = line;
+  if (numNests > 0) {
+    if (strncasecmp(line,"#else",5) == 0 && nests[numNests-1] != 'I') {
+      nests[numNests-1] = (nests[numNests-1] == 'Y') ? 'N' : 'Y';
+      return;
+      }
+    if (nests[numNests-1] != 'Y' && strncasecmp(line,"#ifdef",6) == 0) {
+      nests[numNests++] = 'I';
+      return;
+      }
+    if (strncasecmp(line,"#endif",6) == 0) {
+      numNests--;
+      if (numNests < 0) {
+        showError("<ASM> #endif without #if");
+        exit(1);
+        }
+      return;
+      }
+    if (nests[numNests-1] != 'Y') return;
+    }
+  if (*line == '#') {
+    if (strncasecmp(line,"#define",7) == 0) {
+      line += 7;
+      line = trim(line);
+      pos = 0;
+      while (*line != 0 && *line > ' ') label[pos++] = *line++;
+      label[pos] = 0;
+      line = trim(line);
+      i = atoi(line);
+      if (i == 0) i = 1;
+      addDefine(label, i, 0);
+      return;
+      }
+    if (strncasecmp(line,"#ifdef",6) == 0) {
+      line += 6;
+      line = trim(line);
+      pos = 0;
+      while (*line != 0 && *line > ' ') label[pos++] = *line++;
+      label[pos] = 0;
+      if (getDefine(label)) {
+        nests[numNests++] = 'Y';
+        }
+      else {
+        nests[numNests++] = 'N';
+        }
+      return;
+      }
+    }
+
   asmAddress = address;
-// printf("\n>>%s<<\n",line);
   if (passNumber == 2) {
     if (showAsm) printf("%s\n",line);
     if (useAsm) {

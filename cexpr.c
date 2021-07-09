@@ -428,7 +428,7 @@ int reduce(char last) {
            Asm("           inc     r7");
            Asm("           inc     r7");
            }
-         if (useHeap) {
+         if (getDefine("HEAP")) {
            if (use32Bits) {
              Asm("           ldi     0                   ; High word is zero");
              Asm("           str     r7");
