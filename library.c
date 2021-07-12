@@ -739,9 +739,9 @@ void library() {
     Asm("            lbnz    divgo");
     Asm("            ghi     rd");
     Asm("            lbnz    divgo");
-    Asm("            glo     re");
+    Asm("divret:     glo     re");
     Asm("            shr");
-    Asm("            lbnf    divret");
+    Asm("            lbnf    divrt");
     Asm("            ghi     rf");
     Asm("            xri     0ffh");
     Asm("            phi     rf");
@@ -749,7 +749,7 @@ void library() {
     Asm("            xri     0ffh");
     Asm("            plo     rf");
     Asm("            inc     rf");
-    Asm("divret:     sex     r7");
+    Asm("divrt:      sex     r7");
     Asm("            ghi     rf");
     Asm("            stxd");
     Asm("            glo     rf");
