@@ -1,3 +1,13 @@
+/*
+ *******************************************************************
+ *** This software is copyright 2021 by Michael H Riley          ***
+ *** You have permission to use, modify, copy, and distribute    ***
+ *** this software so long as this copyright notice is retained. ***
+ *** This software may not be used in commercial applications    ***
+ *** without express written permission from the author.         ***
+ *******************************************************************
+*/
+
 #include "header.h"
 
 void processRAM(char* buffer) {
@@ -31,6 +41,7 @@ void processOption(char* option) {
     if (strcmp(option,"-b") == 0) outMode = 'B';
     if (strcmp(option,"-i") == 0) outMode = 'I';
     if (strcmp(option,"-r") == 0) outMode = 'R';
+    if (strcmp(option,"-R") == 0) showRuntime = -1;
     if (strcmp(option,"-l") == 0) showList = -1;
     if (strcmp(option,"-c") == 0) showCompiler = -1;
     if (strcmp(option,"-s") == 0) showSymbols = -1;

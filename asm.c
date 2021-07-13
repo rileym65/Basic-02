@@ -1,3 +1,13 @@
+/*
+ *******************************************************************
+ *** This software is copyright 2021 by Michael H Riley          ***
+ *** You have permission to use, modify, copy, and distribute    ***
+ *** this software so long as this copyright notice is retained. ***
+ *** This software may not be used in commercial applications    ***
+ *** without express written permission from the author.         ***
+ *******************************************************************
+*/
+
 #include "header.h"
 
 void addDefine(char* define, int value, int redefine) {
@@ -329,6 +339,11 @@ void processDb(char* args,char typ) {
     }
   }
 
+void processDs(char* args) {
+  int size;
+  size = atoi(args);
+  }
+
 void Asm(char* line) {
   int   pos;
   char  qt;
@@ -524,6 +539,9 @@ void Asm(char* line) {
       }
     else if (strcasecmp(opcode,"dw") == 0) {
       processDb(args,'W');
+      }
+    else if (strcasecmp(opcode,"ds") == 0) {
+      processDs(args);
       }
     else if (strcasecmp(opcode,"dec") == 0) {
       output(DEC+(processArgs(args) & 0xf));

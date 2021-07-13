@@ -1,3 +1,13 @@
+/*
+ *******************************************************************
+ *** This software is copyright 2021 by Michael H Riley          ***
+ *** You have permission to use, modify, copy, and distribute    ***
+ *** this software so long as this copyright notice is retained. ***
+ *** This software may not be used in commercial applications    ***
+ *** without express written permission from the author.         ***
+ *******************************************************************
+*/
+
 #include "header.h"
 
 int pass(char* filename) {
@@ -76,8 +86,9 @@ int pass(char* filename) {
     if (strlen(buffer) > 16) Asm(buffer);
     if (passNumber == 2 && showCompiler) printf("\n");
     }
-  if (getDefine("ATOI16")) {
-    Asm("iobuffer:   db   0");
+  if (getDefine("ATOI16") || getDefine("ATOI32")) {
+    
+    sprintf(buffer,"iobuffer:   ds   %d",iBufferSize); Asm(buffer);
     }
   }
 

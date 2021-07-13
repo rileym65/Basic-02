@@ -58,6 +58,9 @@ $(PROJECT): $(OBJS)
 .c.o:
 	$(CC) $(DEFS) $(INCDIR) $(INCS) -c $<
 
+library.h: library.asm
+	cat library.asm | ./mklibrary.pl > library.h
+
 clean:
 	-rm *.o
 	-rm $(PROJECT)
@@ -98,7 +101,7 @@ findvariable.o:  header.h findvariable.c
 gethex.o:        header.h gethex.c
 getnumber.o:     header.h getnumber.c
 getvariable.o:   header.h getvariable.c
-library.o:       header.h library.c
+library.o:       header.h library.h library.c
 main.o:          header.h main.c
 match.o:         header.h match.c
 optionfile.o:    header.h optionfile.c

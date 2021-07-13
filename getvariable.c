@@ -1,3 +1,13 @@
+/*
+ *******************************************************************
+ *** This software is copyright 2021 by Michael H Riley          ***
+ *** You have permission to use, modify, copy, and distribute    ***
+ *** this software so long as this copyright notice is retained. ***
+ *** This software may not be used in commercial applications    ***
+ *** without express written permission from the author.         ***
+ *******************************************************************
+*/
+
 #include "header.h"
 
 word getVariable(char* name) {
@@ -5,14 +15,15 @@ word getVariable(char* name) {
   int vsize;
   char vtype;
   if (passNumber == 1) return 0;
-  vtype = 'I';
+  vtype = (use32Bits) ? 'L' : 'I';
   if (name[strlen(name)-1] == '!') vtype = 'R';
   if (name[strlen(name)-1] == '$') vtype = 'S';
   if (name[strlen(name)-1] == '#') vtype = 'D';
   if (vtype == 'S') vsize = 2;
   else if (vtype == 'R') vsize = 4;
   else if (vtype == 'D') vsize = 8;
-  else if (vtype == 'I') vsize = (use32Bits) ? 4 : 2;
+  else if (vtype == 'I') vsize = 2;
+  else if (vtype == 'L') vsize = 4;
   for (i=0; i<numberOfVariables; i++) {
     if (strcasecmp(name, variableNames[i]) == 0) return variableAddresses[i];
     }

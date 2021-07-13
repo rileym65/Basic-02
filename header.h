@@ -186,6 +186,7 @@ LINK byte   SERN;
 LINK char   showAsm;
 LINK char   showCompiler;
 LINK char   showList;
+LINK char   showRuntime;
 LINK char   showSymbols;
 LINK char   showVariables;
 LINK FILE  *source;

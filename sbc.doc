@@ -118,6 +118,7 @@ Switches:
 -i              - output as Intel hex
 -l              - show source list
 -r              - output as RCS hex
+-R              - show runtime modules
 -s              - show assembler symbols
 -v              - show variables
 -lf             - set line endings to line-feed
