@@ -39,9 +39,9 @@ char* clocate(char* line) {
     Asm("          inc   r7                      ; Remove high word");
     Asm("          inc   r7");
     }
-  Asm("          ldi   iobuffer+2.1            ; Point to i/o buffer");
+  Asm("          ldi   (iobuffer+2).1            ; Point to i/o buffer");
   Asm("          phi   rd");
-  Asm("          ldi   iobuffer+2.0");
+  Asm("          ldi   (iobuffer+2).0");
   Asm("          plo   rd");
   Asm("          sep   scall                   ; Send row");
   Asm("          dw    itoa");

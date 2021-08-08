@@ -29,6 +29,24 @@ typedef struct {
 #define OT_68NARG 10
 #define OT_682ARG 11
 
+#define OP_DOT    0x51
+#define OP_MOD    0x43
+#define OP_MUL    0x42
+#define OP_DIV    0x41
+#define OP_ADD    0x32
+#define OP_SUB    0x31
+#define OP_GT     0x26
+#define OP_LT     0x25
+#define OP_GTE    0x24
+#define OP_LTE    0x23
+#define OP_EQ     0x22
+#define OP_NE     0x21
+#define OP_AND    0x13
+#define OP_OR     0x12
+#define OP_XOR    0x11
+#define OP_OP     0x08
+#define OP_CP     0x09
+
 OPCODE opcodes[] = {
   { "adc",   OT_0ARG,   ADC   },
   { "adci",  OT_1ARG,   ADCI  },
@@ -152,6 +170,419 @@ OPCODE opcodes[] = {
   { "",      0,         0     },
   };
 
+dword asm_numStack[256];
+word asm_nstackSize;
+byte asm_tokens[64];
+byte asm_numTokens;
+char *sourceLine;
+
+void writeOutput() {
+  int i;
+  byte checksum;
+  char outLine[80];
+  char temp[16];
+  if (outMode == 'R') {
+    sprintf(outLine,":%04x",outAddress);
+    for (i=0; i<outCount; i++) {
+      sprintf(temp," %02x",outBuffer[i]);
+      strcat(outLine,temp);
+      }
+    sprintf(temp,"%s",lineEnding);
+    strcat(outLine,temp);
+    write(outFile, outLine, strlen(outLine));
+    }
+  if (outMode == 'I') {
+    checksum = outCount;
+    sprintf(outLine,":%02x",outCount);
+    checksum += (outAddress / 256);
+    checksum += (outAddress & 0xff);
+    sprintf(temp,"%04x00",outAddress);
+    strcat(outLine,temp);
+    for (i=0; i<outCount; i++) {
+      checksum += outBuffer[i];
+      sprintf(temp,"%02x",outBuffer[i]);
+      strcat(outLine,temp);
+      }
+    checksum = (checksum ^ 0xff) + 1;
+    sprintf(temp,"%02x",checksum);
+    strcat(outLine, temp);
+    sprintf(temp,"%s",lineEnding);
+    strcat(outLine,temp);
+    write(outFile, outLine, strlen(outLine));
+    }
+  if (outMode == 'B') {
+    write(outFile, outBuffer, outCount);
+    }
+  }
+
+void output(byte value) {
+  if (compMode == 'A' && (address < ramStart || address > ramEnd)) {
+    showError("Address exceeded available RAM");
+    exit(1);
+    }
+  if (compMode == 'O' && (address < romStart || address > romEnd)) {
+    showError("Address exceeded available ROM");
+    exit(1);
+    }
+  if (passNumber == 1) {
+    if (address > highest) highest = address;
+    }
+  if (passNumber == 2) {
+    if (showCompiler) {
+      printf(" %02x",value);
+      listCount++;
+      if (listCount == 16) {
+        printf("\n");
+        printf("     ");
+        listCount = 0;
+        }
+      }
+    outBuffer[outCount++] = value;
+    codeGenerated++;
+    if (outCount == 16) {
+      writeOutput();
+      outCount = 0;
+      outAddress = address+1;
+      }
+    }
+  address++;
+  }
+
+char* asm_convertNumber(char* buffer, dword* value, byte* success) {
+  byte ishex;
+  dword val1,val2;
+  ishex = 0;
+  val1 = 0;
+  val2 = 0;
+  if (*buffer == 'r' || *buffer == 'R') {
+    if (*(buffer+1) == '0') {
+      *value = 0;
+      *success = 0xff;
+      return buffer+2;
+      }
+    if (*(buffer+1) >= '2' && *(buffer+1) <= '9') {
+      *value = *(buffer+1) - '0';
+      *success = 0xff;
+      return buffer+2;
+      }
+    if (*(buffer+1) >= 'a' && *(buffer+1) <= 'f') {
+      *value = *(buffer+1) - 87;
+      *success = 0xff;
+      return buffer+2;
+      }
+    if (*(buffer+1) >= 'A' && *(buffer+1) <= 'F') {
+      *value = *(buffer+1) - 55;
+      *success = 0xff;
+      return buffer+2;
+      }
+    if (*(buffer+1) == '1') {
+      if (*(buffer+2) >= '0' && *(buffer+2) <= '5') {
+        *value = *(buffer+2) - 38;
+        *success = 0xff;
+        return buffer+3;
+        }
+      else {
+        *value = *(buffer+1) - 55;
+        *success = 0xff;
+        return buffer+2;
+        }
+      }
+    }
+  if (*buffer == '\'' && *(buffer+2) == '\'') {
+    buffer++;
+    *value = *buffer;
+    buffer += 2;
+    *success = 0xff;
+    return buffer;
+    }
+  if (*buffer == '%') {
+    buffer++;
+    while (*buffer == '1' || *buffer == '0' || *buffer == '_') {
+      if (*buffer != '_')
+        val1 = (val1 << 1) | (*buffer - '0');
+      buffer++;
+      }
+    *value = val1;
+    *success = 0xff;
+    return buffer;
+    }
+  if (*buffer == '$') {
+    buffer++;
+    if ((*buffer >= '0' && *buffer <= '9') ||
+        (*buffer >= 'a' && *buffer <= 'f') ||
+        (*buffer >= 'A' && *buffer <= 'F'))
+      ishex = 0xff;
+    else {
+      *value = asmAddress;
+      *success = 0xff;
+      return buffer;
+      }
+    }
+  if (ishex == 0 && (*buffer < '0' || *buffer > '9')) {
+    *success = 0;
+    return buffer;
+    }
+  while ((*buffer >= '0' && *buffer <= '9') ||
+         (*buffer >= 'a' && *buffer <= 'f') ||
+         (*buffer >= 'A' && *buffer <= 'F')) {
+      if (*buffer >= '0' && *buffer <= '9') {
+        val1 = (val1 * 10) + (*buffer - '0');
+        val2 = (val2 << 4) | (*buffer - '0');
+        }
+      if (*buffer >= 'a' && *buffer <= 'f')
+        val2 = (val2 << 4) | (*buffer - 87);
+      if (*buffer >= 'A' && *buffer <= 'F')
+        val2 = (val2 << 4) | (*buffer - 55);
+      buffer++;
+    }
+  if (*buffer == 'h' || *buffer == 'H') {
+    ishex = 0xff;
+    buffer++;
+    }
+  *success = 0xff;
+  *value = (ishex != 0) ? val2 : val1;
+  return buffer;
+  }
+
+
+int asm_reduce(char last) {
+  int op;
+  int ret;
+  if (asm_numTokens == 0) return 0;
+  if (asm_tokens[asm_numTokens-1] != OP_NUM) return 0;
+  if (asm_numTokens > 2 && asm_tokens[asm_numTokens-3] >= 0x60) {
+    op   = asm_tokens[asm_numTokens-3];
+    asm_numTokens -= 3;
+    ret = 0;
+    if (last) ret = -1;
+    }
+  else if (asm_numTokens > 2 && asm_tokens[asm_numTokens-3] == OP_OP) {
+    op   = asm_tokens[asm_numTokens-3];
+    asm_numTokens -= 3;
+    ret = 0;
+    if (asm_numTokens > 0 && asm_tokens[asm_numTokens-1] >= 0x60) ret = -1;
+    if (last) ret = -1;
+    }
+  else if (asm_numTokens > 4 && asm_tokens[asm_numTokens-3] >= 0x10 &&
+                            (asm_tokens[asm_numTokens-4] == OP_NUM ||
+                             asm_tokens[asm_numTokens-4] == OP_NUMFP)) {
+    op   = asm_tokens[asm_numTokens-3];
+    asm_numTokens -= 5;
+    ret = -1;
+    }
+  else {
+    return 0;
+    }
+  switch (op) {
+    case OP_DOT:
+         if (asm_numStack[asm_nstackSize-1] == 0)
+           asm_numStack[asm_nstackSize-2] &= 0x00ff;
+         else
+           asm_numStack[asm_nstackSize-2] >>= 8;
+         asm_nstackSize--;
+         break;
+    case OP_MUL:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] *
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_DIV:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] /
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+    case OP_MOD:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] %
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_ADD:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] +
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_SUB:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] -
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_GT :
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] >
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_LT :
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] <
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_GTE:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] >=
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_LTE:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] <=
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_EQ :
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] ==
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_NE :
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] !=
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_AND:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] &
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_OR :
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] |
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    case OP_XOR:
+         asm_numStack[asm_nstackSize-2] =
+             asm_numStack[asm_nstackSize-2] ^
+             asm_numStack[asm_nstackSize-1];
+         asm_nstackSize--;
+         break;
+    }
+  asm_tokens[asm_numTokens++] = 0;
+  asm_tokens[asm_numTokens++] = OP_NUM;
+  return ret;
+  }
+
+void asm_add(int op) {
+  if (asm_tokens[asm_numTokens-1] >= 0x10) {
+    }
+  while (asm_numTokens > 4 && (op & 0xf0) <= (asm_tokens[asm_numTokens-3] & 0xf0)) {
+    asm_reduce(0);
+    }
+  asm_tokens[asm_numTokens++] = op;
+  }
+
+char* asm_evaluate(char* buffer) {
+  char term;
+  int p;
+  char token[64];
+  int flag;
+  int func;
+  int parens;
+  byte success;
+  dword number;
+  parens = 0;
+  asm_numTokens = 0;
+  asm_nstackSize = 0;
+  flag = 1;
+  while (*buffer == ' ') buffer++;
+  if (*buffer == '-' && (*(buffer+1) < '0' || *(buffer+1) > '9')) {
+    asm_tokens[asm_numTokens++] = 0;
+    asm_tokens[asm_numTokens++] = OP_NUM;
+    asm_tokens[asm_numTokens++] = OP_SUB;
+    asm_numStack[asm_nstackSize++] = 0;
+    buffer++;
+    }
+  while (*buffer != 0 && flag) {
+
+    while (*buffer == ' ') buffer++;
+
+    func = -1;
+    while (func) {
+      func = 0;
+      while (*buffer == '(') {
+        asm_tokens[asm_numTokens++] = OP_OP;
+        parens++;
+        buffer++;
+        func = -1;
+        }
+      }
+
+    term = 0;
+
+    /* **************************** */
+    /* ***** Process constant ***** */
+    /* **************************** */
+    buffer = asm_convertNumber(buffer, &number, &success);
+    if (success != 0) {
+      asm_numStack[asm_nstackSize++] = number;
+      asm_tokens[asm_numTokens++] = 0;
+      asm_tokens[asm_numTokens++] = OP_NUM;
+      term = -1;
+      }
+
+    if (term == 0) {
+      if ((*buffer >= 'a' && *buffer <= 'z') ||
+          (*buffer >= 'A' && *buffer <= 'Z')) {
+        p = 0;
+        while ((*buffer >= 'a' && *buffer <= 'z') ||
+               (*buffer >= 'A' && *buffer <= 'Z') ||
+               (*buffer >= '0' && *buffer <= '9') ||
+                *buffer == '_' || *buffer == '!') {
+          token[p++] = *buffer++;
+          }
+        token[p] = 0;
+        asm_numStack[asm_nstackSize++] = getLabel(token);
+        asm_tokens[asm_numTokens++] = 0;
+        asm_tokens[asm_numTokens++] = OP_NUM;
+        term = -1;
+        }
+      }
+
+    if (term == 0) {
+      showError("<ASM>Expression error, invalid term");
+      exit(1);
+      }
+
+    while (*buffer == ' ') buffer++;
+    while (*buffer == ')' && parens > 0) {
+      parens--;
+      while (asm_reduce(0)) ;
+      buffer++;
+      }
+    while (*buffer == ' ') buffer++;
+
+    if (*buffer == '+') { asm_add(OP_ADD); buffer++; }
+    else if (*buffer == '-') { asm_add(OP_SUB); buffer++; }
+    else if (*buffer == '*') { asm_add(OP_MUL); buffer++; }
+    else if (*buffer == '/') { asm_add(OP_DIV); buffer++; }
+    else if (*buffer == '%') { asm_add(OP_MOD); buffer++; }
+    else if (*buffer == '&') { asm_add(OP_AND); buffer++; }
+    else if (*buffer == '|') { asm_add(OP_OR); buffer++; }
+    else if (*buffer == '^') { asm_add(OP_XOR); buffer++; }
+    else if (*buffer == '.') { asm_add(OP_DOT); buffer++; }
+    else if (*buffer == '<' && *(buffer+1) == '=') { asm_add(OP_LTE); buffer+=2; }
+    else if (*buffer == '>' && *(buffer+1) == '=') { asm_add(OP_GTE); buffer+=2; }
+    else if (*buffer == '<' && *(buffer+1) == '>') { asm_add(OP_NE); buffer+=2; }
+    else if (*buffer == '<') { asm_add(OP_LT); buffer++; }
+    else if (*buffer == '>') { asm_add(OP_GT); buffer++; }
+    else if (*buffer == '=') { asm_add(OP_EQ); buffer++; }
+    else flag = 0;
+    }
+  while (asm_reduce(-1));
+  if (asm_numTokens != 2) {
+    showError("<ASM>Expression error, expression does not reduce to 1 value\n");
+    exit(1);
+    }
+  return buffer;
+  }
 
 void addDefine(char* define, int value, int redefine) {
   int i;
@@ -232,242 +663,41 @@ void setLabel(char* label, word value) {
   exit(1);
   }
 
-word convertNumber(char* line) {
-  word num;
-  char* orig;
-  orig = line;
-  if (line[strlen(line)-1] == 'h' ||
-      line[strlen(line)-1] == 'H') {
-    line[strlen(line)-1] = 0;
-    num = 0;
-    while ((*line >= 'a' && *line <= 'f') ||
-           (*line >= 'A' && *line <= 'F') ||
-           (*line >= '0' && *line <= '9')) {
-      if (*line >= '0' && *line <= '9') num = (num << 4) + (*line - '0');
-      if (*line >= 'a' && *line <= 'f') num = (num << 4) + (*line - 'a' + 10);
-      if (*line >= 'A' && *line <= 'F') num = (num << 4) + (*line - 'A' + 10);
-      line++;
-      }
-    if (*line != 0) {
-      printf("<ASM>Unknown character in number: %s\n",orig);
-      exit(1);
-      }
-    return num;
-    }
-  else {
-    num = 0;
-    while (*line >= '0' && *line <= '9') {
-      num = (num * 10) + (*line - '0');
-      line++;
-      }
-    if (*line != 0) {
-      printf("<ASM>Unknown character in number: %s\n",orig);
-      exit(1);
-      }
-    return num;
-    }
-  }
-
-word processArgs(char* args) {
-  word ret;
-  char token[128];
-  int  pos;
-  char op;
-  char qt;
-  word num;
-  args = trim(args);
-  ret = 0;
-  op = ' ';
-  while (*args != 0) {
-    pos = 0;
-    qt = 0;
-    while (*args != 0 && ((qt == 0 && strchr("+-*/&|^.% ",*args) == NULL) || qt)) {
-      if (*args == '\'') qt = 1-qt;
-      token[pos++] = *args++;
-      }
-    token[pos] = 0;
-    if (strcasecmp(token,"r0") == 0) num = 0;
-    else if (strcasecmp(token,"r1") == 0) num = 1;
-    else if (strcasecmp(token,"r2") == 0) num = 2;
-    else if (strcasecmp(token,"r3") == 0) num = 3;
-    else if (strcasecmp(token,"r4") == 0) num = 4;
-    else if (strcasecmp(token,"r5") == 0) num = 5;
-    else if (strcasecmp(token,"r6") == 0) num = 6;
-    else if (strcasecmp(token,"r7") == 0) num = 7;
-    else if (strcasecmp(token,"r8") == 0) num = 8;
-    else if (strcasecmp(token,"r9") == 0) num = 9;
-    else if (strcasecmp(token,"ra") == 0) num = 10;
-    else if (strcasecmp(token,"rb") == 0) num = 11;
-    else if (strcasecmp(token,"rc") == 0) num = 12;
-    else if (strcasecmp(token,"rd") == 0) num = 13;
-    else if (strcasecmp(token,"re") == 0) num = 14;
-    else if (strcasecmp(token,"rf") == 0) num = 15;
-    else if (strcasecmp(token,"r10") == 0) num = 10;
-    else if (strcasecmp(token,"r11") == 0) num = 11;
-    else if (strcasecmp(token,"r12") == 0) num = 12;
-    else if (strcasecmp(token,"r13") == 0) num = 13;
-    else if (strcasecmp(token,"r14") == 0) num = 14;
-    else if (strcasecmp(token,"$") == 0) num = asmAddress;
-    else if (strcasecmp(token,"[stack]") == 0) {
-printf("Disallowed use of [stack]\n");
-exit(1);
-      }
-    else if (strcasecmp(token,"[estack]") == 0) {
-printf("Disallowed use of [estack]\n");
-exit(1);
-      }
-    else if (strcasecmp(token,"[iobuffer]") == 0) {
-printf("Disallowed use of [iobuffer]\n");
-exit(1);
-      }
-    else if (token[0] == '\'' && strlen(token) == 3) num = token[1];
-    else if (token[0] == '[') {
-printf("Disallowed use of [%s]\n",token);
-exit(1);
-      }
-    else if (token[0] == '<') {
-printf("Disallowed use of <%s>\n",token);
-exit(1);
-      }
-    else if (token[0] >= 'a' && token[0] <= 'z') num = getLabel(token);
-    else if (token[0] >= 'A' && token[0] <= 'Z') num = getLabel(token);
-    else if (token[0] >= '0' && token[0] <= '9') num = convertNumber(token);
-    else {
-      printf("<ASM>Expression error: %s\n",token);
-      exit(1);
-      }
-    switch (op) {
-      case '+': ret += num; break;
-      case '-': ret -= num; break;
-      case '*': ret *= num; break;
-      case '/': ret /= num; break;
-      case '%': ret %= num; break;
-      case '&': ret &= num; break;
-      case '|': ret |= num; break;
-      case '^': ret ^= num; break;
-      case '.': ret = (num == 0) ? ret & 0xff : ret >> 8; break;
-      case ' ': ret = num; break;
-      }
-    args = trim(args);
-    if (*args == '+') op = '+';
-    else if (*args == '-') op = '-';
-    else if (*args == '*') op = '*';
-    else if (*args == '/') op = '/';
-    else if (*args == '%') op = '%';
-    else if (*args == '&') op = '&';
-    else if (*args == '|') op = '|';
-    else if (*args == '^') op = '^';
-    else if (*args == '.') op = '.';
-    else if (*args == 0) op = ' ';
-    else {
-      printf("<ASM>Invalid operator encountered: %c\n",*args);
-      exit(1);
-      }
-    if (op != ' ') args++;
-    args = trim(args);
-    }
-  return ret;
+dword processArgs(char* args) {
+  args = asm_evaluate(args);
+  return asm_numStack[0];
   }
 
 void processDb(char* args,char typ) {
-  int  qt;
-  int  pos;
-  word num;
-  char token[256];
+  dword num;
   args = trim(args);
   while (*args != 0) {
-    pos = 0;
-    qt = 0;
-    while (*args != 0 && (*args != ',' || qt != 0)) {
-      if (*args == '\'') qt = (qt) ? 0 : 1;
-      token[pos++] = *args++;
-      }
-    token[pos] = 0;
-    while (strlen(token) > 0 && token[strlen(token)-1] <= ' ') token[strlen(token)-1] = 0;
-    if (token[0] >= '0' && token[0] <= '9') {
-      if (token[strlen(token)-1] == 'h' ||
-          token[strlen(token)-1] == 'H') {
-        token[strlen(token)-1] = 0;
-        num = 0;
-        pos = 0;
-        while ((token[pos] >= 'a' && token[pos] <= 'f') ||
-               (token[pos] >= 'A' && token[pos] <= 'F') ||
-               (token[pos] >= '0' && token[pos] <= '9')) {
-          if (token[pos] >= '0' && token[pos] <= '9') num = (num << 4) + (token[pos] - '0');
-          if (token[pos] >= 'a' && token[pos] <= 'f') num = (num << 4) + (token[pos] - 'a' + 10);
-          if (token[pos] >= 'A' && token[pos] <= 'F') num = (num << 4) + (token[pos] - 'A' + 10);
-          pos++;
-          }
-        if (token[pos] != 0) {
-          printf("<ASM>Unknown data in DB list: %s\n",token);
-          exit(1);
-          }
-        if (typ == 'B') output(num & 0xff);
-        else if (typ == 'W') {
-          output(num/256);
-          output(num%256);
-          }
-        else {
-          output(0);
-          output(0);
-          output(num/256);
-          output(num%256);
-          }
-        }
-      else {
-        num = 0;
-        pos = 0;
-        while (token[pos] >= '0' && token[pos] <= '9') {
-          num = (num * 10) + (token[pos] - '0');
-          pos++;
-          }
-        if (token[pos] != 0) {
-          printf("<ASM>Unknown data in DB list: %s\n",token);
-          exit(1);
-          }
-        if (typ == 'B') output(num & 0xff);
-        else if (typ == 'W') {
-          output(num/256);
-          output(num%256);
-          }
-        else {
-          output(0);
-          output(0);
-          output(num/256);
-          output(num%256);
-          }
-        }
-      }
-    else if (token[0] == '[') {
-printf("Disallowed use of [] in DB\n");
-      }
-    else if (token[0] == '<') {
-printf("Disallowed use of <> in DB\n");
-      }
-    else if (token[0] == '\'') {
-      for (pos=0; pos<strlen(token); pos++)
-        if (token[pos] != '\'') output(token[pos]);
+    if (*args == '\'' && *(args+2) != '\'') {
+      args++;
+      while (*args != 0 && *args != '\'')
+        output(*args++);
+      if (*args == '\'') args++;
       }
     else {
-      num = getLabel(token);
+      args = asm_evaluate(args);
+      num = asm_numStack[0];
       if (typ == 'B') output(num & 0xff);
       else if (typ == 'W') {
-        output(num/256);
-        output(num%256);
+        output(((num & 0x0000FF00) >> 8) & 0xff);
+        output(num & 0xff);
         }
       else {
-        output(0);
-        output(0);
-        output(num/256);
-        output(num%256);
+        output(((num & 0xff000000) >> 24) & 0xff);
+        output(((num & 0x00ff0000) >> 16) & 0xff);
+        output(((num & 0x0000FF00) >> 8) & 0xff);
+        output(num & 0xff);
         }
-//      printf("<ASM>Unknown data in DB list: %s\n",token);
-//      exit(1);
       }
-    
     args = trim(args);
-    if (*args == ',') args++;
-    args = trim(args);
+    if (*args == ',') {
+      args++;
+      args = trim(args);
+      }
     }
   }
 
@@ -487,10 +717,11 @@ void Asm(char* line) {
   char  opcode[32];
   char  args[128];
   char  buffer[256];
-  word  value;
+  dword  value;
   FILE* file;
   int   i;
   orig = line;
+  sourceLine = line;
   if (numNests > 0) {
     if (strncasecmp(line,"#else",5) == 0 && nests[numNests-1] != 'I') {
       nests[numNests-1] = (nests[numNests-1] == 'Y') ? 'N' : 'Y';

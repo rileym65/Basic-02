@@ -31,6 +31,7 @@ void writeAsm(char* line,char* rem) {
     }
   }
 
+/*
 void writeOutput() {
   int i;
   byte checksum;
@@ -102,6 +103,7 @@ void output(byte value) {
     }
   address++;
   }
+*/
 
 int main(int argc, char** argv, char** envp) {
   int i;
@@ -140,6 +142,7 @@ int main(int argc, char** argv, char** envp) {
   use1805 = 0;
   use32Bits = 0;
   useFp = 0;
+  createLst = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
   lblF_read = 0xff06;

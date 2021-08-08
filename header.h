@@ -126,6 +126,7 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int   dword;
 
+LINK char   createLst;
 LINK word   address;
 LINK int    asmFile;
 LINK char   asmName[1024];
@@ -275,6 +276,7 @@ extern void writeAsm(char* line,char* rem);
 extern word getLabel(char* label);
 extern void addDefine(char* define, int value, int redefine);
 extern int  getDefine(char* define);
+extern void writeOutput();
 
 #endif
 

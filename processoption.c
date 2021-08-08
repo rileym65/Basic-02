@@ -43,6 +43,7 @@ void processOption(char* option) {
     if (strcmp(option,"-r") == 0) outMode = 'R';
     if (strcmp(option,"-R") == 0) showRuntime = -1;
     if (strcmp(option,"-l") == 0) showList = -1;
+    if (strcmp(option,"-L") == 0) createLst = -1;
     if (strcmp(option,"-c") == 0) showCompiler = -1;
     if (strcmp(option,"-s") == 0) showSymbols = -1;
     if (strcmp(option,"-v") == 0) showVariables = -1;

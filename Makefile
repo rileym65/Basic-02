@@ -1,6 +1,6 @@
 PROJECT = sbc
 CC = gcc
-DEFS =
+DEFS = -Wall
 INCS =
 INCDIR =
 LIBS =

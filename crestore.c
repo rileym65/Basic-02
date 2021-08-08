@@ -55,17 +55,17 @@ char* crestore(char* line) {
 
   addr = dataAddress + (pos * 2);
   if (use32Bits) {
-    sprintf(buffer,"          ldi   %d*4+data.1             ; Need a SEP R3 command",pos); Asm(buffer);
+    sprintf(buffer,"          ldi   (%d*4+data).1           ; Need a SEP R3 command",pos); Asm(buffer);
     Asm("          str   rf");
     Asm("          inc   rf");
-    sprintf(buffer,"          ldi   %d*4+data.0",pos); Asm(buffer);
+    sprintf(buffer,"          ldi   (%d*4+data).0",pos); Asm(buffer);
     Asm("          str   rf");
     }
   else {
-    sprintf(buffer,"          ldi   %d*2+data.1             ; Need a SEP R3 command",pos); Asm(buffer);
+    sprintf(buffer,"          ldi   (%d*2+data).1           ; Need a SEP R3 command",pos); Asm(buffer);
     Asm("          str   rf");
     Asm("          inc   rf");
-    sprintf(buffer,"          ldi   %d*2+data.0",pos); Asm(buffer);
+    sprintf(buffer,"          ldi   (%d*2+data).0",pos); Asm(buffer);
     Asm("          str   rf");
     }
   return line;
