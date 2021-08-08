@@ -12,13 +12,10 @@
 
 char* con(char* line) {
   int  i;
-  word nxt;
   char mode;
-  word lineNum;
   word addr;
   word lines[256];
   int  lineCount;
-  int  pos;
   line = cexpr(line, 0);
   line = trim(line);
   if (strncasecmp(line,"goto",4) == 0) {

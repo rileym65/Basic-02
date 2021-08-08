@@ -11,8 +11,6 @@
 #include "header.h"
 
 char* cout(char* line) {
-  int  pos;
-  word addr;
   line = cexpr(line, 0);
   line = trim(line);
   if (*line != ',') {

@@ -175,6 +175,7 @@ word asm_nstackSize;
 byte asm_tokens[64];
 byte asm_numTokens;
 char *sourceLine;
+word lstCount;
 
 void writeOutput() {
   int i;
@@ -243,6 +244,18 @@ void output(byte value) {
       writeOutput();
       outCount = 0;
       outAddress = address+1;
+      }
+    if (createLst != 0) {
+      if (lstCount == 4) {
+        fprintf(lstFile,"%s\n",sourceLine);
+        fprintf(lstFile,"      ");
+        }
+      else if (lstCount > 4 && (lstCount % 4) == 0) {
+        fprintf(lstFile,"\n");
+        fprintf(lstFile,"      ");
+        }
+      fprintf(lstFile,"%02x ",value);
+      lstCount++;
       }
     }
   address++;
@@ -838,6 +851,8 @@ void Asm(char* line) {
     addLabel(label, address);
     }
   if (strlen(opcode) > 0) {
+    if (passNumber == 2 && createLst != 0) fprintf(lstFile, "%04x: ",asmAddress);
+    lstCount = 0;
     i = 0;
     pos = -1;
     while (pos < 0 && opcodes[i].opcode[0] != 0) {
@@ -907,6 +922,16 @@ void Asm(char* line) {
            printf("<ASM>Unknown instruction type: %d\n",opcodes[pos].typ);
            exit(1);
            break;
+      }
+    if (passNumber == 2 && createLst != 0) {
+      if (lstCount <= 4) {
+        while (lstCount < 4) {
+          fprintf(lstFile,"   ");
+          lstCount++;
+          }
+        fprintf(lstFile,"%s",sourceLine);
+        }
+      fprintf(lstFile, "\n");
       }
     }
   }

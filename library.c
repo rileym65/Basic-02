@@ -16,8 +16,7 @@
 void library() {
   int  i;
   char ctmp;
-  word a;
-  word t1,t2,t3,t4;
+  word t1,t2,t3;
   FILE* file;
   ctmp = showCompiler;
   showCompiler = 0;
@@ -137,20 +136,20 @@ void library() {
     Asm("          str  rf");
     Asm("          inc  rf");
     }
-  sprintf(buffer,"          ldi  END__.1",t1/256); Asm(buffer);
+  Asm("          ldi  END__.1");
   Asm("          str  rf");
   Asm("          inc  rf");
-  sprintf(buffer,"          ldi  END__.0",t1%256); Asm(buffer);
+  Asm("          ldi  END__.0");
   Asm("          str  rf");
   if (useData) {
-    sprintf(buffer,"          ldi  DATA_.1",a/256); Asm(buffer);
+    Asm("          ldi  DATA_.1");
     Asm("          phi  rf");
-    sprintf(buffer,"          ldi  DATA_.0",a%256); Asm(buffer);
+    Asm("          ldi  DATA_.0");
     Asm("          plo  rf");
-    sprintf(buffer,"          ldi  data.1",dataAddress/256); Asm(buffer);
+    Asm("          ldi  data.1");
     Asm("          str  rf");
     Asm("          inc  rf");
-    sprintf(buffer,"          ldi  data.0",dataAddress%256); Asm(buffer);
+    Asm("          ldi  data.0");
     Asm("          str  rf");
     }
   if (getDefine("HEAP")) {

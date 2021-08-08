@@ -25,7 +25,7 @@ char* cinput(char* line) {
       }
     return line;
     }
-  if (*line = '"') {
+  if (*line == '"') {
     Asm("          sep   scall                   ; Display prompt");
     Asm("          dw    f_inmsg");
     strcpy(buffer,"          db    '");

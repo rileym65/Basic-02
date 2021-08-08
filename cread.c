@@ -14,8 +14,6 @@ char* cread(char* line) {
   word last;
   int  pos;
   word addr;
-  word num;
-  char neg;
   char token[128];
   last = 0xffff;
   line = trim(line);

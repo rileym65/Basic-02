@@ -117,6 +117,7 @@ Switches:
 -c              - show compiler output
 -i              - output as Intel hex
 -l              - show source list
+-L              - create .lst file
 -r              - output as RCS hex
 -R              - show runtime modules
 -s              - show assembler symbols

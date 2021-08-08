@@ -14,11 +14,7 @@ char* crestore(char* line) {
   int  i;
   word pos;
   word num;
-  word addr;
-  char hasVar;
-  char varname[256];
   line = trim(line);
-  hasVar = 0;
   pos = 0;
   if (passNumber == 2) {
     if (*line != ':' && *line != 0) {
@@ -53,7 +49,6 @@ char* crestore(char* line) {
   Asm("          ldi   DATA_.0");
   Asm("          plo   rf");
 
-  addr = dataAddress + (pos * 2);
   if (use32Bits) {
     sprintf(buffer,"          ldi   (%d*4+data).1           ; Need a SEP R3 command",pos); Asm(buffer);
     Asm("          str   rf");

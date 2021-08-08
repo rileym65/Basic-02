@@ -11,7 +11,6 @@
 #include "header.h"
 
 char* casm(char* line) {
-  int  i;
   char flag;
   char aline[2048];
   char *pline;

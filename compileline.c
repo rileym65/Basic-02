@@ -14,6 +14,8 @@ int compileLine(char* line) {
   word l;
   listCount = 0;
   if (showCompiler && passNumber == 2) printf("%04x:",address);
+  if (passNumber == 2 && createLst)
+    fprintf(lstFile,"                  ; %s\n",line);
   if (passNumber == 2 && useAsm) {
     sprintf(buffer,"; %s",line); writeAsm(buffer,"");
     }

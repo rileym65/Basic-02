@@ -11,8 +11,6 @@
 #include "header.h"
 
 char* cdata(char* line) {
-  int  pos;
-  word addr;
   word num;
   char neg;
   if (passNumber == 1) {

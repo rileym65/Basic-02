@@ -11,7 +11,6 @@
 #include "header.h"
 
 char* cq(char* line) {
-  word addr;
   line = trim(line);
   if (match(line,"#")) {
     if (atoi(line) > 0) {

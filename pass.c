@@ -12,7 +12,6 @@
 
 int pass(char* filename) {
   int   i;
-  word  target;
   char  tmp[16];
   source = fopen(filename,"r");
   if (source == NULL) {
@@ -109,5 +108,6 @@ int pass(char* filename) {
     }
     
   Asm("end__:    equ   $");
+  return(0);
   }
 

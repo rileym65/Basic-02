@@ -225,5 +225,6 @@ int prepass(char* filename) {
   if (SERP == BN4) addDefine("SEREF4I",1,1);
 
   printf("\n");
+  return(0);
   }
 

@@ -11,8 +11,6 @@
 #include "header.h"
 
 char* cend(char* line) {
-  word target;
-  target = address;
   if (useStg) {
     Asm("            ldi  [STG_].1");
     Asm("            phi  rf");

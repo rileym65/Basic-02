@@ -11,8 +11,6 @@
 #include "header.h"
 
 char* clocate(char* line) {
-  int  pos;
-  word addr;
   Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
   Asm("          phi   rd");
   Asm("          ldi   iobuffer.0");

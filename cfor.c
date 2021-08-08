@@ -16,7 +16,6 @@ char* cfor(char* line) {
   int  pos;
   word vaddr;
   word addr;
-  word value;
   dword start;
   dword end;
   dword step;

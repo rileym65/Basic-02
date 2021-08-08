@@ -163,6 +163,7 @@ LINK word   lineNumber;
 LINK word   lineNumbers[16384];
 LINK word   lineAddresses[16384];
 LINK word   listCount;
+LINK char   lstName[1024];
 LINK char   matches[10][64];
 LINK int    matchCount;
 LINK word   numberOfLines;
@@ -212,6 +213,7 @@ LINK char  *variableTypes;
 LINK word   variableNextAddress;
 LINK word   variableRAM;
 LINK word   variableStart;
+LINK FILE  *lstFile;
 
 LINK char** defines;
 LINK int*   defineValues;

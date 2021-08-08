@@ -190,6 +190,8 @@ int main(int argc, char** argv, char** envp) {
     }
   strcpy(asmName,baseName);
   strcat(asmName,".asm");
+  strcpy(lstName,baseName);
+  strcat(lstName,".lst");
   printf("out: %s\n",outName);
   if (programStart == 0xffff) programStart = 0x0000;
   if (programStart >= ramStart && programStart <= ramEnd) compMode = 'A';
@@ -253,6 +255,7 @@ int main(int argc, char** argv, char** envp) {
     exit(1);
     }
   if (useAsm) asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
+  if (createLst) lstFile = fopen(lstName,"w");
   pass(sourceFile);
   if (outCount > 0) writeOutput();
   close(outFile);
@@ -426,5 +429,6 @@ int main(int argc, char** argv, char** envp) {
       printf("  %-20s  %04xh\n",labels[i], labelValues[i]);
       }
     }
+  if (createLst) fclose(lstFile);
   }
 
