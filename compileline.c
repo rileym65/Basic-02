@@ -23,9 +23,7 @@ int compileLine(char* line) {
     return -1;
     }
   line = getNumber(line, &l);
-  if (passNumber == 2 && useAsm) {
-    sprintf(buffer,"l%d:",l); writeAsm(buffer,"");
-    }
+  sprintf(buffer,"l_%d:",l); Asm(buffer);
   if (l == 0 || l > 65535) {
     showError("Error: Invalid line number");
     return -1;

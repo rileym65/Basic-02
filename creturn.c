@@ -24,10 +24,10 @@ char* creturn(char* line) {
       showError("Line number not found");
       exit(1);
       }
-    sprintf(buffer,"          ldi   %d                      ; Set line number for return", target / 256);
+    sprintf(buffer,"          ldi   l_%d.1                    ; Set line number for return", lineno);
     Asm(buffer);
     Asm("          phi   r6");
-    sprintf(buffer,"          ldi   %d", target % 256);
+    sprintf(buffer,"          ldi   l_%d.0", lineno);
     Asm(buffer);
     Asm("          plo   r6");
     }

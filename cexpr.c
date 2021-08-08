@@ -446,9 +446,9 @@ int reduce(char last) {
              Asm("           str     r7");
              Asm("           dec     r7");
              }
-           Asm("           ldi     [HEAP_].1           ; Get address of heap");
+           Asm("           ldi     HEAP_.1             ; Get address of heap");
            Asm("           phi     rf");
-           Asm("           ldi     [HEAP_].0");
+           Asm("           ldi     HEAP_.0");
            Asm("           plo     rf");
            Asm("           lda     rf                  ; Retrieve free memory address");
            Asm("           str     r7");
@@ -473,9 +473,9 @@ int reduce(char last) {
            Asm("           dec     r7");
            }
          if (use32Bits) {
-           Asm("           ldi     [FREE_]+2.1           ; Get address of free memory");
+           Asm("           ldi     FREE_+2.1             ; Get address of free memory");
            Asm("           phi     rf");
-           Asm("           ldi     [FREE_]+2.0");
+           Asm("           ldi     FREE_+2.0");
            Asm("           plo     rf");
            Asm("           ldi     0                   ; High word is zero");
            Asm("           str     r7");
@@ -484,9 +484,9 @@ int reduce(char last) {
            Asm("           dec     r7");
            }
          else {
-           Asm("           ldi     [FREE_].1           ; Get address of free memory");
+           Asm("           ldi     FREE_.1             ; Get address of free memory");
            Asm("           phi     rf");
-           Asm("           ldi     [FREE_].0");
+           Asm("           ldi     FREE_.0");
            Asm("           plo     rf");
            }
          Asm("           lda     rf                  ; Retrieve free memory address");
@@ -978,9 +978,9 @@ char* evaluate(char* buffer) {
         if (fp) tokens[numTokens++] = OP_NUMFP;
           else tokens[numTokens++] = OP_NUM;
         number = getVariable(token);
-        sprintf(abuffer,"           ldi     [%s].1              ; Push variable onto expr stack",token); Asm(abuffer);
+        sprintf(abuffer,"           ldi     v_%s.1              ; Push variable onto expr stack",token); Asm(abuffer);
         Asm("           phi     rf");
-        sprintf(abuffer,"           ldi     [%s].0",token); Asm(abuffer);
+        sprintf(abuffer,"           ldi     v_%s.0",token); Asm(abuffer);
         Asm("           plo     rf");
         if (use32Bits) {
           Asm("           sex     r7");
@@ -1154,9 +1154,9 @@ char* cexpr(char* line, int etype) {
     token[pos] = 0;
     if (*temp == ',' || *temp == ';' || *temp == 0) {
       num = getVariable(token);
-      sprintf(buffer,"           ldi     [%s].1              ; Set expression to variable value",token); Asm(buffer);
+      sprintf(buffer,"           ldi     v_%s.1              ; Set expression to variable value",token); Asm(buffer);
       Asm("           phi     rf");
-      sprintf(buffer,"           ldi     [%s].0",token); Asm(buffer);
+      sprintf(buffer,"           ldi     v_%s.0",token); Asm(buffer);
       Asm("           plo     rf");
       if (use32Bits) {
         for (i=0; i<4; i++) {

@@ -10,6 +10,149 @@
 
 #include "header.h"
 
+typedef struct {
+  char opcode[5];
+  byte typ;
+  byte byte1;
+  } OPCODE;
+
+#define OT_0ARG    0
+#define OT_1ARG    1
+#define OT_LBR     2
+#define OT_DB      3
+#define OT_DS      4
+#define OT_NARG    5
+#define OT_EQU     6
+#define OT_ORG     7
+#define OT_680ARG  8
+#define OT_681ARG  9
+#define OT_68NARG 10
+#define OT_682ARG 11
+
+OPCODE opcodes[] = {
+  { "adc",   OT_0ARG,   ADC   },
+  { "adci",  OT_1ARG,   ADCI  },
+  { "add",   OT_0ARG,   ADD   },
+  { "adi",   OT_1ARG,   ADI   },
+  { "and",   OT_0ARG,   AND   },
+  { "ani",   OT_1ARG,   ANI   },
+  { "b1",    OT_1ARG,   B1    },
+  { "b2",    OT_1ARG,   B2    },
+  { "b3",    OT_1ARG,   B3    },
+  { "b4",    OT_1ARG,   B4    },
+  { "bdf",   OT_1ARG,   BDF   },
+  { "bn1",   OT_1ARG,   BN1   },
+  { "bn2",   OT_1ARG,   BN2   },
+  { "bn3",   OT_1ARG,   BN3   },
+  { "bn4",   OT_1ARG,   BN4   },
+  { "bnf",   OT_1ARG,   BNF   },
+  { "bnq",   OT_1ARG,   BNQ   },
+  { "bnz",   OT_1ARG,   BNZ   },
+  { "bq",    OT_1ARG,   BQ    },
+  { "br",    OT_1ARG,   BR    },
+  { "bz",    OT_1ARG,   BZ    },
+  { "db",    OT_DB,     'B'   },
+  { "dw",    OT_DB,     'W'   },
+  { "dd",    OT_DB,     'D'   },
+  { "ds",    OT_DS,     0     },
+  { "dec",   OT_NARG,   DEC   },
+  { "dis",   OT_0ARG,   DIS   },
+  { "equ",   OT_EQU,    0     },
+  { "ghi",   OT_NARG,   GHI   },
+  { "glo",   OT_NARG,   GLO   },
+  { "idl",   OT_0ARG,   IDL   },
+  { "inc",   OT_NARG,   INC   },
+  { "inp",   OT_NARG,   INP   },
+  { "irx",   OT_0ARG,   IRX   },
+  { "lda",   OT_NARG,   LDA   },
+  { "lbdf",  OT_LBR,    LBDF  },
+  { "lbnf",  OT_LBR,    LBNF  },
+  { "lbnq",  OT_LBR,    LBNQ  },
+  { "lbnz",  OT_LBR,    LBNZ  },
+  { "lbq",   OT_LBR,    LBQ   },
+  { "lbr",   OT_LBR,    LBR   },
+  { "lbz",   OT_LBR,    LBZ   },
+  { "ldi",   OT_1ARG,   LDI   },
+  { "ldn",   OT_NARG,   LDN   },
+  { "ldx",   OT_0ARG,   LDX   },
+  { "ldxa",  OT_0ARG,   LDXA  },
+  { "lsdf",  OT_0ARG,   LSDF  },
+  { "lsie",  OT_0ARG,   LSIE  },
+  { "lskp",  OT_0ARG,   NLBR  },
+  { "lsnf",  OT_0ARG,   LSNF  },
+  { "lsnq",  OT_0ARG,   LSNQ  },
+  { "lsnz",  OT_0ARG,   LSNZ  },
+  { "lsq",   OT_0ARG,   LSQ   },
+  { "lsz",   OT_0ARG,   LSZ   },
+  { "mark",  OT_0ARG,   MARK  },
+  { "nbr",   OT_0ARG,   NBR   },
+  { "nlbr",  OT_0ARG,   NLBR  },
+  { "nop",   OT_0ARG,   NOP   },
+  { "or",    OT_0ARG,   OR    },
+  { "ori",   OT_1ARG,   ORI   },
+  { "out",   OT_NARG,   OUT   },
+  { "phi",   OT_NARG,   PHI   },
+  { "plo",   OT_NARG,   PLO   },
+  { "req",   OT_0ARG,   REQ   },
+  { "ret",   OT_0ARG,   RET   },
+  { "sav",   OT_0ARG,   SAV   },
+  { "sd",    OT_0ARG,   SD    },
+  { "sdb",   OT_0ARG,   SDB   },
+  { "sdi",   OT_1ARG,   SDI   },
+  { "sdbi",  OT_1ARG,   SDBI  },
+  { "sep",   OT_NARG,   SEP   },
+  { "seq",   OT_0ARG,   SEQ   },
+  { "sex",   OT_NARG,   SEX   },
+  { "shl",   OT_0ARG,   SHL   },
+  { "shlc",  OT_0ARG,   SHLC  },
+  { "shr",   OT_0ARG,   SHR   },
+  { "shrc",  OT_0ARG,   SHRC  },
+  { "skp",   OT_0ARG,   NBR   },
+  { "sm",    OT_0ARG,   SM    },
+  { "smb",   OT_0ARG,   SMB   },
+  { "smbi",  OT_1ARG,   SMBI  },
+  { "smi",   OT_1ARG,   SMI   },
+  { "str",   OT_NARG,   STR   },
+  { "stxd",  OT_0ARG,   STXD  },
+  { "xor",   OT_0ARG,   XOR   },
+  { "xri",   OT_1ARG,   XRI   },
+  { "org",   OT_ORG,    0     },
+  { "rldi",  OT_68NARG, 0xc0  },
+  { "rlxa",  OT_68NARG, 0x60  },
+  { "rsxd",  OT_68NARG, 0xa0  },
+  { "dbnz",  OT_682ARG, 0x20  },
+  { "rnx",   OT_68NARG, 0xb0  },
+  { "dadd",  OT_680ARG, 0xf4  },
+  { "dadi",  OT_681ARG, 0xfc  },
+  { "dadc",  OT_680ARG, 0x74  },
+  { "daci",  OT_681ARG, 0x7c  },
+  { "dsm",   OT_680ARG, 0xf7  },
+  { "dsmi",  OT_681ARG, 0xff  },
+  { "dsmb",  OT_680ARG, 0x77  },
+  { "dsbi",  OT_681ARG, 0x7f  },
+  { "bci",   OT_681ARG, 0x3e  },
+  { "bxi",   OT_681ARG, 0x3f  },
+  { "ldc",   OT_680ARG, 0x06  },
+  { "gec",   OT_680ARG, 0x08  },
+  { "stpc",  OT_680ARG, 0x00  },
+  { "dtc",   OT_680ARG, 0x01  },
+  { "stm",   OT_680ARG, 0x07  },
+  { "scm1",  OT_680ARG, 0x05  },
+  { "scm2",  OT_680ARG, 0x03  },
+  { "spm1",  OT_680ARG, 0x04  },
+  { "spm2",  OT_680ARG, 0x02  },
+  { "etq",   OT_680ARG, 0x09  },
+  { "xie",   OT_680ARG, 0x0a  },
+  { "xid",   OT_680ARG, 0x0b  },
+  { "cie",   OT_680ARG, 0x0c  },
+  { "cid",   OT_680ARG, 0x0d  },
+  { "dsav",  OT_680ARG, 0x76  },
+  { "scal",  OT_682ARG, 0x80  },
+  { "sret",  OT_680ARG, 0x90  },
+  { "",      0,         0     },
+  };
+
+
 void addDefine(char* define, int value, int redefine) {
   int i;
   if (passNumber == 2) return;
@@ -165,30 +308,26 @@ word processArgs(char* args) {
     else if (strcasecmp(token,"r13") == 0) num = 13;
     else if (strcasecmp(token,"r14") == 0) num = 14;
     else if (strcasecmp(token,"$") == 0) num = asmAddress;
-    else if (strcasecmp(token,"[stack]") == 0) num = stack;
-    else if (strcasecmp(token,"[estack]") == 0) num = estack;
-    else if (strcasecmp(token,"[iobuffer]") == 0) num = keyBuffer;
+    else if (strcasecmp(token,"[stack]") == 0) {
+printf("Disallowed use of [stack]\n");
+exit(1);
+      }
+    else if (strcasecmp(token,"[estack]") == 0) {
+printf("Disallowed use of [estack]\n");
+exit(1);
+      }
+    else if (strcasecmp(token,"[iobuffer]") == 0) {
+printf("Disallowed use of [iobuffer]\n");
+exit(1);
+      }
     else if (token[0] == '\'' && strlen(token) == 3) num = token[1];
     else if (token[0] == '[') {
-      pos = 0;
-      while (token[pos+1] != 0 && token[pos+1] != ']') {
-        token[pos] = token[pos+1];
-        pos++;
-        }
-      token[pos] = 0;
-      num = getVariable(token);
+printf("Disallowed use of [%s]\n",token);
+exit(1);
       }
     else if (token[0] == '<') {
-      pos = 0;
-      while (token[pos+1] != 0 && token[pos+1] != '>') {
-        token[pos] = token[pos+1];
-        pos++;
-        }
-      token[pos] = 0;
-      if (findLine(atoi(token), &num)) {
-        printf("<ASM>Line number not found: %s\n",token);
-        exit(1);
-        }
+printf("Disallowed use of <%s>\n",token);
+exit(1);
       }
     else if (token[0] >= 'a' && token[0] <= 'z') num = getLabel(token);
     else if (token[0] >= 'A' && token[0] <= 'Z') num = getLabel(token);
@@ -264,7 +403,13 @@ void processDb(char* args,char typ) {
           exit(1);
           }
         if (typ == 'B') output(num & 0xff);
+        else if (typ == 'W') {
+          output(num/256);
+          output(num%256);
+          }
         else {
+          output(0);
+          output(0);
           output(num/256);
           output(num%256);
           }
@@ -281,42 +426,23 @@ void processDb(char* args,char typ) {
           exit(1);
           }
         if (typ == 'B') output(num & 0xff);
+        else if (typ == 'W') {
+          output(num/256);
+          output(num%256);
+          }
         else {
+          output(0);
+          output(0);
           output(num/256);
           output(num%256);
           }
         }
       }
     else if (token[0] == '[') {
-      pos = 0;
-      while (token[pos+1] != 0 && token[pos+1] != ']') {
-        token[pos] = token[pos+1];
-        pos++;
-        }
-      token[pos] = 0;
-      num = getVariable(token);
-      if (typ == 'B') output(num & 0xff);
-      else {
-        output(num/256);
-        output(num%256);
-        }
+printf("Disallowed use of [] in DB\n");
       }
     else if (token[0] == '<') {
-      pos = 0;
-      while (token[pos+1] != 0 && token[pos+1] != '>') {
-        token[pos] = token[pos+1];
-        pos++;
-        }
-      token[pos] = 0;
-      if (findLine(atoi(token), &num)) {
-        printf("<ASM>Line number not found: %s\n",token);
-        exit(1);
-        }
-      if (typ == 'B') output(num & 0xff);
-      else {
-        output(num/256);
-        output(num%256);
-        }
+printf("Disallowed use of <> in DB\n");
       }
     else if (token[0] == '\'') {
       for (pos=0; pos<strlen(token); pos++)
@@ -325,7 +451,13 @@ void processDb(char* args,char typ) {
     else {
       num = getLabel(token);
       if (typ == 'B') output(num & 0xff);
+      else if (typ == 'W') {
+        output(num/256);
+        output(num%256);
+        }
       else {
+        output(0);
+        output(0);
         output(num/256);
         output(num%256);
         }
@@ -339,9 +471,12 @@ void processDb(char* args,char typ) {
     }
   }
 
-void processDs(char* args) {
-  int size;
-  size = atoi(args);
+void processDs(word arg) {
+  address += arg;
+  }
+
+void processOrg(word arg) {
+  address = arg;
   }
 
 void Asm(char* line) {
@@ -351,7 +486,9 @@ void Asm(char* line) {
   char  label[32];
   char  opcode[32];
   char  args[128];
+  char  buffer[256];
   word  value;
+  FILE* file;
   int   i;
   orig = line;
   if (numNests > 0) {
@@ -402,6 +539,23 @@ void Asm(char* line) {
       }
     }
 
+  if (strncasecmp(line, "#include",8) == 0) {
+    line += 8;
+    while (*line == ' ' || *line == 9) line++;
+    file = fopen(line,"r");
+    if (file == NULL) {
+      printf("Could not open include file: %s\n",line);
+      exit(1);
+      }
+    while (fgets(buffer, 256, file) != NULL) {
+      while (strlen(buffer) > 0 && buffer[strlen(buffer)-1] < 32)
+        buffer[strlen(buffer)-1] = 0;
+      Asm(buffer);
+      }
+    fclose(file);
+    return;
+    }
+
   asmAddress = address;
   if (passNumber == 2) {
     if (showAsm) printf("%s\n",line);
@@ -419,7 +573,7 @@ void Asm(char* line) {
     while ((*line >= 'a' && *line <= 'z') ||
            (*line >= 'A' && *line <= 'Z') ||
            (*line >= '0' && *line <= '9') ||
-           *line == '_') {
+           *line == '_' || *line == '!') {
       label[pos++] = *line++;
       }
     label[pos] = 0;
@@ -453,451 +607,75 @@ void Asm(char* line) {
     addLabel(label, address);
     }
   if (strlen(opcode) > 0) {
-    if (strcasecmp(opcode,"adc") == 0) {
-      output(ADC);
-      }
-    else if (strcasecmp(opcode,"adci") == 0) {
-      output(ADCI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"add") == 0) {
-      output(ADD);
-      }
-    else if (strcasecmp(opcode,"adi") == 0) {
-      output(ADI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"and") == 0) {
-      output(AND);
-      }
-    else if (strcasecmp(opcode,"ani") == 0) {
-      output(ANI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"b1") == 0) {
-      output(B1);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"b2") == 0) {
-      output(B2);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"b3") == 0) {
-      output(B3);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"b4") == 0) {
-      output(B4);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bdf") == 0) {
-      output(BDF);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bn1") == 0) {
-      output(BN1);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bn2") == 0) {
-      output(BN2);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bn3") == 0) {
-      output(BN3);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bn4") == 0) {
-      output(BN4);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bnf") == 0) {
-      output(BNF);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bnq") == 0) {
-      output(BNQ);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bnz") == 0) {
-      output(BNZ);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bq") == 0) {
-      output(BQ);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"br") == 0) {
-      output(BR);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"bz") == 0) {
-      output(BZ);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"db") == 0) {
-      processDb(args,'B');
-      }
-    else if (strcasecmp(opcode,"dw") == 0) {
-      processDb(args,'W');
-      }
-    else if (strcasecmp(opcode,"ds") == 0) {
-      processDs(args);
-      }
-    else if (strcasecmp(opcode,"dec") == 0) {
-      output(DEC+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"dis") == 0) {
-      output(DIS);
-      }
-    else if (strcasecmp(opcode,"equ") == 0) {
-      value = processArgs(args);
-      setLabel(label, value);
-      }
-    else if (strcasecmp(opcode,"ghi") == 0) {
-      output(GHI+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"glo") == 0) {
-      output(GLO+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"idl") == 0) {
-      output(IDL);
-      }
-    else if (strcasecmp(opcode,"inc") == 0) {
-      output(INC+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"inp") == 0) {
-      output(INP+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"irx") == 0) {
-      output(IRX);
-      }
-    else if (strcasecmp(opcode,"lda") == 0) {
-      output(LDA+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"lbdf") == 0) {
-      value = processArgs(args);
-      output(LBDF);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"lbnf") == 0) {
-      value = processArgs(args);
-      output(LBNF);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"lbnq") == 0) {
-      value = processArgs(args);
-      output(LBNQ);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"lbnz") == 0) {
-      value = processArgs(args);
-      output(LBNZ);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"lbq") == 0) {
-      value = processArgs(args);
-      output(LBQ);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"lbr") == 0) {
-      value = processArgs(args);
-      output(LBR);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"lbz") == 0) {
-      value = processArgs(args);
-      output(LBZ);
-      output(value/256);
-      output(value%256);
-      }
-    else if (strcasecmp(opcode,"ldi") == 0) {
-      output(LDI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"ldn") == 0) {
-      output(LDN+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"ldx") == 0) {
-      output(LDX);
-      }
-    else if (strcasecmp(opcode,"ldxa") == 0) {
-      output(LDXA);
-      }
-    else if (strcasecmp(opcode,"lsdf") == 0) {
-      output(LSDF);
-      }
-    else if (strcasecmp(opcode,"lsie") == 0) {
-      output(LSIE);
-      }
-    else if (strcasecmp(opcode,"lskp") == 0) {
-      output(NLBR);
-      }
-    else if (strcasecmp(opcode,"lsnf") == 0) {
-      output(LSNF);
-      }
-    else if (strcasecmp(opcode,"lsnq") == 0) {
-      output(LSNQ);
-      }
-    else if (strcasecmp(opcode,"lsnz") == 0) {
-      output(LSNZ);
-      }
-    else if (strcasecmp(opcode,"lsq") == 0) {
-      output(LSQ);
-      }
-    else if (strcasecmp(opcode,"lsz") == 0) {
-      output(LSZ);
-      }
-    else if (strcasecmp(opcode,"mark") == 0) {
-      output(MARK);
-      }
-    else if (strcasecmp(opcode,"nbr") == 0) {
-      output(NBR);
-      }
-    else if (strcasecmp(opcode,"nlbr") == 0) {
-      output(NLBR);
-      }
-    else if (strcasecmp(opcode,"nop") == 0) {
-      output(NOP);
-      }
-    else if (strcasecmp(opcode,"or") == 0) {
-      output(OR);
-      }
-    else if (strcasecmp(opcode,"ori") == 0) {
-      output(ORI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"out") == 0) {
-      output(OUT+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"phi") == 0) {
-      output(PHI+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"plo") == 0) {
-      output(PLO+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"req") == 0) {
-      output(REQ);
-      }
-    else if (strcasecmp(opcode,"ret") == 0) {
-      output(RET);
-      }
-    else if (strcasecmp(opcode,"sav") == 0) {
-      output(SAV);
-      }
-    else if (strcasecmp(opcode,"sd") == 0) {
-      output(SD);
-      }
-    else if (strcasecmp(opcode,"sdb") == 0) {
-      output(SDB);
-      }
-    else if (strcasecmp(opcode,"sdi") == 0) {
-      output(SDI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"sdbi") == 0) {
-      output(SDBI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"sep") == 0) {
-      output(SEP+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"seq") == 0) {
-      output(SEQ);
-      }
-    else if (strcasecmp(opcode,"sex") == 0) {
-      output(SEX+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"shl") == 0) {
-      output(SHL);
-      }
-    else if (strcasecmp(opcode,"shlc") == 0) {
-      output(SHLC);
-      }
-    else if (strcasecmp(opcode,"shr") == 0) {
-      output(SHR);
-      }
-    else if (strcasecmp(opcode,"shrc") == 0) {
-      output(SHRC);
-      }
-    else if (strcasecmp(opcode,"skp") == 0) {
-      output(NBR);
-      }
-    else if (strcasecmp(opcode,"sm") == 0) {
-      output(SM);
-      }
-    else if (strcasecmp(opcode,"smb") == 0) {
-      output(SMB);
-      }
-    else if (strcasecmp(opcode,"smbi") == 0) {
-      output(SMBI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"smi") == 0) {
-      output(SMI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (strcasecmp(opcode,"str") == 0) {
-      output(STR+(processArgs(args) & 0xf));
-      }
-    else if (strcasecmp(opcode,"stxd") == 0) {
-      output(STXD);
-      }
-    else if (strcasecmp(opcode,"xor") == 0) {
-      output(XOR);
-      }
-    else if (strcasecmp(opcode,"xri") == 0) {
-      output(XRI);
-      output(processArgs(args) & 0xff);
-      }
-    else if (use1805) {
-      if (strcasecmp(opcode,"rldi") == 0) {
-        output(0x68);
-        output(0xc0 + (processArgs(args) & 0x0f));
-        }
-      else if (strcasecmp(opcode,"rlxa") == 0) {
-        output(0x68);
-        output(0x60 + (processArgs(args) & 0x0f));
-        }
-      else if (strcasecmp(opcode,"rsxd") == 0) {
-        output(0x68);
-        output(0xa0 + (processArgs(args) & 0x0f));
-        }
-      else if (strcasecmp(opcode,"dbnz") == 0) {
-        output(0x68);
-        output(0x20 + (processArgs(args) & 0x0f));
-        }
-      else if (strcasecmp(opcode,"rnx") == 0) {
-        output(0x68);
-        output(0xb0 + (processArgs(args) & 0x0f));
-        }
-      else if (strcasecmp(opcode,"dadd") == 0) {
-        output(0x68);
-        output(0xf4);
-        }
-      else if (strcasecmp(opcode,"dadi") == 0) {
-        output(0x68);
-        output(0xfc);
-        output(processArgs(args) & 0xff);
-        }
-      else if (strcasecmp(opcode,"dadc") == 0) {
-        output(0x68);
-        output(0x74);
-        }
-      else if (strcasecmp(opcode,"daci") == 0) {
-        output(0x68);
-        output(0x7c);
-        output(processArgs(args) & 0xff);
-        }
-      else if (strcasecmp(opcode,"dsm") == 0) {
-        output(0x68);
-        output(0xf7);
-        }
-      else if (strcasecmp(opcode,"dsmi") == 0) {
-        output(0x68);
-        output(0xff);
-        output(processArgs(args) & 0xff);
-        }
-      else if (strcasecmp(opcode,"dsmb") == 0) {
-        output(0x68);
-        output(0x77);
-        }
-      else if (strcasecmp(opcode,"dsbi") == 0) {
-        output(0x68);
-        output(0x7f);
-        output(processArgs(args) & 0xff);
-        }
-      else if (strcasecmp(opcode,"bci") == 0) {
-        output(0x68);
-        output(0x3e);
-        output(processArgs(args) & 0xff);
-        }
-      else if (strcasecmp(opcode,"bxi") == 0) {
-        output(0x68);
-        output(0x3f);
-        output(processArgs(args) & 0xff);
-        }
-      else if (strcasecmp(opcode,"ldc") == 0) {
-        output(0x68);
-        output(0x06);
-        }
-      else if (strcasecmp(opcode,"gec") == 0) {
-        output(0x68);
-        output(0x08);
-        }
-      else if (strcasecmp(opcode,"stpc") == 0) {
-        output(0x68);
-        output(0x00);
-        }
-      else if (strcasecmp(opcode,"dtc") == 0) {
-        output(0x68);
-        output(0x01);
-        }
-      else if (strcasecmp(opcode,"stm") == 0) {
-        output(0x68);
-        output(0x07);
-        }
-      else if (strcasecmp(opcode,"scm1") == 0) {
-        output(0x68);
-        output(0x05);
-        }
-      else if (strcasecmp(opcode,"scm2") == 0) {
-        output(0x68);
-        output(0x03);
-        }
-      else if (strcasecmp(opcode,"spm1") == 0) {
-        output(0x68);
-        output(0x04);
-        }
-      else if (strcasecmp(opcode,"spm2") == 0) {
-        output(0x68);
-        output(0x02);
-        }
-      else if (strcasecmp(opcode,"etq") == 0) {
-        output(0x68);
-        output(0x09);
-        }
-      else if (strcasecmp(opcode,"xie") == 0) {
-        output(0x68);
-        output(0x0a);
-        }
-      else if (strcasecmp(opcode,"xid") == 0) {
-        output(0x68);
-        output(0x0b);
-        }
-      else if (strcasecmp(opcode,"cie") == 0) {
-        output(0x68);
-        output(0x0c);
-        }
-      else if (strcasecmp(opcode,"cid") == 0) {
-        output(0x68);
-        output(0x0d);
-        }
-      else if (strcasecmp(opcode,"dsav") == 0) {
-        output(0x68);
-        output(0x76);
-        }
-      else if (strcasecmp(opcode,"scal") == 0) {
-        output(0x68);
-        output(0x80 + (processArgs(args) & 0x0f));
-        }
-      else if (strcasecmp(opcode,"scal") == 0) {
-        output(0x68);
-        output(0x90 + (processArgs(args) & 0x0f));
-        }
-      else { 
-        printf("<ASM>Unknown opcode: %s\n",opcode);
-        exit(1);
-        }
-      }
-    else { 
+    i = 0;
+    pos = -1;
+    while (pos < 0 && opcodes[i].opcode[0] != 0) {
+      if (strcasecmp(opcode, opcodes[i].opcode) == 0) pos = i;
+      i++;
+      }
+    if (pos < 0) {
       printf("<ASM>Unknown opcode: %s\n",opcode);
       exit(1);
+      }
+    switch (opcodes[pos].typ) {
+      case OT_0ARG:
+           output(opcodes[pos].byte1);
+           break;
+      case OT_1ARG:
+           output(opcodes[pos].byte1);
+           output(processArgs(args) & 0xff);
+           break;
+      case OT_NARG:
+           output(opcodes[pos].byte1 | (processArgs(args) & 0xf));
+           break;
+      case OT_DB:
+           processDb(args,opcodes[pos].byte1);
+           break;
+      case OT_DS:
+           processDs(processArgs(args));
+           break;
+      case OT_ORG:
+           processOrg(processArgs(args));
+           break;
+      case OT_EQU:
+           value = processArgs(args);
+           setLabel(label, value);
+           break;
+      case OT_LBR:
+           value = processArgs(args);
+           output(opcodes[pos].byte1);
+           output(value/256);
+           output(value%256);
+           break;
+      case OT_680ARG:
+           if (use1805 == 0) {
+             printf("<ASM>1805 Instruction used while not in 1805 mode\n");
+             exit(1);
+             }
+           output(0x68);
+           output(opcodes[pos].byte1);
+           break;
+      case OT_681ARG:
+           if (use1805 == 0) {
+             printf("<ASM>1805 Instruction used while not in 1805 mode\n");
+             exit(1);
+             }
+           output(0x68);
+           output(opcodes[pos].byte1);
+           output(processArgs(args) & 0xff);
+           break;
+      case OT_68NARG:
+           if (use1805 == 0) {
+             printf("<ASM>1805 Instruction used while not in 1805 mode\n");
+             exit(1);
+             }
+           output(0x68);
+           output(opcodes[pos].byte1 | (processArgs(args) & 0xf));
+           break;
+      default:
+           printf("<ASM>Unknown instruction type: %d\n",opcodes[pos].typ);
+           exit(1);
+           break;
       }
     }
   }

@@ -231,17 +231,18 @@ int main(int argc, char** argv, char** envp) {
   variableRAM = (variableStart == 0xffff) ? keyBuffer+iBufferSize : variableStart;
   variableNextAddress = variableRAM;
   passNumber = 2;
-  if (getDefine("LFSR")) {
-    getVariable("LFSR_");
-    getVariable("LFSR__");
+  if (getDefine("STRINGS")) {
+    getVariable("STMP0_$");
+    getVariable("STMP1_$");
+    getVariable("STMP2_$");
+    getVariable("STMP3_$");
+    getVariable("STMP4_$");
+    getVariable("STMP5_$");
+    getVariable("STMP6_$");
+    getVariable("STMP7_$");
+    getVariable("STMP8_$");
+    getVariable("STMP9_$");
     }
-  if (useData) {
-    getVariable("DATA_");
-    }
-  if (getDefine("HEAP")) {
-    getVariable("HEAP_");
-    }
-  getVariable("FREE_");
   outCount = 0;
   outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
   if (outFile < 0) {
@@ -253,14 +254,14 @@ int main(int argc, char** argv, char** envp) {
   if (outCount > 0) writeOutput();
   close(outFile);
   if (useAsm) {
-    for (i=0; i<numberOfVariables; i++) {
-      if (useAsm) {
-        sprintf(buffer,"%s: ",variableNames[i]);
-        while (strlen(buffer) < 10) strcat(buffer," ");
-        strcat(buffer,"dw    0");
-        writeAsm(buffer,"");
-        }
-      }
+//    for (i=0; i<numberOfVariables; i++) {
+//      if (useAsm) {
+//        sprintf(buffer,"%s: ",variableNames[i]);
+//        while (strlen(buffer) < 10) strcat(buffer," ");
+//        strcat(buffer,"dw    0");
+//        writeAsm(buffer,"");
+//        }
+//      }
     close(asmFile);
     }
   if (numNests > 0) printf("#define without #endif\n");
@@ -411,7 +412,8 @@ int main(int argc, char** argv, char** envp) {
   if (showVariables) {
     printf("Variables:\n");
     for (i=0; i<numberOfVariables; i++) {
-      printf("  %-20s  %c %04xh\n",variableNames[i],variableTypes[i],variableAddresses[i]);
+      sprintf(buffer,"v_%s",variableNames[i]);
+      printf("  %-20s  %c %04xh\n",variableNames[i],variableTypes[i],getLabel(buffer));
       }
     printf("\n");
     }

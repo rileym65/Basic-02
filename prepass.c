@@ -101,6 +101,7 @@ int prepass(char* filename) {
           if (strncasecmp(currentLine+i,"read",4) == 0) useData = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) addDefine("USEEF",1,1);
           if (strncasecmp(currentLine+i,"alloc(",6) == 0) addDefine("HEAP",1,1);
+          if (strncasecmp(currentLine+i,"$",1) == 0) addDefine("STRINGS",1,1);
           }
         }
       }
@@ -110,6 +111,10 @@ int prepass(char* filename) {
   if (useFp) addDefine("USEFP",1,1);
   if (useTrig) addDefine("USETRIG",1,1);
   if (useSelfTerm) addDefine("SELFTERM",1,1);
+
+  if (getDefine("STRINGS")) {
+    addDefine("HEAP",1,1);
+    }
 
   if (getDefine("ASINFP")) addDefine("ATANFP",1,1);
   if (getDefine("ACOSFP")) addDefine("ATANFP",1,1);

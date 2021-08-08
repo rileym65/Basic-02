@@ -13,9 +13,9 @@
 char* clocate(char* line) {
   int  pos;
   word addr;
-  Asm("          ldi   [iobuffer].1            ; Point to i/o buffer");
+  Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
   Asm("          phi   rd");
-  Asm("          ldi   [iobuffer].0");
+  Asm("          ldi   iobuffer.0");
   Asm("          plo   rd");
   Asm("          ldi   27                      ; initial portion of escape sequence");
   Asm("          str   rd");
@@ -39,9 +39,9 @@ char* clocate(char* line) {
     Asm("          inc   r7                      ; Remove high word");
     Asm("          inc   r7");
     }
-  Asm("          ldi   [iobuffer]+2.1          ; Point to i/o buffer");
+  Asm("          ldi   iobuffer+2.1            ; Point to i/o buffer");
   Asm("          phi   rd");
-  Asm("          ldi   [iobuffer]+2.0");
+  Asm("          ldi   iobuffer+2.0");
   Asm("          plo   rd");
   Asm("          sep   scall                   ; Send row");
   Asm("          dw    itoa");
@@ -74,9 +74,9 @@ char* clocate(char* line) {
   Asm("          inc   rd");
   Asm("          ldi   0                       ; terminate string");
   Asm("          str   rd");
-  Asm("          ldi   [iobuffer].1            ; Point to i/o buffer");
+  Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
   Asm("          phi   rf");
-  Asm("          ldi   [iobuffer].0");
+  Asm("          ldi   iobuffer.0");
   Asm("          plo   rf");
   Asm("          sep   scall                   ; Send position escape sequcne");
   Asm("          dw    f_msg");

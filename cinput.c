@@ -79,28 +79,28 @@ char* cinput(char* line) {
     Asm("          sep   scall                   ; display question mark");
     Asm("          dw    f_inmsg");
     Asm("          db    '? ',0");
-    Asm("          ldi   [iobuffer].1            ; Point to keyboard buffer");
+    Asm("          ldi   iobuffer.1              ; Point to keyboard buffer");
     Asm("          phi   rf");
-    Asm("          ldi   [iobuffer].0");
+    Asm("          ldi   iobuffer.0");
     Asm("          plo   rf");
     Asm("          sep   scall                   ; Get input from user");
     Asm("          dw    f_input");
-    Asm("          ldi   [iobuffer].1            ; Point to keyboard buffer");
+    Asm("          ldi   iobuffer.1              ; Point to keyboard buffer");
     Asm("          phi   rf");
-    Asm("          ldi   [iobuffer].0");
+    Asm("          ldi   iobuffer.0");
     Asm("          plo   rf");
     if (fp) {
-      sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rd");
-      sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.0",name); Asm(buffer);
       Asm("          plo   rd");
       Asm("          sep   scall                   ; Convert ASCII to integer");
       Asm("          dw    atof");
       }
     else if (use32Bits) {
-      sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rd");
-      sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.0",name); Asm(buffer);
       Asm("          plo   rd");
       Asm("          sep   scall                   ; Convert ASCII to integer");
       Asm("          dw    atoi32");
@@ -108,9 +108,9 @@ char* cinput(char* line) {
     else {
       Asm("          sep   scall                   ; Convert ASCII to integer");
       Asm("          dw    atoi");
-      sprintf(buffer,"          ldi   [%s].1              ; Point to destination variable",name); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rf");
-      sprintf(buffer,"          ldi   [%s].0",name); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.0",name); Asm(buffer);
       Asm("          plo   rf");
       Asm("          ghi   rc                      ; Store value into variable");
       Asm("          str   rf");

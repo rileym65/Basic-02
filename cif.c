@@ -27,7 +27,7 @@ char* cif(char* line) {
     }
   Asm("          sex   r2                      ; Point X to system stack");
   findNextLineNumber(lastLineNumber, &addr);
-  sprintf(buffer,"          lbz   <%d>                    ; Jump if test failed",addr); Asm(buffer);
+  sprintf(buffer,"          lbz   l_%d                    ; Jump if test failed",addr); Asm(buffer);
   if (strncasecmp(line,"then",4) == 0) {
     line += 4;
     }

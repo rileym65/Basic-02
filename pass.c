@@ -86,9 +86,28 @@ int pass(char* filename) {
     if (strlen(buffer) > 16) Asm(buffer);
     if (passNumber == 2 && showCompiler) printf("\n");
     }
-  if (getDefine("ATOI16") || getDefine("ATOI32")) {
-    
-    sprintf(buffer,"iobuffer:   ds   %d",iBufferSize); Asm(buffer);
+  sprintf(buffer,"iobuffer: ds    %d",iBufferSize); Asm(buffer);
+  if (getDefine("LFSR")) {
+    Asm("LFSR_:    dw    0");
+    Asm("LFSR__:   dw    0");
     }
+  if (useData) {
+    Asm("DATA_:    dw    0");
+    }
+  if (getDefine("HEAP")) {
+    Asm("HEAP_:    dw    0");
+    }
+  Asm("FREE_:    dw    0");
+  for (i=0; i<numberOfVariables; i++) {
+    sprintf(buffer,"v_%s: ",variableNames[i]);
+    while (strlen(buffer) < 10) strcat(buffer," ");
+    if (use32Bits)
+      strcat(buffer,"dd    0");
+    else 
+      strcat(buffer,"dw    0");
+    Asm(buffer);
+    }
+    
+  Asm("end__:    equ   $");
   }
 

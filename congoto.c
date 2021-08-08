@@ -58,12 +58,12 @@ char* con(char* line) {
       exit(1);
       }
     if (mode == 'G') {
-      sprintf(buffer,"          lbz   <%d>                    ; Jump if index is zero", lines[i]); Asm(buffer);
+      sprintf(buffer,"          lbz   l_%d                    ; Jump if index is zero", lines[i]); Asm(buffer);
       }
     if (mode == 'S') {
       Asm("          lbnz  $+9                     ; Jump if index not zero");
       Asm("          sep   scall                   ; Perform subroutine call");
-      sprintf(buffer,"          dw    <%d>", lines[i]); Asm(buffer);
+      sprintf(buffer,"          dw    l_%d", lines[i]); Asm(buffer);
       addr = 3 + ((lineCount-i-1) * 11);
       sprintf(buffer,"          lbr   $+%d           ; Jump past remaining entries",addr); Asm(buffer);
       }

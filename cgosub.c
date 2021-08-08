@@ -24,7 +24,7 @@ char* cgosub(char* line) {
     exit(1);
     }
   Asm("          sep   scall                   ; Call subroutine");
-  sprintf(buffer,"          dw    <%d>",lineno); Asm(buffer);
+  sprintf(buffer,"          dw    l_%d",lineno); Asm(buffer);
   return line;
   }
 

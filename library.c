@@ -23,6 +23,8 @@ void library() {
   showCompiler = 0;
   Asm("scall:      equ  r4");
   Asm("sret:       equ  r5");
+  sprintf(buffer,"stack:      equ  0%04xh",stack); Asm(buffer);
+  sprintf(buffer,"estack:     equ  0%04xh",estack); Asm(buffer);
   if (useElfos) {
     t1 = programStart;
     t2 = (highest - programStart + 1);
@@ -81,11 +83,8 @@ void library() {
       }
     }
   else {
-    while (fgets(buffer,256,file) != NULL) {
-      while (strlen(buffer) > 0 && buffer[strlen(buffer)-1] < 32) buffer[strlen(buffer)-1] = 0;
-      Asm(buffer);
-      }
     fclose(file);
+    Asm("#include library.asm");
     }
 
 
@@ -106,14 +105,14 @@ void library() {
     Asm("            str  rf");
     }
   else {
-    Asm("start:      ldi  [stack].1");
+    Asm("start:      ldi  stack.1");
     Asm("            phi  r2");
-    Asm("            ldi  [stack].0");
+    Asm("            ldi  stack.0");
     Asm("            plo  r2");
     }
-  Asm("            ldi  [estack].1");
+  Asm("            ldi  estack.1");
   Asm("            phi  r7");
-  Asm("            ldi  [estack].0");
+  Asm("            ldi  estack.0");
   Asm("            plo  r7");
   if (useElfos == 0 && useStg == 0) {
     Asm("          ldi  call.1");
@@ -127,10 +126,9 @@ void library() {
     }
 //   t1 = variableRAM + (2 * numberOfVariables);
   t1 = variableNextAddress;
-  t2 = getVariable("FREE_");
-  Asm("          ldi  [free_].1");
+  Asm("          ldi  free_.1");
   Asm("          phi  rf");
-  Asm("          ldi  [free_].0");
+  Asm("          ldi  free_.0");
   Asm("          plo  rf");
   if (use32Bits) {
     Asm("          ldi  0");
@@ -139,28 +137,26 @@ void library() {
     Asm("          str  rf");
     Asm("          inc  rf");
     }
-  sprintf(buffer,"          ldi  %d",t1/256); Asm(buffer);
+  sprintf(buffer,"          ldi  END__.1",t1/256); Asm(buffer);
   Asm("          str  rf");
   Asm("          inc  rf");
-  sprintf(buffer,"          ldi  %d",t1%256); Asm(buffer);
+  sprintf(buffer,"          ldi  END__.0",t1%256); Asm(buffer);
   Asm("          str  rf");
   if (useData) {
-    a = getVariable("DATA_");
-    sprintf(buffer,"          ldi  %d",a/256); Asm(buffer);
+    sprintf(buffer,"          ldi  DATA_.1",a/256); Asm(buffer);
     Asm("          phi  rf");
-    sprintf(buffer,"          ldi  %d",a%256); Asm(buffer);
+    sprintf(buffer,"          ldi  DATA_.0",a%256); Asm(buffer);
     Asm("          plo  rf");
-    sprintf(buffer,"          ldi  %d",dataAddress/256); Asm(buffer);
+    sprintf(buffer,"          ldi  data.1",dataAddress/256); Asm(buffer);
     Asm("          str  rf");
     Asm("          inc  rf");
-    sprintf(buffer,"          ldi  %d",dataAddress%256); Asm(buffer);
+    sprintf(buffer,"          ldi  data.0",dataAddress%256); Asm(buffer);
     Asm("          str  rf");
     }
   if (getDefine("HEAP")) {
-    a = getVariable("HEAP_");
-    sprintf(buffer,"          ldi  %d",a/256); Asm(buffer);
+    Asm("          ldi  HEAP_.1");
     Asm("          phi  rf");
-    sprintf(buffer,"          ldi  %d",a%256); Asm(buffer);
+    Asm("          ldi  HEAP_.0");
     Asm("          plo  rf");
     sprintf(buffer,"          ldi  %d",heap/256); Asm(buffer);
     Asm("          str  rf");

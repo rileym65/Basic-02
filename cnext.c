@@ -43,9 +43,9 @@ char* cnext(char* line) {
       else Asm("          dw    next");
     }
   else {
-    sprintf(buffer,"          ldi   [%s].1                   ; Get loop variable address",varname); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.1                   ; Get loop variable address",varname); Asm(buffer);
     Asm("          phi   rc");
-    sprintf(buffer,"          ldi   [%s].0",varname); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.0",varname); Asm(buffer);
     Asm("          plo   rc");
     Asm("          sep   scall                   ; Call NEXT with var handler");
     if (use32Bits) Asm("          dw    nextvar32");

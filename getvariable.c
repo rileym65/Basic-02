@@ -14,7 +14,6 @@ word getVariable(char* name) {
   int i;
   int vsize;
   char vtype;
-  if (passNumber == 1) return 0;
   vtype = (use32Bits) ? 'L' : 'I';
   if (name[strlen(name)-1] == '!') vtype = 'R';
   if (name[strlen(name)-1] == '$') vtype = 'S';

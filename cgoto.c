@@ -23,7 +23,7 @@ char* cgoto(char* line) {
     showError("Line number not found");
     exit(1);
     }
-  sprintf(buffer,"          lbr   <%d>                    ; Jump",lineno); Asm(buffer);
+  sprintf(buffer,"          lbr   l_%d                    ; Jump",lineno); Asm(buffer);
   return line;
   }
 

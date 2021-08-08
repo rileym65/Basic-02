@@ -18,7 +18,7 @@ char* ccls(char* line) {
     }
   Asm("          sep   scall                   ; Display message");
   Asm("          dw    f_inmsg");
-  Asm("          db    27,'[2J',0");
+  Asm("          db    27,'[H',27,'[2J',0");
   return line;
   }
 

@@ -47,9 +47,9 @@ char* cfor(char* line) {
     }
 
   if (quick) {
-    sprintf(buffer,"          ldi   [%s].1                  ; Get variable address",matches[0]); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.1                  ; Get variable address",matches[0]); Asm(buffer);
     Asm("          phi   rf");
-    sprintf(buffer,"          ldi   [%s].0",matches[0]); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.0",matches[0]); Asm(buffer);
     Asm("          plo   rf");
     if (use32Bits) {
       sprintf(buffer,"          ldi   %d                      ; Write start to variable",(start & 0xff000000) >> 24); Asm(buffer);
@@ -87,9 +87,9 @@ char* cfor(char* line) {
     sprintf(buffer,"          ldi   %d",step & 0xff); Asm(buffer);
     Asm("          stxd");
 
-    sprintf(buffer,"          ldi   [%s].1                  ; Write variable address to stack",matches[0]); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.1                  ; Write variable address to stack",matches[0]); Asm(buffer);
     Asm("          stxd");
-    sprintf(buffer,"          ldi   [%s].0",matches[0]); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.0",matches[0]); Asm(buffer);
     Asm("          stxd");
 
     addr = address + 6;
@@ -126,15 +126,15 @@ char* cfor(char* line) {
   vaddr = getVariable(varname);
 
   if (use32Bits) {
-    sprintf(buffer,"          ldi   [%s]+3.1                ; Get variable address",varname); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s+3.1                ; Get variable address",varname); Asm(buffer);
     Asm("          phi   rf");
-    sprintf(buffer,"          ldi   [%s]+3.0",varname); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s+3.0",varname); Asm(buffer);
     Asm("          plo   rf");
     }
   else {
-    sprintf(buffer,"          ldi   [%s]+1.1                ; Get variable address",varname); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s+1.1                ; Get variable address",varname); Asm(buffer);
     Asm("          phi   rf");
-    sprintf(buffer,"          ldi   [%s]+1.0",varname); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s+1.0",varname); Asm(buffer);
     Asm("          plo   rf");
     }
   Asm("          inc   r7                      ; Store start value into variable");
@@ -305,9 +305,9 @@ char* cfor(char* line) {
 
   addr = address + 12;
 
-  sprintf(buffer,"          ldi   [%s].1                  ; Write variable address to stack",varname); Asm(buffer);
+  sprintf(buffer,"          ldi   v_%s.1                  ; Write variable address to stack",varname); Asm(buffer);
   Asm("          stxd");
-  sprintf(buffer,"          ldi   [%s].0",varname); Asm(buffer);
+  sprintf(buffer,"          ldi   v_%s.0",varname); Asm(buffer);
   Asm("          stxd");
   addr = address + 6;
   Asm("          ldi   $+6.1                   ; Write execution address to stack");

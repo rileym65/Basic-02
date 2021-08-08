@@ -19,10 +19,9 @@ char* cread(char* line) {
   char token[128];
   last = 0xffff;
   line = trim(line);
-  addr = getVariable("DATA_");
-  Asm("          ldi   [DATA_].1               ; Point to DATA pointer");
+  Asm("          ldi   DATA_.1                 ; Point to DATA pointer");
   Asm("          phi   rf");
-  Asm("          ldi   [DATA_].0");
+  Asm("          ldi   DATA_.0");
   Asm("          plo   rf");
   Asm("          lda   rf                      ; Retrieve DATA pointer");
   Asm("          phi   rd");
@@ -45,10 +44,10 @@ char* cread(char* line) {
       }
     addr = getVariable(token);
     if (last == 0xffff || ((addr & 0xff00) != (addr & 0xff00))) {
-      sprintf(buffer,"          ldi   [%s].1               ; Point to variable",token); Asm(buffer);
+      sprintf(buffer,"          ldi   v_%s.1               ; Point to variable",token); Asm(buffer);
       Asm("          phi   rc");
       }
-    sprintf(buffer,"          ldi   [%s].0               ; Point to variable",token); Asm(buffer);
+    sprintf(buffer,"          ldi   v_%s.0               ; Point to variable",token); Asm(buffer);
     Asm("          plo   rc");
     Asm("          lda   rd                      ; Retrieve data from DATA pool");
     Asm("          str   rc                      ; And store into variable");
