@@ -15,4 +15,5 @@ elfos
 elfrc
 run
 tointel.pl
+!library.asm
 
