@@ -108,6 +108,20 @@ producing a fully self-contained program that has no external dependencies.
   A single line number must be contained on a single input line.  Each input
 line is currently limited to 2048 character.
 
+Compiler Directives:
+.1805           - Enable 1804/5/6 assembler mode
+.32             - Enable 32-bit mode
+.fp             - Enable floating-point mode
+.elfos          - Produce Elf/OS executable
+.list           - Show source list
+.nolist         - Turn off source list
+.noruntime      - Do not show runtime modules
+.nosymbols      - Do not show assembler symbols
+.novars         - Do not show variables
+.runtime        - Show runtime modules
+.symbols        - Show assembler symbols
+.vars           - Show variables
+
 Switches:
 -32             - compile in 32-bit mode
 -fp             - enable floating point

@@ -29,6 +29,21 @@ int prepass(char* filename) {
 
   while (fgets(currentLine, 1023, source) != NULL) {
     while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] < 32) currentLine[strlen(currentLine)-1] = 0;
+    if (currentLine[0] == '.') {
+      if (strcasecmp(currentLine,".fp") == 0) { useFp = -1; use32Bits = -1; }
+      if (strcasecmp(currentLine,".32") == 0) { use32Bits = -1; }
+      if (strcasecmp(currentLine,".elfos") == 0) { useElfos = -1; programStart = 0x2000; }
+      if (strcasecmp(currentLine,".list") == 0) { showList = -1; }
+      if (strcasecmp(currentLine,".nolist") == 0) { showList = 0; }
+      if (strcasecmp(currentLine,".1805") == 0) { use1805 = -1; }
+      if (strcasecmp(currentLine,".vars") == 0) { showVariables = -1; }
+      if (strcasecmp(currentLine,".novars") == 0) { showVariables = 0; }
+      if (strcasecmp(currentLine,".symbols") == 0) { showSymbols = -1; }
+      if (strcasecmp(currentLine,".nosymbols") == 0) { showSymbols = 0; }
+      if (strcasecmp(currentLine,".runtime") == 0) { showRuntime = -1; }
+      if (strcasecmp(currentLine,".noruntime") == 0) { showRuntime = 0; }
+      strcpy(currentLine,"");
+      }
     if (strlen(currentLine) > 0) {
       qt = 0;
       for (i=0; i<strlen(currentLine); i++) {

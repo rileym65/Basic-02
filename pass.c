@@ -26,6 +26,7 @@ int pass(char* filename) {
   library();
   while (fgets(currentLine, 1023, source) != NULL) {
     while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] < 32) currentLine[strlen(currentLine)-1] = 0;
+    if (currentLine[0] == '.') strcpy(currentLine,"");
     if (strlen(currentLine) > 0) {
       lineCount++;
       if (passNumber == 2 && showList) printf("%s\n",currentLine);
