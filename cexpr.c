@@ -678,7 +678,7 @@ void add(int op) {
 char* evaluate(char* buffer) {
   int  i;
   int  fp;
-  char abuffer[128];
+  char abuffer[256];
   char term;
   int p;
   char token[64];
