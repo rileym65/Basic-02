@@ -41,7 +41,7 @@ char* cread(char* line) {
       line++;
       }
     addr = getVariable(token);
-    if (last == 0xffff || ((addr & 0xff00) != (addr & 0xff00))) {
+    if (last == 0xffff || ((addr & 0xff00) != (last & 0xff00))) {
       sprintf(buffer,"          ldi   v_%s.1               ; Point to variable",token); Asm(buffer);
       Asm("          phi   rc");
       }
