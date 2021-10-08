@@ -12,9 +12,9 @@
 
 char* cend(char* line) {
   if (useStg) {
-    Asm("            ldi  [STG_].1");
+    Asm("            ldi  STG_.1");
     Asm("            phi  rf");
-    Asm("            ldi  [STG_].0");
+    Asm("            ldi  STG_.0");
     Asm("            plo  rf");
     Asm("            lda  rf");
     Asm("            phi  r2");

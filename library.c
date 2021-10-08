@@ -93,9 +93,9 @@ void library() {
     Asm("            stxd");
     Asm("            glo  r6");
     Asm("            stxd");
-    Asm("            ldi  [STG_].1");
+    Asm("            ldi  STG_.1");
     Asm("            phi  rf");
-    Asm("            ldi  [STG_].0");
+    Asm("            ldi  STG_.0");
     Asm("            plo  rf");
     Asm("            ghi  r2");
     Asm("            str  rf");

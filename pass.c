@@ -36,9 +36,9 @@ int pass(char* filename) {
   fclose(source);
   if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (useStg) {
-    Asm("            ldi  [STG_].1");
+    Asm("            ldi  STG_.1");
     Asm("            phi  rf");
-    Asm("            ldi  [STG_].0");
+    Asm("            ldi  STG_.0");
     Asm("            plo  rf");
     Asm("            lda  rf");
     Asm("            phi  r2");
@@ -96,6 +96,9 @@ int pass(char* filename) {
     }
   if (getDefine("HEAP")) {
     Asm("HEAP_:    dw    0");
+    }
+  if (useStg) {
+    Asm("STG_:     dw    0");
     }
   Asm("FREE_:    dw    0");
   for (i=0; i<numberOfVariables; i++) {
