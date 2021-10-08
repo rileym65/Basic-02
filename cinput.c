@@ -41,9 +41,10 @@ char* cinput(char* line) {
       showError("Syntax error");
       exit(1);
       }
+    line++;
     }
   fp = 0;
-  line++;
+  line = trim(line);
   while (*line != ':' && *line != 0) {
     if (!(*line >= 'a' && *line <= 'z') &&
         !(*line >= 'A' && *line <= 'Z')) {
