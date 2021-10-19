@@ -71,6 +71,9 @@ int compileLine(char* line) {
     else if (strncasecmp(line,"asm",3) == 0) line=casm(line+3);
     else if (strncasecmp(line,"dealloc",7) == 0) line=cdealloc(line+7);
     else if (useElfos != 0 && strncasecmp(line, "open",4) == 0) line = copen(line+4);
+    else if (useElfos != 0 && strncasecmp(line, "close",5) == 0) line = cclose(line+5);
+    else if (useElfos != 0 && strncasecmp(line, "put",3) == 0) line = cput(line+3);
+    else if (useElfos != 0 && strncasecmp(line, "get",3) == 0) line = cget(line+3);
     else line = clet(line);
   
     line = trim(line);

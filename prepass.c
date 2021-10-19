@@ -42,6 +42,7 @@ int prepass(char* filename) {
       if (strcasecmp(currentLine,".nosymbols") == 0) { showSymbols = 0; }
       if (strcasecmp(currentLine,".runtime") == 0) { showRuntime = -1; }
       if (strcasecmp(currentLine,".noruntime") == 0) { showRuntime = 0; }
+      if (strcasecmp(currentLine,".binary") == 0) { outMode = 'B'; }
       strcpy(currentLine,"");
       }
     if (strlen(currentLine) > 0) {
@@ -117,6 +118,8 @@ int prepass(char* filename) {
           if (strncasecmp(currentLine+i,"flg(",4) == 0) addDefine("USEEF",1,1);
           if (strncasecmp(currentLine+i,"alloc(",6) == 0) addDefine("HEAP",1,1);
           if (strncasecmp(currentLine+i,"$",1) == 0) addDefine("STRINGS",1,1);
+          if (strncasecmp(currentLine+i,"open",4) == 0) addDefine("FILES",1,1);
+          if (strncasecmp(currentLine+i,"close",5) == 0) addDefine("FILES",1,1);
           }
         }
       }
@@ -126,6 +129,10 @@ int prepass(char* filename) {
   if (useFp) addDefine("USEFP",1,1);
   if (useTrig) addDefine("USETRIG",1,1);
   if (useSelfTerm) addDefine("SELFTERM",1,1);
+
+  if (getDefine("FILES")) {
+    addDefine("HEAP",1,1);
+    }
 
   if (getDefine("STRINGS")) {
     addDefine("HEAP",1,1);

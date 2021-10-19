@@ -8,6 +8,7 @@ LIBDIR =
 OBJS = \
 	asm.o \
 	casm.o \
+	cclose.o \
 	ccls.o \
 	cdata.o \
 	cdealloc.o \
@@ -16,6 +17,7 @@ OBJS = \
 	cend.o \
 	cfor.o \
 	cexpr.o \
+	cget.o \
 	cgosub.o \
 	cgoto.o \
 	cidle.o \
@@ -29,9 +31,11 @@ OBJS = \
 	cnext.o \
 	compileline.o \
 	congoto.o \
+	copen.o \
 	cout.o \
 	cpoke.o \
 	cprint.o \
+	cput.o \
 	cq.o \
 	cread.o \
 	crem.o \
@@ -67,6 +71,7 @@ clean:
 
 asm.o:           header.h asm.c
 casm.o:          header.h casm.c
+cclose.o:        header.h cclose.c
 ccls.o:          header.h ccls.c
 cdata.o:         header.h cdata.c
 cdealloc.o:      header.h cdealloc.c
@@ -75,6 +80,7 @@ cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c
 cexpr.o:         header.h cexpr.c
 cfor.o:          header.h cfor.c
+cget.o:          header.h cget.c
 cgosub.o:        header.h cgosub.c
 cgoto.o:         header.h cgoto.c
 cidle.o:         header.h cidle.c
@@ -88,8 +94,10 @@ clocate.o:       header.h clocate.c
 cnext.o:         header.h cnext.c
 compileline.o:   header.h compileline.c
 congoto.o:       header.h congoto.c
+copen.o:         header.h copen.c
 cout.o:          header.h cout.c
 cpoke.o:         header.h cpoke.c
+cput.o:          header.h cput.c
 cprint.o:        header.h cprint.c
 cq.o:            header.h cq.c
 cread.o:         header.h cread.c

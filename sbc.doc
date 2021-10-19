@@ -1,4 +1,5 @@
 ASM
+CLOSE #filenum
 CLS
 DATA number,number,...
 DEALLOC addr
@@ -6,6 +7,7 @@ DMA expr
 DPOKE addr,value
 END
 FOR var=expr TO expr [STEP expr]
+GET #filenum var,...
 GOSUB line
 GOTO line
 IDLE
@@ -19,9 +21,11 @@ LOCATE y,x
 NEXT [var]
 ON expr GOSUB line,line,...
 ON expr GOTO line,line,...
+OPEN "filename" FOR INPUT|OUTPUT|APPEND AS #filenum
 OUT port,value
 POKE addr,value
 PRINT expr[,;]expr[,;]...
+PUT #filenum var,...
 Q expr
 READ var,var,...
 REM text
@@ -111,6 +115,7 @@ line is currently limited to 2048 character.
 Compiler Directives:
 .1805           - Enable 1804/5/6 assembler mode
 .32             - Enable 32-bit mode
+.binary         - Output file as binary
 .fp             - Enable floating-point mode
 .elfos          - Produce Elf/OS executable
 .list           - Show source list
