@@ -100,6 +100,16 @@ int pass(char* filename) {
   if (useStg) {
     Asm("STG_:     dw    0");
     }
+  if (getDefine ("FILES")) {
+    Asm("file1_:   dw    0");
+    Asm("file2_:   dw    0");
+    Asm("file3_:   dw    0");
+    Asm("file4_:   dw    0");
+    Asm("file5_:   dw    0");
+    Asm("file6_:   dw    0");
+    Asm("file7_:   dw    0");
+    Asm("file8_:   dw    0");
+    }
   Asm("FREE_:    dw    0");
   for (i=0; i<numberOfVariables; i++) {
     sprintf(buffer,"v_%s: ",variableNames[i]);
