@@ -7,6 +7,8 @@ DMA expr
 DPOKE addr,value
 END
 FOR var=expr TO expr [STEP expr]
+FREAD #filenum address,length
+FWRITE #filenum address,length
 GET #filenum var,...
 GOSUB line
 GOTO line

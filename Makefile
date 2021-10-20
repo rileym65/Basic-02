@@ -17,6 +17,8 @@ OBJS = \
 	cend.o \
 	cfor.o \
 	cexpr.o \
+	cfread.o \
+	cfwrite.o \
 	cget.o \
 	cgosub.o \
 	cgoto.o \
@@ -80,6 +82,8 @@ cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c
 cexpr.o:         header.h cexpr.c
 cfor.o:          header.h cfor.c
+cfread.o:        header.h cfread.c
+cfwrite.o:       header.h cfwrite.c
 cget.o:          header.h cget.c
 cgosub.o:        header.h cgosub.c
 cgoto.o:         header.h cgoto.c

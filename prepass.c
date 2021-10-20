@@ -114,7 +114,8 @@ int prepass(char* filename) {
             }
           if (strncasecmp(currentLine+i,"dealloc",7) == 0) addDefine("HEAP",1,1);
           if (strncasecmp(currentLine+i,"locate",6) == 0) addDefine("ITOA16",1,1);
-          if (strncasecmp(currentLine+i,"read",4) == 0) useData = -1;
+          if (strncasecmp(currentLine+i,"read",4) == 0 &&
+              currentLine[i-1] != 'f') useData = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) addDefine("USEEF",1,1);
           if (strncasecmp(currentLine+i,"alloc(",6) == 0) addDefine("HEAP",1,1);
           if (strncasecmp(currentLine+i,"$",1) == 0) addDefine("STRINGS",1,1);

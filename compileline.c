@@ -74,6 +74,8 @@ int compileLine(char* line) {
     else if (useElfos != 0 && strncasecmp(line, "close",5) == 0) line = cclose(line+5);
     else if (useElfos != 0 && strncasecmp(line, "put",3) == 0) line = cput(line+3);
     else if (useElfos != 0 && strncasecmp(line, "get",3) == 0) line = cget(line+3);
+    else if (useElfos != 0 && strncasecmp(line, "fwrite",6) == 0) line = cfwrite(line+6);
+    else if (useElfos != 0 && strncasecmp(line, "fread",5) == 0) line = cfread(line+5);
     else line = clet(line);
   
     line = trim(line);

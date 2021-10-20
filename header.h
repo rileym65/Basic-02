@@ -237,6 +237,8 @@ extern char* cdpoke(char* line);
 extern char* cend(char* line);
 extern char* cexpr(char* line, int etype);
 extern char* cfor(char* line);
+extern char* cfread(char* line);
+extern char* cfwrite(char* line);
 extern char* cget(char* line);
 extern char* cgosub(char* line);
 extern char* cgoto(char* line);
