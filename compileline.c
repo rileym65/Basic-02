@@ -78,6 +78,9 @@ int compileLine(char* line) {
     else if (useElfos != 0 && strncasecmp(line, "fread",5) == 0) line = cfread(line+5);
     else if (useElfos != 0 && strncasecmp(line, "rename",6) == 0) line = crename(line+6);
     else if (useElfos != 0 && strncasecmp(line, "delete",6) == 0) line = cdelete(line+6);
+    else if (useElfos != 0 && strncasecmp(line, "mkdir",5) == 0) line = cmkdir(line+5);
+    else if (useElfos != 0 && strncasecmp(line, "chdir",5) == 0) line = cchdir(line+5);
+    else if (useElfos != 0 && strncasecmp(line, "rmdir",5) == 0) line = crmdir(line+5);
     else line = clet(line);
   
     line = trim(line);

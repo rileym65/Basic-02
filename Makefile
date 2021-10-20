@@ -8,6 +8,7 @@ LIBDIR =
 OBJS = \
 	asm.o \
 	casm.o \
+	cchdir.o \
 	cclose.o \
 	ccls.o \
 	cdata.o \
@@ -31,6 +32,7 @@ OBJS = \
 	cion.o \
 	clet.o \
 	clocate.o \
+	cmkdir.o \
 	cnext.o \
 	compileline.o \
 	congoto.o \
@@ -45,6 +47,7 @@ OBJS = \
 	crename.o \
 	crestore.o \
 	creturn.o \
+	crmdir.o \
 	findline.o \
 	findvariable.o \
 	gethex.o \
@@ -75,6 +78,7 @@ clean:
 
 asm.o:           header.h asm.c
 casm.o:          header.h casm.c
+cchdir.o:        header.h cchdir.c
 cclose.o:        header.h cclose.c
 ccls.o:          header.h ccls.c
 cdata.o:         header.h cdata.c
@@ -98,6 +102,7 @@ cioff.o:         header.h cioff.c
 cion.o:          header.h cion.c
 clet.o:          header.h clet.c
 clocate.o:       header.h clocate.c
+cmkdir.o:        header.h cmkdir.c
 cnext.o:         header.h cnext.c
 compileline.o:   header.h compileline.c
 congoto.o:       header.h congoto.c
@@ -112,6 +117,7 @@ crem.o:          header.h crem.c
 crename.o:       header.h crename.c
 crestore.o:      header.h crestore.c
 creturn.o:       header.h creturn.c
+crmdir.o:        header.h crmdir.c
 findline.o:      header.h findline.c
 findvariable.o:  header.h findvariable.c
 gethex.o:        header.h gethex.c

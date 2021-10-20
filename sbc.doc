@@ -1,4 +1,5 @@
 ASM
+CHDIR "dirname"
 CLOSE #filenum
 CLS
 DATA number,number,...
@@ -21,6 +22,7 @@ IOFF
 ION
 [LET] var=expr
 LOCATE y,x
+MKDIR "dirname"
 NEXT [var]
 ON expr GOSUB line,line,...
 ON expr GOTO line,line,...
@@ -35,6 +37,7 @@ REM text
 RENAME "filename" TO "filename"
 RESTORE [line]
 RETURN [line]
+RMDIR "dirname"
 
 Expressions:
   +
