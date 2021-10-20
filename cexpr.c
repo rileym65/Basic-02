@@ -10,6 +10,7 @@
 
 #include "header.h"
 
+#define OP_POS    0x65
 #define OP_ACOS   0x64
 #define OP_ASIN   0x63
 #define OP_ATAN   0x62
@@ -660,6 +661,54 @@ int reduce(char last) {
          Asm("           sep     scall               ; Perform asin function");
          Asm("           dw      fpasin");
          break;
+    case OP_POS:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
+         Asm("           inc     r7                  ; Retrieve file number");
+         Asm("           lda     r7");
+         if (use32Bits) {
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           }
+         Asm("           smi     1                   ; subtract 1");
+         Asm("           shl                         ; multiply file number by 2");
+         Asm("           adi     file1_.0            ; add to file handles");
+         Asm("           plo     rf                  ; save in pointer");
+         Asm("           ldi     file1_.1            ; get high byte of address");
+         Asm("           adci    0                   ; propagate carry");
+         Asm("           phi     rf                  ; RF now has file handle");
+         Asm("           lda     rf                  ; retrieve FILDES");
+         Asm("           phi     rd");
+         Asm("           ldn     rf");
+         Asm("           plo     rd");
+         if (use32Bits) {
+           Asm("           lda     rd                  ; get file position");
+           Asm("           str     r7                  ; write to expression stack");
+           Asm("           dec     r7");
+           Asm("           lda     rd");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           lda     rd");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           lda     rd");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
+         else {
+           Asm("           inc     rd                  ; move to lsw");
+           Asm("           inc     rd");
+           Asm("           lda     rd                  ; get file position");
+           Asm("           str     r7                  ; write to expression stack");
+           Asm("           dec     r7");
+           Asm("           lda     rd");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
+         break;
     }
   tokens[numTokens++] = 0;
   tokens[numTokens++] = (opType == 'I') ? OP_NUM : OP_NUMFP;
@@ -771,6 +820,13 @@ char* evaluate(char* buffer) {
          tokens[numTokens++] = OP_ALLOC;
          tokens[numTokens++] = OP_OP;
          buffer+=6;
+         parens++;
+         func = -1;
+         }
+      if (strncasecmp(buffer,"pos(",4) == 0) {
+         tokens[numTokens++] = OP_POS;
+         tokens[numTokens++] = OP_OP;
+         buffer+=4;
          parens++;
          func = -1;
          }

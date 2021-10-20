@@ -70,6 +70,7 @@ Expressions:
   INP(port)
   LN(expr)
   PEEK(addr)
+  POS(filenum)
   RND(range)
   SGN(expr)
   SIN(expr)
