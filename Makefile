@@ -12,6 +12,7 @@ OBJS = \
 	ccls.o \
 	cdata.o \
 	cdealloc.o \
+	cdelete.o \
 	cdma.o \
 	cdpoke.o \
 	cend.o \
@@ -41,6 +42,7 @@ OBJS = \
 	cq.o \
 	cread.o \
 	crem.o \
+	crename.o \
 	crestore.o \
 	creturn.o \
 	findline.o \
@@ -77,6 +79,7 @@ cclose.o:        header.h cclose.c
 ccls.o:          header.h ccls.c
 cdata.o:         header.h cdata.c
 cdealloc.o:      header.h cdealloc.c
+cdelete.o:       header.h cdelete.c
 cdma.o:          header.h cdma.c
 cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c
@@ -106,6 +109,7 @@ cprint.o:        header.h cprint.c
 cq.o:            header.h cq.c
 cread.o:         header.h cread.c
 crem.o:          header.h crem.c
+crename.o:       header.h crename.c
 crestore.o:      header.h crestore.c
 creturn.o:       header.h creturn.c
 findline.o:      header.h findline.c

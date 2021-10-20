@@ -3,6 +3,7 @@ CLOSE #filenum
 CLS
 DATA number,number,...
 DEALLOC addr
+DELETE "filename"
 DMA expr
 DPOKE addr,value
 END
@@ -31,6 +32,7 @@ PUT #filenum var,...
 Q expr
 READ var,var,...
 REM text
+RENAME "filename" TO "filename"
 RESTORE [line]
 RETURN [line]
 
