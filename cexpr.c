@@ -10,6 +10,7 @@
 
 #include "header.h"
 
+#define OP_EOF    0x66
 #define OP_POS    0x65
 #define OP_ACOS   0x64
 #define OP_ASIN   0x63
@@ -709,6 +710,37 @@ int reduce(char last) {
            Asm("           dec     r7");
            }
          break;
+    case OP_EOF:
+         if (opType == 'F') {
+           Asm("           sep     scall               ; Convert floating point argument to integer");
+           Asm("           dw      ftoi");
+           opType = 'I';
+           }
+         Asm("           inc     r7                  ; Retrieve file number");
+         Asm("           lda     r7");
+         if (use32Bits) {
+           Asm("           inc     r7");
+           Asm("           inc     r7");
+           }
+         Asm("           sep     scall               ; check for EOF");
+         Asm("           dw      eof");
+         if (use32Bits) {
+           Asm("           str     r7                  ; store result");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
+         else {
+           Asm("           str     r7                  ; store result");
+           Asm("           dec     r7");
+           Asm("           str     r7");
+           Asm("           dec     r7");
+           }
+         break;
     }
   tokens[numTokens++] = 0;
   tokens[numTokens++] = (opType == 'I') ? OP_NUM : OP_NUMFP;
@@ -825,6 +857,13 @@ char* evaluate(char* buffer) {
          }
       if (strncasecmp(buffer,"pos(",4) == 0) {
          tokens[numTokens++] = OP_POS;
+         tokens[numTokens++] = OP_OP;
+         buffer+=4;
+         parens++;
+         func = -1;
+         }
+      if (strncasecmp(buffer,"eof(",4) == 0) {
+         tokens[numTokens++] = OP_EOF;
          tokens[numTokens++] = OP_OP;
          buffer+=4;
          parens++;

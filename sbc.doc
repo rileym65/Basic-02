@@ -65,6 +65,7 @@ Expressions:
   COS(expr)
   CSNG(expr)
   DPEEK(addr)
+  EOF(filenum)
   EXP(addr)
   FLG(expr)
   FRE(addr)
