@@ -39,6 +39,7 @@ OBJS = \
 	copen.o \
 	cout.o \
 	cpoke.o \
+	cpos.o \
 	cprint.o \
 	cput.o \
 	cq.o \
@@ -109,6 +110,7 @@ congoto.o:       header.h congoto.c
 copen.o:         header.h copen.c
 cout.o:          header.h cout.c
 cpoke.o:         header.h cpoke.c
+cpos.o:          header.h cpos.c
 cput.o:          header.h cput.c
 cprint.o:        header.h cprint.c
 cq.o:            header.h cq.c

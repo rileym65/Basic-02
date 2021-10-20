@@ -259,6 +259,7 @@ extern char* con(char* line);
 extern char* copen(char* line);
 extern char* cout(char* line);
 extern char* cpoke(char* line);
+extern char* cpos(char* line);
 extern char* cprint(char* line);
 extern char* cput(char* line);
 extern char* cq(char* line);

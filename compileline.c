@@ -81,6 +81,7 @@ int compileLine(char* line) {
     else if (useElfos != 0 && strncasecmp(line, "mkdir",5) == 0) line = cmkdir(line+5);
     else if (useElfos != 0 && strncasecmp(line, "chdir",5) == 0) line = cchdir(line+5);
     else if (useElfos != 0 && strncasecmp(line, "rmdir",5) == 0) line = crmdir(line+5);
+    else if (useElfos != 0 && strncasecmp(line, "pos",3) == 0) line = cpos(line+3);
     else line = clet(line);
   
     line = trim(line);
