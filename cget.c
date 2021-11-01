@@ -46,7 +46,6 @@ char* cget(char* line) {
       }
     token[i] = 0;
     i = getVariable(token);
-printf(">>%s<< = %x\n",token,i);
     sprintf(buffer,"          ldi   v_%s.1                    ; get address of variable data",token);
     Asm(buffer);
     Asm("          phi   rf");
