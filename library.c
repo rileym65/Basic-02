@@ -180,9 +180,12 @@ void library() {
       Asm("          ghi  r7");
       Asm("          smi  1");
       Asm("          str  rf");
+      Asm("          phi  r7");
       Asm("          inc  rf");
       Asm("          glo  r7");
       Asm("          str  rf");
+      Asm("          ldi  0");
+      Asm("          str  r7");
       }
     else {
       sprintf(buffer,"          ldi  %d",heap/256); Asm(buffer);
