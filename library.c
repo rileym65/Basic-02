@@ -22,8 +22,10 @@ void library() {
   showCompiler = 0;
   Asm("scall:      equ  r4");
   Asm("sret:       equ  r5");
-  sprintf(buffer,"stack:      equ  0%04xh",stack); Asm(buffer);
-  sprintf(buffer,"estack:     equ  0%04xh",estack); Asm(buffer);
+  if (useElfos == 0) {
+    sprintf(buffer,"stack:      equ  0%04xh",stack); Asm(buffer);
+    sprintf(buffer,"estack:     equ  0%04xh",estack); Asm(buffer);
+    }
   if (useElfos) {
     t1 = programStart;
     t2 = (highest - programStart + 1);
@@ -88,7 +90,22 @@ void library() {
 
 
   if (passNumber == 1) lblStart = address;
-  if (useStg) {
+  if (useElfos) {
+    Asm("start:      ldi  004h");
+    Asm("            phi  r7");
+    Asm("            ldi  042h");
+    Asm("            plo  r7");
+    Asm("            lda  r7");
+    Asm("            phi  r2");
+    Asm("            smi  1");
+    Asm("            phi  rf");
+    Asm("            phi  r7");
+    Asm("            lda  r7");
+    Asm("            plo  rf");
+    Asm("            plo  r2");
+    Asm("            plo  r7");
+    }
+  else if (useStg) {
     Asm("start:      ghi  r6");
     Asm("            stxd");
     Asm("            glo  r6");
@@ -109,10 +126,12 @@ void library() {
     Asm("            ldi  stack.0");
     Asm("            plo  r2");
     }
-  Asm("            ldi  estack.1");
-  Asm("            phi  r7");
-  Asm("            ldi  estack.0");
-  Asm("            plo  r7");
+  if (useElfos == 0) {
+    Asm("            ldi  estack.1");
+    Asm("            phi  r7");
+    Asm("            ldi  estack.0");
+    Asm("            plo  r7");
+    }
   if (useElfos == 0 && useStg == 0) {
     Asm("          ldi  call.1");
     Asm("          phi  r4      ");
@@ -157,11 +176,21 @@ void library() {
     Asm("          phi  rf");
     Asm("          ldi  HEAP_.0");
     Asm("          plo  rf");
-    sprintf(buffer,"          ldi  %d",heap/256); Asm(buffer);
-    Asm("          str  rf");
-    Asm("          inc  rf");
-    sprintf(buffer,"          ldi  %d",heap%256); Asm(buffer);
-    Asm("          str  rf");
+    if (useElfos) {
+      Asm("          ghi  r7");
+      Asm("          smi  1");
+      Asm("          str  rf");
+      Asm("          inc  rf");
+      Asm("          glo  r7");
+      Asm("          str  rf");
+      }
+    else {
+      sprintf(buffer,"          ldi  %d",heap/256); Asm(buffer);
+      Asm("          str  rf");
+      Asm("          inc  rf");
+      sprintf(buffer,"          ldi  %d",heap%256); Asm(buffer);
+      Asm("          str  rf");
+      }
     }
   if ((getDefine("ITOA16") || getDefine("ATOI16") || getDefine("ITOA32") || getDefine("ATOI32")) && useElfos == 0) {
     Asm("          sep  scall");
