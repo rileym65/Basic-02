@@ -123,7 +123,7 @@ char* copen(char* line) {
          Asm("          ldi   3                       ; Open for writing");
          break;
     case 'A':
-         Asm("          ldi   17                      ; Open for append");
+         Asm("          ldi   5                       ; Open for append");
          break;
     }
   Asm("          plo   r7                      ; set open flags");
