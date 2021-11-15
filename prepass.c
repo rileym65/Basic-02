@@ -28,7 +28,7 @@ int prepass(char* filename) {
   lblStart = 0;
 
   while (fgets(currentLine, 1023, source) != NULL) {
-    while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] < 32) currentLine[strlen(currentLine)-1] = 0;
+    while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] <= 32) currentLine[strlen(currentLine)-1] = 0;
     if (currentLine[0] == '.') {
       if (strcasecmp(currentLine,".fp") == 0) { useFp = -1; use32Bits = -1; }
       if (strcasecmp(currentLine,".32") == 0) { use32Bits = -1; }
