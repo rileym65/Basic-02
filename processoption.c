@@ -40,6 +40,7 @@ void processOption(char* option) {
     if (strcmp(option,"-A") == 0) showAsm = -1;
     if (strcmp(option,"-b") == 0) outMode = 'B';
     if (strcmp(option,"-i") == 0) outMode = 'I';
+    if (strcmp(option,"-o") == 0) showOptions = -1;
     if (strcmp(option,"-r") == 0) outMode = 'R';
     if (strcmp(option,"-R") == 0) showRuntime = -1;
     if (strcmp(option,"-l") == 0) showList = -1;

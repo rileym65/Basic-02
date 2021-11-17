@@ -133,6 +133,7 @@ Compiler Directives:
 .noruntime      - Do not show runtime modules
 .nosymbols      - Do not show assembler symbols
 .novars         - Do not show variables
+.options        - Show options in effect
 .runtime        - Show runtime modules
 .symbols        - Show assembler symbols
 .vars           - Show variables
@@ -147,6 +148,7 @@ Switches:
 -i              - output as Intel hex
 -l              - show source list
 -L              - create .lst file
+-o              - show options in effect
 -r              - output as RCS hex
 -R              - show runtime modules
 -s              - show assembler symbols

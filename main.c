@@ -129,6 +129,7 @@ int main(int argc, char** argv, char** envp) {
   showSymbols = 0;
   showCompiler = 0;
   showList = 0;
+  showOptions = 0;
   showVariables = 0;
   showRuntime = 0;
   stack = 0;
@@ -223,6 +224,25 @@ int main(int argc, char** argv, char** envp) {
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);
+  if (showOptions) {
+    printf("Options in effect:\n");
+    if (use32Bits) printf("  32-bits\n");
+    if (useFp) printf("  Floating point\n");
+    if (use1805) printf("  1804/5/6 instructions\n");
+    if (useAsm) printf("  Create .asm file\n");
+    if (showAsm) printf("  Show assembly listing\n");
+    if (outMode == 'B') printf("  Produce binary output\n");
+    if (outMode == 'I') printf("  Produce Intel hex output\n");
+    if (outMode == 'R') printf("  Produce RCS hex output\n");
+    if (showRuntime) printf("  Show runtime modules\n");
+    if (showList) printf("  Show source list\n");
+    if (createLst) printf("  Create .lst file\n");
+    if (showCompiler) printf("  Show compiler output\n");
+    if (showSymbols) printf("  Show symbols\n");
+    if (showVariables) printf("  Show variables\n");
+    if (useElfos) printf("  Produce Elf/OS executable\n");
+    printf("\n");
+    }
   if (useSelfTerm == 0) {
     addLabel("f_type",lblF_type);
     addLabel("f_setbd",lblF_setbd);
