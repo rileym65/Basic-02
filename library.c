@@ -92,16 +92,14 @@ void library() {
   if (passNumber == 1) lblStart = address;
   if (useElfos) {
     Asm("start:      ldi  004h");
-    Asm("            phi  r7");
+    Asm("            phi  rf");
     Asm("            ldi  042h");
-    Asm("            plo  r7");
-    Asm("            lda  r7");
+    Asm("            plo  rf");
+    Asm("            lda  rf");
     Asm("            phi  r2");
     Asm("            smi  1");
-    Asm("            phi  rf");
     Asm("            phi  r7");
-    Asm("            lda  r7");
-    Asm("            plo  rf");
+    Asm("            lda  rf");
     Asm("            plo  r2");
     Asm("            plo  r7");
     }
@@ -180,12 +178,13 @@ void library() {
       Asm("          ghi  r7");
       Asm("          smi  1");
       Asm("          str  rf");
-      Asm("          phi  r7");
+      Asm("          phi  r9");
       Asm("          inc  rf");
       Asm("          glo  r7");
+      Asm("          plo  r9");
       Asm("          str  rf");
       Asm("          ldi  0");
-      Asm("          str  r7");
+      Asm("          str  r9");
       }
     else {
       sprintf(buffer,"          ldi  %d",heap/256); Asm(buffer);
