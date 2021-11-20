@@ -41,7 +41,7 @@ char* cget(char* line) {
   while (*line != ':' && *line != 0) {
     line=trim(line);
     i = 0;
-    while (*line != 0 && *line > ' ' && *line != ',') {
+    while (*line != 0 && *line > ' ' && *line != ',' && *line != ':') {
       token[i++] = *line++;
       }
     token[i] = 0;
