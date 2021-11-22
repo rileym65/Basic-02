@@ -35,6 +35,8 @@ char* cclose(char* line) {
   Asm("          plo   rd");
   Asm("          sep   scall                   ; Call Elf/OS to close the file");
   Asm("          dw    0312h");
+  Asm("          sep   scall                   ; Set I/O return variables");
+  Asm("          dw    ioresults");
   sprintf(buffer,"          ldi   (file1_+%d*2).0         ; Point to file handle",fnum % 256);
   Asm(buffer);
   Asm("          plo   rd");

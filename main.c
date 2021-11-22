@@ -268,6 +268,10 @@ int main(int argc, char** argv, char** envp) {
     getVariable("STMP8_$");
     getVariable("STMP9_$");
     }
+  if (getDefine("FILES")) {
+    getVariable("IORESULT");
+    getVariable("IOFLAG");
+    }
   outCount = 0;
   outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
   if (outFile < 0) {

@@ -6779,5 +6779,27 @@ eof:        smi     1            ; handle number minus 1
 eof_no:     ldi     0            ; signal not in eof
             sep     sret         ; and return
 
+ioresults:  plo    re              ; save return code
+            ldi    v_ioresult.1    ; point to ioresult variable
+            phi    rf
+            ldi    v_ioresult.0
+            plo    rf
+            ldi    0               ; set msb to zero
+            str    rf
+            inc    rf
+            glo    re              ; then set lsb to result code
+            str    rf
+            ldi    v_ioflag.1      ; point to ioflag variable
+            phi    rf
+            ldi    v_ioflag.0
+            plo    rf
+            ldi    0               ; clear msb of ioflag
+            str    rf
+            inc    rf
+            shlc                   ; set D to DF
+            str    rf              ; and store into ioflag
+            sep    sret            ; return to caller
+
+
 #endif
 

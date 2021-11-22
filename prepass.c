@@ -123,7 +123,7 @@ int prepass(char* filename) {
               currentLine[i-1] != 'f') useData = -1;
           if (strncasecmp(currentLine+i,"flg(",4) == 0) addDefine("USEEF",1,1);
           if (strncasecmp(currentLine+i,"alloc(",6) == 0) addDefine("HEAP",1,1);
-          if (strncasecmp(currentLine+i,"$",1) == 0) addDefine("STRINGS",1,1);
+//          if (strncasecmp(currentLine+i,"$",1) == 0) addDefine("STRINGS",1,1);
           if (strncasecmp(currentLine+i,"open",4) == 0) addDefine("FILES",1,1);
           if (strncasecmp(currentLine+i,"close",5) == 0) addDefine("FILES",1,1);
           }

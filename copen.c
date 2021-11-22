@@ -129,6 +129,8 @@ char* copen(char* line) {
   Asm("          plo   r7                      ; set open flags");
   Asm("          sep   scall                   ; Call Elf/OS to open the file");
   Asm("          dw    0306h");
+  Asm("          sep   scall                   ; Set I/O return variables");
+  Asm("          dw    ioresults");
 
 
 
