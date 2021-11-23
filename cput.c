@@ -91,6 +91,8 @@ char* cput(char* line) {
       line = trim(line);
       }
     }
+  Asm("          sep   scall                   ; Set I/O return variables");
+  Asm("          dw    ioresults");
   return line;
   }
 

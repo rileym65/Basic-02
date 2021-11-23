@@ -82,6 +82,9 @@ char* cfwrite(char* line) {
   Asm("          plo   rf");
   Asm("          sep   scall                   ; Call Elf/OS to write data");
   Asm("          dw    030ch");
+  Asm("          sep   scall                   ; Set I/O return variables");
+  Asm("          dw    ioresults");
+
   while (*line != ':' && *line != 0) line++;
   return line;
   }
