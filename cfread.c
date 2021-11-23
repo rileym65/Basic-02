@@ -84,6 +84,16 @@ char* cfread(char* line) {
   Asm("          dw    0309h");
   Asm("          sep   scall                   ; Set I/O return variables");
   Asm("          dw    ioresults");
+  Asm("          lbdf  $+14                    ; jump on error");
+  Asm("          ldi   v_ioresult.1            ; point to i/o result variable");
+  Asm("          phi   rf");
+  Asm("          ldi   v_ioresult.0");
+  Asm("          plo   rf");
+  Asm("          ghi   rc                      ; store count of bytes read");
+  Asm("          str   rf");
+  Asm("          inc   rf");
+  Asm("          glo   rc");
+  Asm("          str   rf");
 
   while (*line != ':' && *line != 0) line++;
   return line;
