@@ -13,6 +13,9 @@
 int compileLine(char* line) {
   word l;
   listCount = 0;
+  char token[256];
+  int  pos;
+  char *pline;
   if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (passNumber == 2 && createLst)
     fprintf(lstFile,"                  ; %s\n",line);
@@ -42,46 +45,54 @@ int compileLine(char* line) {
     }
   line = trim(line);
   while (*line != 0) {
-    if (strncasecmp(line,"end",3) == 0) line=cend(line+3);
-    else if (strncasecmp(line,"gosub",5) == 0) line=cgosub(line+5);
-    else if (strncasecmp(line,"goto",4) == 0) line=cgoto(line+4);
-    else if (strncasecmp(line,"idle",4) == 0) line=cidle(line+4);
-    else if (strncasecmp(line,"intr",4) == 0) line=cintr(line+4);
-    else if (strncasecmp(line,"ioff",4) == 0) line=cioff(line+4);
-    else if (strncasecmp(line,"ion",3) == 0) line=cion(line+3);
-    else if (strncasecmp(line,"let ",4) == 0) line=clet(line+4);
-    else if (strncasecmp(line,"rem",3) == 0) line=crem(line+3);
-    else if (strncasecmp(line,"return",6) == 0) line=creturn(line+6);
-    else if (strncasecmp(line,"poke",4) == 0) line=cpoke(line+4);
-    else if (strncasecmp(line,"dpoke",5) == 0) line=cdpoke(line+5);
-    else if (strncasecmp(line,"on",2) == 0) line=con(line+2);
-    else if (strncasecmp(line,"if",2) == 0) line=cif(line+2);
-    else if (strncasecmp(line,"print",5) == 0) line=cprint(line+5);
-    else if (strncasecmp(line,"input",5) == 0) line=cinput(line+5);
-    else if (strncasecmp(line,"dma",3) == 0) line=cdma(line+3);
-    else if (strncasecmp(line,"q",1) == 0) line=cq(line+1);
-    else if (strncasecmp(line,"out",3) == 0) line=cout(line+3);
-    else if (strncasecmp(line,"for",3) == 0) line=cfor(line+3);
-    else if (strncasecmp(line,"next",4) == 0) line=cnext(line+4);
-    else if (strncasecmp(line,"cls",3) == 0) line=ccls(line+3);
-    else if (strncasecmp(line,"locate",6) == 0) line=clocate(line+6);
-    else if (strncasecmp(line,"data",4) == 0) line=cdata(line+4);
-    else if (strncasecmp(line,"read",4) == 0) line=cread(line+4);
-    else if (strncasecmp(line,"restore",7) == 0) line=crestore(line+7);
-    else if (strncasecmp(line,"asm",3) == 0) line=casm(line+3);
-    else if (strncasecmp(line,"dealloc",7) == 0) line=cdealloc(line+7);
-    else if (useElfos != 0 && strncasecmp(line, "open",4) == 0) line = copen(line+4);
-    else if (useElfos != 0 && strncasecmp(line, "close",5) == 0) line = cclose(line+5);
-    else if (useElfos != 0 && strncasecmp(line, "put",3) == 0) line = cput(line+3);
-    else if (useElfos != 0 && strncasecmp(line, "get",3) == 0) line = cget(line+3);
-    else if (useElfos != 0 && strncasecmp(line, "fwrite",6) == 0) line = cfwrite(line+6);
-    else if (useElfos != 0 && strncasecmp(line, "fread",5) == 0) line = cfread(line+5);
-    else if (useElfos != 0 && strncasecmp(line, "rename",6) == 0) line = crename(line+6);
-    else if (useElfos != 0 && strncasecmp(line, "delete",6) == 0) line = cdelete(line+6);
-    else if (useElfos != 0 && strncasecmp(line, "mkdir",5) == 0) line = cmkdir(line+5);
-    else if (useElfos != 0 && strncasecmp(line, "chdir",5) == 0) line = cchdir(line+5);
-    else if (useElfos != 0 && strncasecmp(line, "rmdir",5) == 0) line = crmdir(line+5);
-    else if (useElfos != 0 && strncasecmp(line, "pos",3) == 0) line = cpos(line+3);
+    pos = 0;
+    pline = line;
+    while (*pline != 0 &&
+          ((*pline >= 'a' && *pline <= 'z')  ||
+           (*pline >= 'A' && *pline <= 'Z') ||
+           (*pline >= '0' && *pline <= '9') ||
+           *pline == '_')) token[pos++] = *pline++;
+    token[pos] = 0;
+    if (strcasecmp(line,"end") == 0) line=cend(line+3);
+    else if (strcasecmp(token,"gosub") == 0) line=cgosub(line+5);
+    else if (strcasecmp(token,"goto") == 0) line=cgoto(line+4);
+    else if (strcasecmp(token,"idle") == 0) line=cidle(line+4);
+    else if (strcasecmp(token,"intr") == 0) line=cintr(line+4);
+    else if (strcasecmp(token,"ioff") == 0) line=cioff(line+4);
+    else if (strcasecmp(token,"ion") == 0) line=cion(line+3);
+    else if (strcasecmp(token,"let ") == 0) line=clet(line+4);
+    else if (strcasecmp(token,"rem") == 0) line=crem(line+3);
+    else if (strcasecmp(token,"return") == 0) line=creturn(line+6);
+    else if (strcasecmp(token,"poke") == 0) line=cpoke(line+4);
+    else if (strcasecmp(token,"dpoke") == 0) line=cdpoke(line+5);
+    else if (strcasecmp(token,"on") == 0) line=con(line+2);
+    else if (strcasecmp(token,"if") == 0) line=cif(line+2);
+    else if (strcasecmp(token,"print") == 0) line=cprint(line+5);
+    else if (strcasecmp(token,"input") == 0) line=cinput(line+5);
+    else if (strcasecmp(token,"dma") == 0) line=cdma(line+3);
+    else if (strcasecmp(token,"q") == 0) line=cq(line+1);
+    else if (strcasecmp(token,"out") == 0) line=cout(line+3);
+    else if (strcasecmp(token,"for") == 0) line=cfor(line+3);
+    else if (strcasecmp(token,"next") == 0) line=cnext(line+4);
+    else if (strcasecmp(token,"cls") == 0) line=ccls(line+3);
+    else if (strcasecmp(token,"locate") == 0) line=clocate(line+6);
+    else if (strcasecmp(token,"data") == 0) line=cdata(line+4);
+    else if (strcasecmp(token,"read") == 0) line=cread(line+4);
+    else if (strcasecmp(token,"restore") == 0) line=crestore(line+7);
+    else if (strcasecmp(token,"asm") == 0) line=casm(line+3);
+    else if (strcasecmp(token,"dealloc") == 0) line=cdealloc(line+7);
+    else if (useElfos != 0 && strcasecmp(token, "open") == 0) line = copen(line+4);
+    else if (useElfos != 0 && strcasecmp(token, "close") == 0) line = cclose(line+5);
+    else if (useElfos != 0 && strcasecmp(token, "put") == 0) line = cput(line+3);
+    else if (useElfos != 0 && strcasecmp(token, "get") == 0) line = cget(line+3);
+    else if (useElfos != 0 && strcasecmp(token, "fwrite") == 0) line = cfwrite(line+6);
+    else if (useElfos != 0 && strcasecmp(token, "fread") == 0) line = cfread(line+5);
+    else if (useElfos != 0 && strcasecmp(token, "rename") == 0) line = crename(line+6);
+    else if (useElfos != 0 && strcasecmp(token, "delete") == 0) line = cdelete(line+6);
+    else if (useElfos != 0 && strcasecmp(token, "mkdir") == 0) line = cmkdir(line+5);
+    else if (useElfos != 0 && strcasecmp(token, "chdir") == 0) line = cchdir(line+5);
+    else if (useElfos != 0 && strcasecmp(token, "rmdir") == 0) line = crmdir(line+5);
+    else if (useElfos != 0 && strcasecmp(token, "pos") == 0) line = cpos(line+3);
     else line = clet(line);
   
     line = trim(line);
