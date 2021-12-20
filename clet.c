@@ -293,6 +293,11 @@ char* clet(char* line) {
   else {
     if (fp) line = cexpr(line, 1);
       else line = cexpr(line, 0);
+    line = trim(line);
+    if (*line != ':' && *line > ' ') {
+      showError("Syntax error");
+      exit(1);
+      }
     addr = getVariable(varname);
     if (use32Bits) {
       sprintf(buffer,"          ldi   (v_%s+3).1              ; Get destination variable address", varname); Asm(buffer);
