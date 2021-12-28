@@ -60,7 +60,7 @@ int compileLine(char* line) {
     else if (strcasecmp(token,"intr") == 0) line=cintr(line+4);
     else if (strcasecmp(token,"ioff") == 0) line=cioff(line+4);
     else if (strcasecmp(token,"ion") == 0) line=cion(line+3);
-    else if (strcasecmp(token,"let ") == 0) line=clet(line+4);
+    else if (strcasecmp(token,"let") == 0) line=clet(line+4);
     else if (strcasecmp(token,"rem") == 0) line=crem(line+3);
     else if (strcasecmp(token,"return") == 0) line=creturn(line+6);
     else if (strcasecmp(token,"poke") == 0) line=cpoke(line+4);
