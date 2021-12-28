@@ -250,6 +250,10 @@ int main(int argc, char** argv, char** envp) {
     addLabel("f_input",lblF_input);
     addLabel("f_msg",lblF_msg);
     }
+  if (getDefine("FILES")) {
+    getVariable("IORESULT");
+    getVariable("IOFLAG");
+    }
   passNumber = 1;
   pass(sourceFile);
   keyBuffer = address;
@@ -267,10 +271,6 @@ int main(int argc, char** argv, char** envp) {
     getVariable("STMP7_$");
     getVariable("STMP8_$");
     getVariable("STMP9_$");
-    }
-  if (getDefine("FILES")) {
-    getVariable("IORESULT");
-    getVariable("IOFLAG");
     }
   outCount = 0;
   outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
