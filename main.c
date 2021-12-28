@@ -224,6 +224,11 @@ int main(int argc, char** argv, char** envp) {
   codeGenerated = 0;
   highest = 0;
   prepass(sourceFile);
+  //grw - moved variable defs before pass 1
+  if (getDefine("FILES")) {
+    getVariable("IORESULT");
+    getVariable("IOFLAG");
+    }
   if (showOptions) {
     printf("Options in effect:\n");
     if (use32Bits) printf("  32-bits\n");
@@ -267,10 +272,6 @@ int main(int argc, char** argv, char** envp) {
     getVariable("STMP7_$");
     getVariable("STMP8_$");
     getVariable("STMP9_$");
-    }
-  if (getDefine("FILES")) {
-    getVariable("IORESULT");
-    getVariable("IOFLAG");
     }
   outCount = 0;
   outFile = open(outName,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
@@ -455,4 +456,3 @@ int main(int argc, char** argv, char** envp) {
     }
   if (createLst) fclose(lstFile);
   }
-
