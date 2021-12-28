@@ -255,6 +255,10 @@ int main(int argc, char** argv, char** envp) {
     addLabel("f_input",lblF_input);
     addLabel("f_msg",lblF_msg);
     }
+  if (getDefine("FILES")) {
+    getVariable("IORESULT");
+    getVariable("IOFLAG");
+    }
   passNumber = 1;
   pass(sourceFile);
   keyBuffer = address;
