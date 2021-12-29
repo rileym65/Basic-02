@@ -27,6 +27,10 @@ int prepass(char* filename) {
 
   lblStart = 0;
 
+  if (use32Bits) {
+    addDefine("use32bits",1,1);
+    }
+
   while (fgets(currentLine, 1023, source) != NULL) {
     while (strlen(currentLine) > 0 && currentLine[strlen(currentLine)-1] <= 32) currentLine[strlen(currentLine)-1] = 0;
     if (currentLine[0] == '.') {
