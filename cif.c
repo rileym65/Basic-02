@@ -14,6 +14,7 @@ char* cif(char* line) {
   word addr;
   line = trim(line);
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   line = trim(line);
   Asm("          sex   r7                      ; Point X to expr stack");
   Asm("          irx                           ; Move to lsb of result");

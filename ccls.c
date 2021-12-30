@@ -14,7 +14,8 @@ char* ccls(char* line) {
   line = trim(line);
   if (*line != ':' && *line != 0) {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   Asm("          sep   scall                   ; Display message");
   Asm("          dw    f_inmsg");

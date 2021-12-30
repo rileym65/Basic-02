@@ -17,7 +17,8 @@ char* casm(char* line) {
   line = trim(line);
   if (*line != 0) {
     showError("Nothing can follow ASM on a line");
-    exit(1);
+    *line = 0;
+    return line;
     }
   flag = -1;
   while (flag) {

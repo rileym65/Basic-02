@@ -245,7 +245,8 @@ char* clet(char* line) {
   /* ********************************** */
   if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {
     showError("Invalid variable name");
-    exit(1);
+    *line = 0;
+    return line;
     }
   pos = 0;
   fp = 0;
@@ -263,7 +264,8 @@ char* clet(char* line) {
           (*line >= '0' && *line <= '9') ||
           *line == '_') {
           showError("Invalid variable name");
-          exit(1);
+          *line = 0;
+          return line;
         }
       }
     if (useFp) {
@@ -275,7 +277,8 @@ char* clet(char* line) {
             (*line >= '0' && *line <= '9') ||
             *line == '_') {
             showError("Invalid variable name");
-            exit(1);
+            *line = 0;
+            return line;
           }
         }
       }
@@ -284,7 +287,8 @@ char* clet(char* line) {
   line = trim(line);
   if (*line != '=') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   line = trim(line);
@@ -293,10 +297,12 @@ char* clet(char* line) {
   else {
     if (fp) line = cexpr(line, 1);
       else line = cexpr(line, 0);
+    if (exprErrors > 0) return line;
     line = trim(line);
     if (*line != ':' && *line > ' ') {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     addr = getVariable(varname);
     if (use32Bits) {

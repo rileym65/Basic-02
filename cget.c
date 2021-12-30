@@ -17,12 +17,14 @@ char* cget(char* line) {
   line = trim(line);
   if (*line != '#') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   if (*line < '1' || *line > '8') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   fnum = *line - '1';
   line++;

@@ -13,6 +13,7 @@
 char* cdma(char* line) {
   line = trim(line);
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   Asm("          inc   r7                      ; Set R0 to address");
   Asm("          lda   r7");
   Asm("          plo   r0");

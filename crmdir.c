@@ -14,7 +14,8 @@ char* crmdir(char* line) {
   line = trim(line);
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
@@ -31,7 +32,8 @@ char* crmdir(char* line) {
   Asm("          str   rf                      ; write to i/o buffer");
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   line = trim(line);

@@ -39,7 +39,8 @@ char* cinput(char* line) {
     line = trim(line);
     if (*line != ',') {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     line++;
     }
@@ -49,7 +50,8 @@ char* cinput(char* line) {
     if (!(*line >= 'a' && *line <= 'z') &&
         !(*line >= 'A' && *line <= 'Z')) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     pos = 0;
     while ((*line >= 'a' && *line <= 'z') ||
@@ -66,7 +68,8 @@ char* cinput(char* line) {
                  (*line >= '0' && *line <= '9') ||
                  *line == '_') {
             showError("Invalid variable name");
-            exit(1);
+            *line = 0;
+            return line;
             }
           }
         }
@@ -74,7 +77,8 @@ char* cinput(char* line) {
     name[pos] = 0;
     if (strlen(name) == 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     addr = getVariable(name);
     Asm("          sep   scall                   ; display question mark");
@@ -125,7 +129,8 @@ char* cinput(char* line) {
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     if (*line == ',') line++;
     }

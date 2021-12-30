@@ -23,6 +23,7 @@ char* cq(char* line) {
     return line;
     }
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   Asm("          inc   r7                      ; Recover computed value");
   Asm("          lda   r7");
   if (use32Bits) {

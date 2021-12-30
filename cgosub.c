@@ -17,11 +17,13 @@ char* cgosub(char* line) {
   line = getNumber(line, &lineno);
   if (lineno == 0) {
     showError("Invalid line number for gosub");
-    exit(1);
+    *line = 0;
+    return line;
     }
   if (findLine(lineno, &target) != 0) {
     showError("Line number not found");
-    exit(1);
+    *line = 0;
+    return line;
     }
   Asm("          sep   scall                   ; Call subroutine");
   sprintf(buffer,"          dw    l_%d",lineno); Asm(buffer);

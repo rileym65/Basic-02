@@ -138,6 +138,8 @@ LINK dword  *data;
 LINK word   dataAddress;
 LINK word  *dataLines;
 LINK word  *dataPositions;
+LINK int    errorCount;
+LINK int    exprErrors;
 LINK word   numData;
 LINK word   numDataLines;
 LINK word   iBufferSize;

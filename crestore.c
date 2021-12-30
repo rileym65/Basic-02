@@ -20,7 +20,8 @@ char* crestore(char* line) {
     if (*line != ':' && *line != 0) {
       if (*line < '0' || *line > '9') {
         showError("Invalid line number");
-        exit(1);
+        *line = 0;
+        return line;
         }
       num = 0;
       while (*line >= '0' && *line <= '9') {
@@ -36,7 +37,8 @@ char* crestore(char* line) {
         }
       if (pos == 0xffff) {
         showError("Line number not found");
-        exit(1);
+        *line = 0;
+        return line;
         }
       }
     }

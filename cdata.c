@@ -30,7 +30,8 @@ char* cdata(char* line) {
   while (*line != ':' && *line != 0) {
     if ((*line < '0' || *line > '9') && *line != '-') {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     neg = 0;
     num = 0;
@@ -45,7 +46,8 @@ char* cdata(char* line) {
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     if (neg) {
       num = (num ^ 0xffff) + 1;

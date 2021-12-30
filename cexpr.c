@@ -73,7 +73,9 @@ char* isFloatingPointNumber(char* line, char* token) {
       }
     else if (*line == '.') {
       showError("Syntax error");
-      exit(1);
+      exprErrors++;
+      *line = 0;
+      return line;
       }
     else flag = 2;
     }
@@ -956,6 +958,10 @@ char* evaluate(char* buffer) {
     /* ***** Process floating-point constant ***** */
     /* ******************************************* */
     buffer = isFloatingPointNumber(buffer, token);
+    if (exprErrors > 0) {
+      *buffer = 0;
+      return buffer;
+      }
     if (strlen(token) > 0) {
       if (useFp) {
         fpi.f = atof(token);
@@ -975,7 +981,9 @@ char* evaluate(char* buffer) {
         }
       else {
         showError("Floating point not allowed in integer mode");
-        exit(1);
+        exprErrors++;
+        *buffer = 0;
+        return buffer;
         }
       }
 
@@ -1063,7 +1071,9 @@ char* evaluate(char* buffer) {
                      (*buffer >= '0' && *buffer <= '9') ||
                       *buffer == '_') {
                 showError("Invalid variable name");
-                exit(1);
+                exprErrors++;
+                *buffer = 0;
+                return buffer;
                 }
               }
             }
@@ -1098,7 +1108,9 @@ char* evaluate(char* buffer) {
 
     if (term == 0) {
       showError("Expression error");
-      exit(1);
+      exprErrors++;
+      *buffer = 0;
+      return buffer;
       }
 
     while (*buffer == ' ') buffer++;
@@ -1128,7 +1140,9 @@ char* evaluate(char* buffer) {
   while (reduce(-1));
   if (numTokens != 2) {
     showError("Expression error\n");
-    exit(1);
+    exprErrors++;
+    *buffer = 0;
+    return buffer;
     }
   return buffer;
   }
@@ -1151,6 +1165,7 @@ char* cexpr(char* line, int etype) {
   temp = line;
   handled = 0;
   numTokens = 0;
+  exprErrors = 0;
 
   fp = 0;
   /* ************************************************* */
@@ -1241,7 +1256,8 @@ char* cexpr(char* line, int etype) {
                  (*temp >= '0' && *temp <= '9') ||
                  *temp == '_') {
             showError("Invalid variable name");
-            exit(1);
+            *line = 0;
+            return line;
             }
           }
         }
@@ -1278,14 +1294,22 @@ char* cexpr(char* line, int etype) {
   /* **************************************** */
   /* ***** Otherwise process expression ***** */
   /* **************************************** */
-  if (!handled) line = evaluate(line);
+  if (!handled) {
+    line = evaluate(line);
+    if (exprErrors > 0) {
+      *line = 0;
+      return line;
+      }
+    }
   if (numTokens != 2) {
     showError("Expression error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   if (tokens[1] != OP_NUM && tokens[1] != OP_NUMFP) {
     showError("Expression error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   if (tokens[1] == OP_NUM && etype == 1) {
     Asm("           sep     scall               ; Convert integer to floating point");

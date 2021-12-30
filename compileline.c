@@ -98,7 +98,7 @@ int compileLine(char* line) {
     line = trim(line);
     if (*line != ':' && *line != 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
       }
     if (*line == ':') {
       line++;

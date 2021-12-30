@@ -12,10 +12,12 @@
 
 char* cpoke(char* line) {
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   line = trim(line);
   if (*line != ',') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   Asm("          inc   r7                      ; Get poke address");
@@ -28,6 +30,7 @@ char* cpoke(char* line) {
     Asm("          inc   r7");
     }
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   Asm("          irx                           ; Recover poke address");
   Asm("          ldxa");
   Asm("          phi   rf");

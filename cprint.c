@@ -57,6 +57,7 @@ char* cprint(char* line) {
       }
     else {
       line = cexpr(line, 2);
+      if (exprErrors > 0) return line;
       if (useFp) {
         if (tokens[1] == OP_NUM) {
           Asm("          inc   r7                      ; Point to expression result");
@@ -103,8 +104,9 @@ char* cprint(char* line) {
           Asm("          inc   r7");
           }
         else {
-printf("Expression error\n");
-exit(1);
+          showError("Expression error\n");
+          *line = 0;
+          return line;
           }
         }
       else if (use32Bits) {

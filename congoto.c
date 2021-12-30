@@ -17,6 +17,7 @@ char* con(char* line) {
   word lines[256];
   int  lineCount;
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   line = trim(line);
   if (strncasecmp(line,"goto",4) == 0) {
     mode = 'G';
@@ -31,14 +32,16 @@ char* con(char* line) {
     line = trim(line);
     if (*line < '0' || *line > '9') {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     line = getNumber(line, &addr);
     lines[lineCount++] = addr;
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     if (*line == ',') line++;
     }
@@ -52,7 +55,8 @@ char* con(char* line) {
     Asm("          smi   1                       ; Subtract 1 from index");
     if (findLine(lines[i], &addr) != 0) {
       showError("Line number not found");
-      exit(1);
+      *line = 0;
+      return line;
       }
     if (mode == 'G') {
       sprintf(buffer,"          lbz   l_%d                    ; Jump if index is zero", lines[i]); Asm(buffer);

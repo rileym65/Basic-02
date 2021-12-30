@@ -15,12 +15,14 @@ char* cput(char* line) {
   line = trim(line);
   if (*line != '#') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   if (*line < '1' || *line > '8') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   fnum = *line - '1';
   line++;
@@ -43,6 +45,7 @@ char* cput(char* line) {
     Asm("          glo   rd");
     Asm("          stxd");
     line = cexpr(line, 2);
+    if (exprErrors > 0) return line;
     Asm("          inc   r7                      ; Point to expression result");
     Asm("          ldi   0                       ; set high byte of count to zero");
     Asm("          phi   rc");

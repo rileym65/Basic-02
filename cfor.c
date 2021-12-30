@@ -104,7 +104,8 @@ char* cfor(char* line) {
 
   if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {
     showError("Invalid variable name");
-    exit(1);
+    *line = 0;
+    return line;
     }
   pos = 0;
   while ((*line >= 'a' && *line <= 'z') ||
@@ -117,11 +118,13 @@ char* cfor(char* line) {
   line = trim(line);
   if (*line != '=') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   line = trim(line);
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   vaddr = getVariable(varname);
 
   if (use32Bits) {
@@ -159,11 +162,13 @@ char* cfor(char* line) {
 
   if (strncasecmp(line,"to",2) != 0) {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line += 2;
   line = trim(line);
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   line = trim(line);
   if (use32Bits) {
     Asm("          sep   scall                   ; subtract end from start");
@@ -221,10 +226,12 @@ char* cfor(char* line) {
     line += 4;
     line = trim(line);
     line = cexpr(line, 0);
+    if (exprErrors > 0) return line;
     line = trim(line);
     if (*line != ':' && *line != 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     Asm("          stxd                          ; save room for loop count");
     Asm("          stxd");
@@ -299,7 +306,8 @@ char* cfor(char* line) {
     }
   else {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
 
   addr = address + 12;

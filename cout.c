@@ -12,10 +12,12 @@
 
 char* cout(char* line) {
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   line = trim(line);
   if (*line != ',') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   Asm("          ldi   0d3h                    ; Need a SEP R3 command");
@@ -30,6 +32,7 @@ char* cout(char* line) {
     Asm("          inc   r7");
     }
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   Asm("          irx                           ; Recover OUT command");
   Asm("          ldx");
   Asm("          plo   re                      ; Set aside for a moment");

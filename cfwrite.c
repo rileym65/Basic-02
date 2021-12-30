@@ -15,17 +15,20 @@ char* cfwrite(char* line) {
   line = trim(line);
   if (*line != '#') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   if (*line < '1' || *line > '8') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   fnum = *line - '1';
   line++;
   line = trim(line);
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   if (use32Bits) {
     Asm("          inc   r7                      ; Retrieve address");
     Asm("          inc   r7");
@@ -45,10 +48,12 @@ char* cfwrite(char* line) {
   line = trim(line);
   if (*line != ',') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   if (use32Bits) {
     Asm("          inc   r7                      ; Retrieve address");
     Asm("          inc   r7");

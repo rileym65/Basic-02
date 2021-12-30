@@ -29,7 +29,8 @@ char* cread(char* line) {
     if ((*line < 'a' || *line > 'z') &&
         (*line < 'A' || *line > 'Z')) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     pos = 0;
     while ((*line >= 'a' && *line <= 'z') ||
@@ -64,7 +65,8 @@ char* cread(char* line) {
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
-      exit(1);
+      *line = 0;
+      return line;
       }
     if (*line == ',') {
       line++;

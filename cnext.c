@@ -23,7 +23,8 @@ char* cnext(char* line) {
   else {
     if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {
       showError("Invalid variable name");
-      exit(1);
+      *line = 0;
+      return line;
       }
     pos = 0;
     while ((*line >= 'a' && *line <= 'z') ||

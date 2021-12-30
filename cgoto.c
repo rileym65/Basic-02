@@ -17,11 +17,13 @@ char* cgoto(char* line) {
   line = getNumber(line, &lineno);
   if (lineno == 0) {
     showError("Invalid line number for goto");
-    exit(1);
+    *line = 0;
+    return line;
     }
   if (findLine(lineno, &target) != 0) {
     showError("Line number not found");
-    exit(1);
+    *line = 0;
+    return line;
     }
   sprintf(buffer,"          lbr   l_%d                    ; Jump",lineno); Asm(buffer);
   return line;

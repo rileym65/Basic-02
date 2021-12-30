@@ -13,6 +13,7 @@
 char* cdealloc(char* line) {
   line = trim(line);
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   Asm("           inc     r7                  ; Get transfer address");
   Asm("           lda     r7");
   Asm("           plo     rf");

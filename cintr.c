@@ -16,11 +16,13 @@ char* cintr(char* line) {
   line = getNumber(line, &target);
   if (target == 0) {
     showError("Invalid line number for intr");
-    exit(1);
+    *line = 0;
+    return line;
     }
   if (findLine(target, &target) != 0) {
     showError("Line number not found");
-    exit(1);
+    *line = 0;
+    return line;
     }
   Asm("          ldi   [INTR_].1               ; Point to interrupt line");
   Asm("          phi   rf");

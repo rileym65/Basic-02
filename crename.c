@@ -14,7 +14,8 @@ char* crename(char* line) {
   line = trim(line);
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
@@ -36,19 +37,22 @@ char* crename(char* line) {
   Asm("          plo   rc");
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   line = trim(line);
   if (strncasecmp(line, "to", 2) != 0) {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line += 3;
   line = trim(line);
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   while (*line != 0 && *line != '"') {

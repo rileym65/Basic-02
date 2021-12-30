@@ -116,6 +116,7 @@ int main(int argc, char** argv, char** envp) {
     printf("Usage: sbc [options] filename\n");
     exit(1);
     }
+  errorCount = 0;
   iBufferSize = 0;
   outMode = 'R';
   programStart = 0xffff;
@@ -256,6 +257,11 @@ int main(int argc, char** argv, char** envp) {
     }
   passNumber = 1;
   pass(sourceFile);
+  if (errorCount != 0) {
+    printf("Errors: %d\n",errorCount);
+    printf("Compilation aborted\n");
+    exit(1);
+    }
   keyBuffer = address;
   variableRAM = (variableStart == 0xffff) ? keyBuffer+iBufferSize : variableStart;
   variableNextAddress = variableRAM;
@@ -297,6 +303,7 @@ int main(int argc, char** argv, char** envp) {
   if (numNests > 0) printf("#define without #endif\n");
   printf("\n\n");
   printf("Lines compiled: %d\n",lineCount);
+  printf("Error count   : %d\n",errorCount);
   printf("Runtime size  : %d\n",runtime-programStart);
   printf("Program size  : %d\n",codeGenerated-(runtime-programStart));
   printf("Total size    : %d\n",codeGenerated);

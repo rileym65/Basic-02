@@ -22,10 +22,12 @@ char* clocate(char* line) {
   Asm("          str   rd");
   Asm("          inc   rd");
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   line = trim(line);
   if (*line != ',') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   Asm("          inc   r7                      ; Get row");
@@ -51,6 +53,7 @@ char* clocate(char* line) {
   Asm("          glo   rd");
   Asm("          stxd");
   line = cexpr(line, 0);
+  if (exprErrors > 0) return line;
   Asm("          irx                           ; Recover RD");
   Asm("          ldxa");
   Asm("          plo   rd");

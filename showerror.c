@@ -11,9 +11,9 @@
 #include "header.h"
 
 void showError(char* msg) {
-  printf("%s\n",msg);
-  printf("%s\n",currentLine);
-  return;
+  printf("\n*** %s\n", msg);
+  printf("%d:%s\n",lineCount, currentLine);
+  errorCount++;
   }
 
 

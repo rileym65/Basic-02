@@ -16,7 +16,8 @@ char* copen(char* line) {
   line = trim(line);
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
@@ -33,13 +34,15 @@ char* copen(char* line) {
   Asm("          str   rf                      ; write to i/o buffer");
   if (*line != '"') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   line = trim(line);
   if (strncasecmp(line, "for", 3) != 0) {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line += 4;
   line = trim(line);
@@ -48,23 +51,27 @@ char* copen(char* line) {
   else if (strncasecmp(line, "append", 6) == 0) { mode = 'A'; line += 6; }
   else {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line = trim(line);
   if (strncasecmp(line, "as", 2) != 0) {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line += 2;
   line = trim(line);
   if (*line != '#') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   line++;
   if (*line < '1' || *line > '8') {
     showError("Syntax error");
-    exit(1);
+    *line = 0;
+    return line;
     }
   fnum = *line - '1';
   line++;
