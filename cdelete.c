@@ -11,8 +11,6 @@
 #include "header.h"
 
 char* cdelete(char* line) {
-  char mode;
-  byte fnum;
   line = trim(line);
   if (*line != '"') {
     showError("Syntax error");
