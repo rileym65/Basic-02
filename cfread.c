@@ -28,12 +28,12 @@ char* cfread(char* line) {
   line = cexpr(line, 0);
   if (use32Bits) {
     Asm("          inc   r7                      ; Retrieve address");
-    Asm("          inc   r7");
-    Asm("          inc   r7");
     Asm("          lda   r7");
     Asm("          stxd                          ; save on stack for now");
     Asm("          ldn   r7");
     Asm("          stxd");
+    Asm("          inc   r7");
+    Asm("          inc   r7");
     }
   else {
     Asm("          inc   r7                      ; Retrieve address");
@@ -51,12 +51,12 @@ char* cfread(char* line) {
   line = cexpr(line, 0);
   if (use32Bits) {
     Asm("          inc   r7                      ; Retrieve address");
-    Asm("          inc   r7");
-    Asm("          inc   r7");
     Asm("          lda   r7");
     Asm("          plo   rc                      ; place into count register");
     Asm("          ldn   r7");
     Asm("          phi   rc");
+    Asm("          inc   r7");
+    Asm("          inc   r7");
     }
   else {
     Asm("          inc   r7                      ; Retrieve address");
