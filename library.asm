@@ -6800,6 +6800,12 @@ ioresults:  plo    re              ; save return code
             ldi    v_ioflag.0
             plo    rf
             ldi    0               ; clear msb of ioflag
+#ifdef use32bits
+            str    rf              ; clear high word if 32 bits
+            inc    rf
+            str    rf
+            inc    rf
+#endif
             str    rf
             inc    rf
             shlc                   ; set D to DF
