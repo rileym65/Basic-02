@@ -22,6 +22,8 @@
 #define LINK extern
 #endif
 
+#define VERSION  "0.1.0"
+
 #define IDL      0x00
 #define LDN      0x00
 #define INC      0x10

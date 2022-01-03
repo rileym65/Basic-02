@@ -108,7 +108,7 @@ void output(byte value) {
 int main(int argc, char** argv, char** envp) {
   int i;
   char temp[1024];
-  printf("BASIC/02 Compiler v0.1\n");
+  printf("BASIC/02 Compiler v%s\n",VERSION);
   printf("by Michael H. Riley\n");
   printf("\n");
   strcpy(sourceFile,"");
