@@ -767,6 +767,18 @@ void Asm(char* line) {
       addDefine(label, i, 0);
       return;
       }
+    if (strncasecmp(line,"#redefine",9) == 0) {
+      line += 9;
+      line = trim(line);
+      pos = 0;
+      while (*line != 0 && *line > ' ') label[pos++] = *line++;
+      label[pos] = 0;
+      line = trim(line);
+      i = atoi(line);
+      if (i == 0) i = 1;
+      addDefine(label, i, 1);
+      return;
+      }
     if (strncasecmp(line,"#ifdef",6) == 0) {
       line += 6;
       line = trim(line);
