@@ -22,9 +22,9 @@ void library() {
   struct tm tv;
  
   time_t epochSeconds;
-  epochSeconds = time(NULL);  
-  localtime_r(&(epochSeconds), &(tv));     
-  
+  epochSeconds = time(NULL);
+  localtime_r(&(epochSeconds), &(tv));
+
   ctmp = showCompiler;
   showCompiler = 0;
   Asm("scall:      equ  r4");
