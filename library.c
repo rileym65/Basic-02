@@ -10,7 +10,6 @@
 
 #include "header.h"
 #include "library.h"
-#include <sys/time.h>
 #include <time.h>
 
 // R7 - data stack
@@ -23,9 +22,9 @@ void library() {
   struct tm tv;
  
   time_t epochSeconds;
-  epochSeconds = time(NULL);
-  localtime_r(&(epochSeconds), &(tv));
-
+  epochSeconds = time(NULL);  
+  localtime_r(&(epochSeconds), &(tv));     
+  
   ctmp = showCompiler;
   showCompiler = 0;
   Asm("scall:      equ  r4");
@@ -226,4 +225,3 @@ void library() {
   showCompiler = ctmp;
   if (passNumber == 1) runtime = address;
   }
-
