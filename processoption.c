@@ -110,6 +110,15 @@ void processOption(char* option) {
       lblF_msg = 0xff09;
       lblF_setbd = 0xff2d;
       }
+    if (strcmp(option,"-term=elfos") == 0) {
+      useSelfTerm = 0;
+      lblF_inmsg = 0x034b;
+      lblF_type = 0x0330;
+      lblF_read = 0x0309;
+      lblF_input = 0x0339;
+      lblF_msg = 0x0333;
+      lblF_setbd = 0x0360;
+      }      
     if (strcmp(option,"-term=self") == 0) {
       useSelfTerm = 0xff;
       lblF_inmsg = 0x0000;
@@ -214,4 +223,3 @@ void processOption(char* option) {
     if (strncmp(option,"-heap=",6) == 0) heap=getHex(option+6);
     if (strncmp(option,"-keybuf=",8) == 0) iBufferSize=getHex(option+8);
   }
-
