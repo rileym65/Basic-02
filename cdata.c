@@ -13,6 +13,7 @@
 char* cdata(char* line) {
   word num;
   char neg;
+  useData = -1;
   if (passNumber == 1) {
     numDataLines++;
     if (numDataLines == 1) {

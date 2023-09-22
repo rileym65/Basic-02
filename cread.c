@@ -15,6 +15,7 @@ char* cread(char* line) {
   int  pos;
   word addr;
   char token[128];
+  useData = -1;
   last = 0xffff;
   line = trim(line);
   Asm("          ldi   DATA_.1                 ; Point to DATA pointer");

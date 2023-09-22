@@ -114,6 +114,7 @@ int pass(char* filename) {
     }
   if (useData) {
     Asm("DATA_:    dw    0");
+    Asm("          public  DATA_");
     }
   if (useHeap) {
     Asm("HEAP_:    dw    0");
