@@ -223,8 +223,6 @@ int main(int argc, char** argv, char** envp) {
   numberOfVariables = 0;
   numData = 0;
   numDataLines = 0;
-  numLabels = 0;
-  numDefines = 0;
   numNests = 0;
   codeGenerated = 0;
   highest = 0;

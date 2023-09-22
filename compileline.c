@@ -23,25 +23,23 @@ int compileLine(char* line) {
     sprintf(buffer,"; %s",line); writeAsm(buffer,"");
     }
   line = trim(line);
-  if (*line < '0' || *line > '9') {
-    showError("Error: Line does not start with a line number");
-    return -1;
-    }
-  line = getNumber(line, &l);
-  sprintf(buffer,"l_%d:",l); Asm(buffer);
-  if (l == 0 || l > 65535) {
-    showError("Error: Invalid line number");
-    return -1;
-    }
-  if (l < lastLineNumber) {
-    showError("Error: Line number out of sequence");
-    return -1;
-    }
-  lastLineNumber = l;
-  if (passNumber == 1) {
-    lineNumbers[numberOfLines] = l;
-    lineAddresses[numberOfLines] = address;
-    numberOfLines++;
+  if (*line >= '0' && *line <= '9') {
+    line = getNumber(line, &l);
+    sprintf(buffer,"l_%d:",l); Asm(buffer);
+    if (l == 0 || l > 65535) {
+      showError("Error: Invalid line number");
+      return -1;
+      }
+    if (l < lastLineNumber) {
+      showError("Error: Line number out of sequence");
+      return -1;
+      }
+    lastLineNumber = l;
+    if (passNumber == 1) {
+      lineNumbers[numberOfLines] = l;
+      lineAddresses[numberOfLines] = address;
+      numberOfLines++;
+      }
     }
   line = trim(line);
   while (*line != 0) {
