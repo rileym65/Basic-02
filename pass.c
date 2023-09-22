@@ -41,6 +41,7 @@ int pass(char* filename) {
   outAddress = address;
   lastLineNumber = 0;
   lineCount = 0;
+  autoLabel = 1;
   library();
   while (fgets(currentLine, 1023, source) != NULL) {
     lineCount++;
@@ -116,6 +117,7 @@ int pass(char* filename) {
     }
   if (useHeap) {
     Asm("HEAP_:    dw    0");
+    Asm("          public  HEAP_");
     }
   if (useStg) {
     Asm("STG_:     dw    0");
@@ -131,6 +133,7 @@ int pass(char* filename) {
     Asm("file8_:   dw    0");
     }
   Asm("FREE_:    dw    0");
+  Asm("          public  FREE_");
   for (i=0; i<numberOfVariables; i++) {
     sprintf(buffer,"v_%s: ",variableNames[i]);
     while (strlen(buffer) < 10) strcat(buffer," ");

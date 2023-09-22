@@ -224,6 +224,7 @@ LINK word   variableNextAddress;
 LINK word   variableRAM;
 LINK word   variableStart;
 LINK FILE  *lstFile;
+LINK int    autoLabel;
 
 LINK char** externalProcs;
 LINK char** externals;

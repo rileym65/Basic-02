@@ -42,6 +42,8 @@ int compileLine(char* line) {
       }
     }
   line = trim(line);
+  sprintf(buffer,"la_%d:",autoLabel);
+  Asm(buffer);
   while (*line != 0) {
     pos = 0;
     pline = line;
@@ -103,6 +105,7 @@ int compileLine(char* line) {
       line = trim(line);
       }
     }
+  autoLabel++;
   if (passNumber == 2 && showCompiler) printf("\n");
   return 0;
   }

@@ -25,6 +25,7 @@ char* cdealloc(char* line) {
     }
   Asm("           sep     scall               ; Call dealloc routine");
   Asm("           dw      dealloc");
+  AddExternal(currentProc, "dealloc");
   return line;
   }
 
