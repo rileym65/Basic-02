@@ -14,8 +14,6 @@
 
 char* cfor(char* line) {
   int  pos;
-  word vaddr;
-  word addr;
   dword start;
   dword end;
   dword step;
@@ -26,7 +24,7 @@ char* cfor(char* line) {
   quick = 0;
   if (match(line,"A=#A#A#")) {
     if (strcasecmp(matches[3],"to") == 0 && strcasecmp(matches[5],"step") == 0) {
-      vaddr = getVariable(matches[0]);
+      getVariable(matches[0]);
       start = atoi(matches[2]);
       end = atoi(matches[4]);
       step = atoi(matches[6]);
@@ -36,7 +34,7 @@ char* cfor(char* line) {
     }
   if (match(line,"A=#A#")) {
     if (strcasecmp(matches[3],"to") == 0) {
-      vaddr = getVariable(matches[0]);
+      getVariable(matches[0]);
       start = atoi(matches[2]);
       end = atoi(matches[4]);
       step = 1;
@@ -91,7 +89,7 @@ char* cfor(char* line) {
     sprintf(buffer,"          ldi   v_%s.0",matches[0]); Asm(buffer);
     Asm("          stxd");
 
-    addr = address + 6;
+//    addr = address + 6;
     Asm("          ldi   ($+6).1                   ; Write execution address to stack");
     Asm("          stxd");
     Asm("          ldi   ($+3).0");
@@ -125,7 +123,7 @@ char* cfor(char* line) {
   line = trim(line);
   line = cexpr(line, 0);
   if (exprErrors > 0) return line;
-  vaddr = getVariable(varname);
+  getVariable(varname);
 
   if (use32Bits) {
     sprintf(buffer,"          ldi   (v_%s+3).1                ; Get variable address",varname); Asm(buffer);
@@ -175,12 +173,16 @@ char* cfor(char* line) {
     Asm("          dw    sub32");
     Asm("          sep   scall                   ; get absolute value");
     Asm("          dw    abs32");
+    AddExternal(currentProc, "abs32");
+    AddExternal(currentProc, "sub32");
     }
   else {
     Asm("          sep   scall                   ; subtract end from start");
     Asm("          dw    sub16");
     Asm("          sep   scall                   ; get absolute value");
     Asm("          dw    abs16");
+    AddExternal(currentProc, "abs16");
+    AddExternal(currentProc, "sub16");
     }
 
   if (*line == ':' || *line == 0) {
@@ -274,6 +276,7 @@ char* cfor(char* line) {
       Asm("          inc   ra");
       Asm("          ldn   r7");
       Asm("          str   ra");
+      AddExternal(currentProc, "div32");
       }
     else {
       Asm("          inc   r7                      ; Store increment onto stack");
@@ -300,6 +303,7 @@ char* cfor(char* line) {
       Asm("          stxd");
       Asm("          dec   r2                      ; move stack below step");
       Asm("          dec   r2");
+      AddExternal(currentProc, "div16");
       }
 
 
@@ -310,13 +314,13 @@ char* cfor(char* line) {
     return line;
     }
 
-  addr = address + 12;
+//  addr = address + 12;
 
   sprintf(buffer,"          ldi   v_%s.1                  ; Write variable address to stack",varname); Asm(buffer);
   Asm("          stxd");
   sprintf(buffer,"          ldi   v_%s.0",varname); Asm(buffer);
   Asm("          stxd");
-  addr = address + 6;
+//  addr = address + 6;
   Asm("          ldi   ($+6).1                   ; Write execution address to stack");
   Asm("          stxd");
   Asm("          ldi   ($+3).0");

@@ -114,13 +114,13 @@ int pass(char* filename) {
   if (useData) {
     Asm("DATA_:    dw    0");
     }
-  if (getDefine("HEAP")) {
+  if (useHeap) {
     Asm("HEAP_:    dw    0");
     }
   if (useStg) {
     Asm("STG_:     dw    0");
     }
-  if (getDefine ("FILES")) {
+  if (useFiles) {
     Asm("file1_:   dw    0");
     Asm("file2_:   dw    0");
     Asm("file3_:   dw    0");

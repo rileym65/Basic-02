@@ -1,6 +1,5 @@
 sbc
 *.o
-*.asm
 *.bak
 *.hex
 *.bin
@@ -8,6 +7,7 @@ sbc
 *.bas
 *.lst
 *.rc
+*.build
 disk1.ide
 disktool
 elf

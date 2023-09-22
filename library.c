@@ -15,10 +15,8 @@
 // R7 - data stack
 
 void library() {
-  int  i;
   char ctmp;
   word t1,t2,t3;
-  FILE* file;
   struct tm tv;
  
   time_t epochSeconds;
@@ -179,7 +177,7 @@ void library() {
     Asm("          ldi  data.0");
     Asm("          str  rf");
     }
-  if (getDefine("HEAP")) {
+  if (useHeap) {
     Asm("          ldi  HEAP_.1");
     Asm("          phi  rf");
     Asm("          ldi  HEAP_.0");
@@ -204,7 +202,7 @@ void library() {
       Asm("          str  rf");
       }
     }
-  if ((getDefine("ITOA16") || getDefine("ATOI16") || getDefine("ITOA32") || getDefine("ATOI32")) && useElfos == 0) {
+  if (useTerminal && useElfos == 0) {
     Asm("          sep  scall");
     Asm("          dw   f_setbd");
     }

@@ -13,6 +13,7 @@
 char* cprint(char* line) {
   char qt;
   char last;
+  useTerminal = -1;
   line = trim(line);
   if (lblF_inmsg == 0xffff) {
     qt = 0;

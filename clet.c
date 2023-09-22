@@ -14,7 +14,6 @@ char* clet(char* line) {
   int  pos;
   int  fp;
   int  st;
-  word addr;
   dword value;
   char varname[256];
   line = trim(line);
@@ -22,7 +21,7 @@ char* clet(char* line) {
   /* ***** Look for optimizations ***** */
   /* ********************************** */
   if (match(line,"A=#")) {
-    addr = getVariable(matches[0]);
+    getVariable(matches[0]);
     value = atoi(matches[2]);
     sprintf(buffer,"          ldi   v_%s.1                  ; Get variable address", matches[0]); Asm(buffer);
     Asm("          phi   rf");
@@ -46,12 +45,12 @@ char* clet(char* line) {
     return line;
     }
   if (match(line,"A=A")) {
-    addr = getVariable(matches[0]);
+    getVariable(matches[0]);
     sprintf(buffer,"          ldi   v_%s.1                  ; Get first variable address", matches[0]); Asm(buffer);
     Asm("          phi   rf");
     sprintf(buffer,"          ldi   v_%s.0", matches[0]); Asm(buffer);
     Asm("          plo   rf");
-    addr = getVariable(matches[2]);
+    getVariable(matches[2]);
     sprintf(buffer,"          ldi   v_%s.1                  ; Get second variable address", matches[2]); Asm(buffer);
     Asm("          phi   rd");
     sprintf(buffer,"          ldi   v_%s.0", matches[2]); Asm(buffer);
@@ -74,7 +73,7 @@ char* clet(char* line) {
     }
   if (match(line,"A=A+#")) {
     if (strcasecmp(matches[0], matches[2]) == 0) {
-      addr = getVariable(matches[0]) + 1;
+      getVariable(matches[0]);
       value = atoi(matches[4]);
       if (use32Bits) {
         sprintf(buffer,"          ldi   (v_%s+3).1              ; Get variable address +3", matches[0]); Asm(buffer);
@@ -109,14 +108,14 @@ char* clet(char* line) {
       return line;
       }
     else {
-      addr = getVariable(matches[0]) + 1;
+      getVariable(matches[0]);
       value = atoi(matches[4]);
       if (use32Bits) {
         sprintf(buffer,"          ldi   (v_%s+3).1                ; Get first variable address +3", matches[0]); Asm(buffer);
         Asm("          phi   rf");
         sprintf(buffer,"          ldi   (v_%s+3).0", matches[0]); Asm(buffer);
         Asm("          plo   rf");
-        addr = getVariable(matches[2]) + 1;
+        getVariable(matches[2]);
         sprintf(buffer,"          ldi   (v_%s+3).1                ; Get second variable address +3", matches[2]); Asm(buffer);
         Asm("          phi   rd");
         sprintf(buffer,"          ldi   (v_%s+3).0", matches[2]); Asm(buffer);
@@ -127,7 +126,7 @@ char* clet(char* line) {
         Asm("          phi   rf");
         sprintf(buffer,"          ldi   (v_%s+1).0", matches[0]); Asm(buffer);
         Asm("          plo   rf");
-        addr = getVariable(matches[2]) + 1;
+        getVariable(matches[2]);
         sprintf(buffer,"          ldi   (v_%s+1).1                ; Get second variable address +1", matches[2]); Asm(buffer);
         Asm("          phi   rd");
         sprintf(buffer,"          ldi   (v_%s+1).0", matches[2]); Asm(buffer);
@@ -159,7 +158,7 @@ char* clet(char* line) {
     }
   if (match(line,"A=A-#")) {
     if (strcasecmp(matches[0], matches[2]) == 0) {
-      addr = getVariable(matches[0]) + 1;
+      getVariable(matches[0]);
       value = atoi(matches[4]);
       if (use32Bits) {
         sprintf(buffer,"          ldi   (v_%s+3).1              ; Get variable address +3", matches[0]); Asm(buffer);
@@ -194,14 +193,14 @@ char* clet(char* line) {
       return line;
       }
     else {
-      addr = getVariable(matches[0]) + 1;
+      getVariable(matches[0]);
       value = atoi(matches[4]);
       if (use32Bits) {
         sprintf(buffer,"          ldi   (v_%s+3).1                ; Get first variable address +3", matches[0]); Asm(buffer);
         Asm("          phi   rf");
         sprintf(buffer,"          ldi   (v_%s+3).0", matches[0]); Asm(buffer);
         Asm("          plo   rf");
-        addr = getVariable(matches[2]) + 1;
+        getVariable(matches[2]);
         sprintf(buffer,"          ldi   (v_%s+3).1                ; Get second variable address +3", matches[2]); Asm(buffer);
         Asm("          phi   rd");
         sprintf(buffer,"          ldi   (v_%s+3).0", matches[2]); Asm(buffer);
@@ -212,7 +211,7 @@ char* clet(char* line) {
         Asm("          phi   rf");
         sprintf(buffer,"          ldi   (v_%s+1).0", matches[0]); Asm(buffer);
         Asm("          plo   rf");
-        addr = getVariable(matches[2]) + 1;
+        getVariable(matches[2]);
         sprintf(buffer,"          ldi   (v_%s+1).1                ; Get second variable address +1", matches[2]); Asm(buffer);
         Asm("          phi   rd");
         sprintf(buffer,"          ldi   (v_%s+1).0", matches[2]); Asm(buffer);
@@ -304,7 +303,7 @@ char* clet(char* line) {
       *line = 0;
       return line;
       }
-    addr = getVariable(varname);
+    getVariable(varname);
     if (use32Bits) {
       sprintf(buffer,"          ldi   (v_%s+3).1              ; Get destination variable address", varname); Asm(buffer);
       Asm("          phi   rf");

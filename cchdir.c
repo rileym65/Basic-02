@@ -15,7 +15,7 @@ char* cchdir(char* line) {
   if (*line != '"') {
     showError("Syntax error");
     *line = 0;
-    return;
+    return line;
     }
   line++;
   Asm("          ldi   iobuffer.1              ; Point to i/o buffer");
@@ -33,7 +33,7 @@ char* cchdir(char* line) {
   if (*line != '"') {
     showError("Syntax error");
     *line = 0;
-    return;
+    return line;
     }
   line++;
   line = trim(line);

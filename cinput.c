@@ -13,9 +13,9 @@
 char* cinput(char* line) {
   int  fp;
   char qt;
-  word addr;
   char name[256];
   int  pos;
+  useTerminal = -1;
   line = trim(line);
   if (lblF_inmsg == 0xffff) {
     qt = 0;
@@ -80,7 +80,7 @@ char* cinput(char* line) {
       *line = 0;
       return line;
       }
-    addr = getVariable(name);
+    getVariable(name);
     Asm("          sep   scall                   ; display question mark");
     Asm("          dw    f_inmsg");
     Asm("          db    '? ',0");

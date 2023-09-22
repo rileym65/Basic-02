@@ -12,13 +12,13 @@
 
 char* cnext(char* line) {
   int  pos;
-  word addr;
+//  word addr;
   char hasVar;
   char varname[256];
   line = trim(line);
   hasVar = 0;
   if (*line == ':' || *line == 0) {
-    addr = 0;
+//    addr = 0;
     }
   else {
     if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {
@@ -35,7 +35,8 @@ char* cnext(char* line) {
       }
     varname[pos] = 0;
     line = trim(line);
-    addr = getVariable(varname);
+//    addr = getVariable(varname);
+    getVariable(varname);
     hasVar = -1;
     }
   if (hasVar == 0) {

@@ -92,13 +92,11 @@ char* isFloatingPointNumber(char* line, char* token) {
 
 char* isIntegerNumber(char* line, char* token) {
   char  flag;
-  char  dot;
   char* oline;
   char *otoken;
   oline = line;
   otoken = token;
   flag = 0;
-  dot = 0;
   if (*line == '-') *token++ = *line++;
   while (flag == 0) {
     if (*line >= '0' && *line <= '9') *token++ = *line++;
@@ -116,13 +114,11 @@ char* isIntegerNumber(char* line, char* token) {
 
 char* isIntegerVariable(char* line, char* token) {
   char  flag;
-  char  dot;
   char* oline;
   char *otoken;
   oline = line;
   otoken = token;
   flag = 0;
-  dot = 0;
   while (flag == 0) {
     if ((*line >= 'a' && *line <= 'z') ||
         (*line >= 'A' && *line <= 'Z') ||
@@ -169,14 +165,9 @@ void check2args() {
   }
 
 int reduce(char last) {
-  int i;
   int arg1,arg2;
   int op;
-  int done;
-  int flag;
   int ret;
-  word addr;
-  flag = 0;
   if (numTokens == 0) return 0;
   if (tokens[numTokens-1] != OP_NUM && tokens[numTokens-1] != OP_NUMFP) return 0;
   opType = 'I';
@@ -597,7 +588,7 @@ int reduce(char last) {
            Asm("           inc     r7");
            Asm("           inc     r7");
            }
-         if (getDefine("HEAP")) {
+         if (useHeap) {
            if (use32Bits) {
              Asm("           ldi     0                   ; High word is zero");
              Asm("           str     r7");
@@ -714,6 +705,7 @@ int reduce(char last) {
          Asm("           sep     scall               ; Call alloc function");
          Asm("           dw      alloc");
          AddExternal(currentProc, "alloc");
+         useHeap = -1;
          if (use32Bits) {
            Asm("           ldi     0                   ; Clear high word");
            Asm("           str     r7");
@@ -948,7 +940,6 @@ char* evaluate(char* buffer) {
   char term;
   int p;
   char token[64];
-  int neg;
   int flag;
   int func;
   int parens;
@@ -1339,11 +1330,8 @@ char* cexpr(char* line, int etype) {
   dword num32;
   char  token[128];
   char *temp;
-  char *oline;
   char  neg;
   char  handled;
-  FPI   fpi;
-  oline = line;
   line = trim(line);
   temp = line;
   handled = 0;

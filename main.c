@@ -145,6 +145,9 @@ int main(int argc, char** argv, char** envp) {
   use1805 = 0;
   use32Bits = 0;
   useFp = 0;
+  useHeap = 0;
+  useFiles = 0;
+  useTerminal = 0;
   createLst = 0;
   lblF_inmsg = 0xff66;
   lblF_type = 0xff03;
@@ -245,14 +248,14 @@ int main(int argc, char** argv, char** envp) {
     if (useElfos) printf("  Produce Elf/OS executable\n");
     printf("\n");
     }
-  if (useSelfTerm == 0) {
-    addLabel("f_type",lblF_type);
-    addLabel("f_setbd",lblF_setbd);
-    addLabel("f_inmsg",lblF_inmsg);
-    addLabel("f_input",lblF_input);
-    addLabel("f_msg",lblF_msg);
-    }
-  if (getDefine("FILES")) {
+//  if (useSelfTerm == 0) {
+//    addLabel("f_type",lblF_type);
+//    addLabel("f_setbd",lblF_setbd);
+//    addLabel("f_inmsg",lblF_inmsg);
+//    addLabel("f_input",lblF_input);
+//    addLabel("f_msg",lblF_msg);
+//    }
+  if (useFiles) {
     getVariable("IORESULT");
     getVariable("IOFLAG");
     }
@@ -267,7 +270,7 @@ int main(int argc, char** argv, char** envp) {
   variableRAM = (variableStart == 0xffff) ? keyBuffer+iBufferSize : variableStart;
   variableNextAddress = variableRAM;
   passNumber = 2;
-  if (getDefine("STRINGS")) {
+  if (useStrings) {
     getVariable("STMP0_$");
     getVariable("STMP1_$");
     getVariable("STMP2_$");
@@ -313,137 +316,14 @@ int main(int argc, char** argv, char** envp) {
   printf("Rom           : %04xh-%04xh\n",romStart,romEnd);
   printf("Stack         : %04xh\n",stack);
   printf("Expr. Stack   : %04xh\n",estack);
-  if (getDefine("HEAP"))
+  if (useHeap)
     printf("Heap          : %04xh\n",heap);
-  printf("Program start : %04xh\n",getLabel("start"));
+//  printf("Program start : %04xh\n",getLabel("start"));
   printf("\n");
   if (showRuntime) {
     printf("Included in runtime:\n");
-    if (getDefine("SELFTERM") != 0)   printf("  Delay      %04xh\n",getLabel("delay"));
-    if (getDefine("SELFTERM") != 0)   printf("  f_msg      %04xh\n",getLabel("f_msg"));
-    if (getDefine("SELFTERM") != 0)   printf("  f_inmsg    %04xh\n",getLabel("f_inmsg"));
-    if (getDefine("SELFTERM") != 0)   printf("  f_input    %04xh\n",getLabel("f_input"));
-    if (getDefine("SELFTERM") != 0)   printf("  f_read     %04xh\n",getLabel("f_read"));
-    if (getDefine("SELFTERM") != 0)   printf("  f_setbd    %04xh\n",getLabel("f_setbd"));
-    if (getDefine("SELFTERM") != 0)   printf("  f_type     %04xh\n",getLabel("f_type"));
-    if (getDefine("ABS16") != 0)      printf("  abs16      %04xh\n",getLabel("abs16"));
-    if (getDefine("ADD16") != 0)      printf("  add16      %04xh\n",getLabel("add16"));
-    if (getDefine("HEAP") != 0)       printf("  alloc      %04xh\n",getLabel("alloc"));
-    if (getDefine("HEAP") != 0)       printf("  dealloc    %04xh\n",getLabel("dealloc"));
-    if (getDefine("HEAP") != 0)       printf("  hfree      %04xh\n",getLabel("hfree"));
-    if (getDefine("AND16") != 0)      printf("  and16      %04xh\n",getLabel("and16"));
-    if (getDefine("ATOI16") != 0)     printf("  atoi16     %04xh\n",getLabel("atoi"));
-    if (getDefine("DIV16") != 0)      printf("  div16      %04xh\n",getLabel("div16"));
-    if (getDefine("USEEF") != 0)      printf("  readef     %04xh\n",getLabel("readef"));
-    if (getDefine("EQ16") != 0)       printf("  eq16       %04xh\n",getLabel("eq16"));
-    if (getDefine("CMP16") != 0)      printf("  false      %04xh\n",getLabel("false"));
-    if (getDefine("GT16") != 0)       printf("  gt16       %04xh\n",getLabel("gt16"));
-    if (getDefine("GTE16") != 0)      printf("  gte16      %04xh\n",getLabel("gte16"));
-    if (getDefine("ITOA16") != 0)     printf("  itoa16     %04xh\n",getLabel("itoa"));
-    if (getDefine("ITOA16") != 0)     printf("  tobcd      %04xh\n",getLabel("tobcd"));
-    if (getDefine("LT16") != 0)       printf("  lt16       %04xh\n",getLabel("lt16"));
-    if (getDefine("LTE16") != 0)      printf("  lte16      %04xh\n",getLabel("lte16"));
-    if (getDefine("MOD16") != 0)      printf("  mod16      %04xh\n",getLabel("mod16"));
-    if (getDefine("MUL16") != 0)      printf("  mul16      %04xh\n",getLabel("mul16"));
-    if (getDefine("NE16") != 0)       printf("  ne16       %04xh\n",getLabel("ne16"));
-    if (getDefine("NEXT16") != 0)     printf("  next16     %04xh\n",getLabel("next"));
-    if (getDefine("OR16") != 0)       printf("  or16       %04xh\n",getLabel("or16"));
-    if (getDefine("RND16") != 0)      printf("  rnd16      %04xh\n",getLabel("rnd16"));
-    if (getDefine("SGN16") != 0)      printf("  sgn16      %04xh\n",getLabel("sgn16"));
-    if (getDefine("SUB16") != 0)      printf("  sub16      %04xh\n",getLabel("sub16"));
-    if (getDefine("CMP16") != 0)      printf("  true       %04xh\n",getLabel("true"));
-    if (getDefine("XOR16") != 0)      printf("  xor16      %04xh\n",getLabel("xor16"));
-    if (getDefine("LFSR") != 0)       printf("  lfsr       %04xh\n",getLabel("lfsr_lp"));
-  
-    if (getDefine("ABS32") != 0)      printf("  abs32      %04xh\n",getLabel("abs32"));
-    if (getDefine("ADD32") != 0)      printf("  add32      %04xh\n",getLabel("add32"));
-    if (getDefine("AND32") != 0)      printf("  and32      %04xh\n",getLabel("and32"));
-    if (getDefine("ATOI32") != 0)     printf("  atoi32     %04xh\n",getLabel("atoi32"));
-    if (getDefine("CMP32") != 0)      printf("  cmp32      %04xh\n",getLabel("cmp32"));
-    if (getDefine("COMP32") != 0)     printf("  comp32     %04xh\n",getLabel("comp32"));
-    if (getDefine("DIV32") != 0)      printf("  div32      %04xh\n",getLabel("div32"));
-    if (getDefine("EQ32") != 0)       printf("  eq32       %04xh\n",getLabel("eq32"));
-    if (getDefine("CMP32") != 0)      printf("  false32    %04xh\n",getLabel("false32"));
-    if (getDefine("GT32") != 0)       printf("  gt32       %04xh\n",getLabel("gt32"));
-    if (getDefine("GTE32") != 0)      printf("  gte32      %04xh\n",getLabel("gte32"));
-    if (getDefine("ICOMP32") != 0)    printf("  icomp32    %04xh\n",getLabel("icomp32"));
-    if (getDefine("ITOA32") != 0)     printf("  itoa32     %04xh\n",getLabel("itoa32"));
-    if (getDefine("LT32") != 0)       printf("  lt32       %04xh\n",getLabel("lt32"));
-    if (getDefine("LTE32") != 0)      printf("  lte32      %04xh\n",getLabel("lte32"));
-    if (getDefine("MOD32") != 0)      printf("  mod32      %04xh\n",getLabel("mod32"));
-    if (getDefine("MUL32") != 0)      printf("  mul32      %04xh\n",getLabel("mul32"));
-    if (getDefine("NE32") != 0)       printf("  ne32       %04xh\n",getLabel("ne32"));
-    if (getDefine("NEG32") != 0)      printf("  neg32      %04xh\n",getLabel("neg32"));
-    if (getDefine("NEXT32") != 0)     printf("  next32     %04xh\n",getLabel("next32"));
-    if (getDefine("NULL32") != 0)     printf("  null32     %04xh\n",getLabel("null32"));
-    if (getDefine("OR32") != 0)       printf("  or32       %04xh\n",getLabel("or32"));
-    if (getDefine("RND32") != 0)      printf("  rnd32      %04xh\n",getLabel("rnd32"));
-    if (getDefine("SGN32") != 0)      printf("  sgn32      %04xh\n",getLabel("sgn32"));
-    if (getDefine("SHL32") != 0)      printf("  shl32      %04xh\n",getLabel("shl32"));
-    if (getDefine("SHR32") != 0)      printf("  shr32      %04xh\n",getLabel("shr32"));
-    if (getDefine("SUB32") != 0)      printf("  sub32      %04xh\n",getLabel("sub32"));
-    if (getDefine("ITOA32") != 0)     printf("  tobcd32    %04xh\n",getLabel("tobcd32"));
-    if (getDefine("CMP32") != 0)      printf("  true32     %04xh\n",getLabel("true32"));
-    if (getDefine("XOR32") != 0)      printf("  xor32      %04xh\n",getLabel("xor32"));
-    if (getDefine("ZERO32") != 0)     printf("  zero32     %04xh\n",getLabel("zero32"));
-  
-    if (getDefine("ABSFP") != 0)      printf("  absfp      %04xh\n",getLabel("absfp"));
-    if (getDefine("ADDFP") != 0)      printf("  addfp      %04xh\n",getLabel("addfp"));
-    if (getDefine("ATOF") != 0)       printf("  atof       %04xh\n",getLabel("atof"));
-    if (getDefine("DIVFP") != 0)      printf("  divfp      %04xh\n",getLabel("divfp"));
-    if (getDefine("EQFP") != 0)       printf("  eqfp       %04xh\n",getLabel("eqfp"));
-    if (getDefine("FTOA") != 0)       printf("  ftoa       %04xh\n",getLabel("ftoa"));
-    if (getDefine("GTFP") != 0)       printf("  gtfp       %04xh\n",getLabel("gtfp"));
-    if (getDefine("GTEFP") != 0)      printf("  gtefp      %04xh\n",getLabel("gtefp"));
-    if (getDefine("LTFP") != 0)       printf("  ltfp       %04xh\n",getLabel("ltfp"));
-    if (getDefine("LTEFP") != 0)      printf("  ltefp      %04xh\n",getLabel("ltefp"));
-    if (getDefine("MULFP") != 0)      printf("  mulfp      %04xh\n",getLabel("mulfp"));
-    if (getDefine("NEFP") != 0)       printf("  nefp       %04xh\n",getLabel("nefp"));
-    if (getDefine("SUBFP") != 0)      printf("  subfp      %04xh\n",getLabel("subfp"));
-    if (getDefine("SGNFP") != 0)      printf("  sgnfp      %04xh\n",getLabel("sgnfp"));
-    if (getDefine("USEFP") != 0)      printf("  fpargs     %04xh\n",getLabel("fpargs"));
-    if (getDefine("USEFP") != 0)      printf("  fpnorm     %04xh\n",getLabel("fpnorm"));
-    if (getDefine("USEFP") != 0)      printf("  fpret_0    %04xh\n",getLabel("fpret_0"));
-    if (getDefine("USEFP") != 0)      printf("  fpret_a    %04xh\n",getLabel("fpret_a"));
-    if (getDefine("USEFP") != 0)      printf("  fpret_b    %04xh\n",getLabel("fpret_b"));
-    if (getDefine("USEFP") != 0)      printf("  fpcomp2    %04xh\n",getLabel("fpcomp2"));
-    if (getDefine("USEFP") != 0)      printf("  itof       %04xh\n",getLabel("itof"));
-    if (getDefine("USEFP") != 0)      printf("  ftoi       %04xh\n",getLabel("ftoi"));
-    if (getDefine("USEFP") != 0)      printf("  fpdot1     %04xh\n",getLabel("fpdot1"));
-    if (getDefine("USEFP") != 0)      printf("  fpdot5     %04xh\n",getLabel("fpdot5"));
-    if (getDefine("USEFP") != 0)      printf("  fp_0       %04xh\n",getLabel("fp_0"));
-    if (getDefine("USEFP") != 0)      printf("  fp_1       %04xh\n",getLabel("fp_1"));
-    if (getDefine("USEFP") != 0)      printf("  fp_2       %04xh\n",getLabel("fp_2"));
-    if (getDefine("USEFP") != 0)      printf("  fp_3       %04xh\n",getLabel("fp_3"));
-    if (getDefine("USEFP") != 0)      printf("  fp_10      %04xh\n",getLabel("fp_10"));
-    if (getDefine("USEFP") != 0)      printf("  fp_100     %04xh\n",getLabel("fp_100"));
-    if (getDefine("USEFP") != 0)      printf("  fp_1000    %04xh\n",getLabel("fp_1000"));
-    if (getDefine("USEFP") != 0)      printf("  fp_e       %04xh\n",getLabel("fp_e"));
-    if (getDefine("USEFP") != 0)      printf("  fp_pi      %04xh\n",getLabel("fp_pi"));
-    if (getDefine("USEFP") != 0)      printf("  fp_halfpi  %04xh\n",getLabel("fp_halfpi"));
-  
-    if (useTrig != 0) {
-      }
-    if (getDefine("COSFP") != 0)      printf("  fpcos      %04xh\n",getLabel("fpcos"));
-    if (getDefine("EXPFP") != 0)      printf("  fpexp      %04xh\n",getLabel("fpexp"));
-    if (getDefine("POWFP") != 0)      printf("  fppow      %04xh\n",getLabel("fppow"));
-    if (getDefine("LNFP") != 0)       printf("  fpln       %04xh\n",getLabel("fpln"));
-    if (getDefine("SINFP") != 0)      printf("  fpsin      %04xh\n",getLabel("fpsin"));
-    if (getDefine("SQRTFP") != 0)     printf("  fpsqrt     %04xh\n",getLabel("fpsqrt"));
-    if (getDefine("TANFP") != 0)      printf("  fptan      %04xh\n",getLabel("fptan"));
-    if (getDefine("ATANFP") != 0)     printf("  fpatan     %04xh\n",getLabel("fpatan"));
-    if (getDefine("ASINFP") != 0)     printf("  fpasin     %04xh\n",getLabel("fpasin"));
-    if (getDefine("ACOSFP") != 0)     printf("  fpacos     %04xh\n",getLabel("fpacos"));
-  
-    if (getDefine("STRCAT") != 0)     printf("  strcat     %04xh\n",getLabel("strcat"));
-    if (getDefine("STRCPY") != 0)     printf("  strcpy     %04xh\n",getLabel("strcpy"));
-    if (getDefine("STRLEN") != 0)     printf("  strlen     %04xh\n",getLabel("strlen"));
-    if (getDefine("STRCMP") != 0)     printf("  strcmp     %04xh\n",getLabel("strcmp"));
-    if (getDefine("LEFT") != 0)       printf("  left       %04xh\n",getLabel("left"));
-    if (getDefine("MID") != 0)        printf("  mid        %04xh\n",getLabel("mid"));
-    if (getDefine("RIGHT") != 0)      printf("  right      %04xh\n",getLabel("right"));
-    if (getDefine("LOWER") != 0)      printf("  lower      %04xh\n",getLabel("lower"));
-    if (getDefine("UPPER") != 0)      printf("  upper      %04xh\n",getLabel("upper"));
+    for (i=0; i<numExternals; i++)
+      printf("  %s:%s\n", externalProcs[i], externals[i]);
   }
 
   printf("\n");
@@ -451,15 +331,9 @@ int main(int argc, char** argv, char** envp) {
     printf("Variables:\n");
     for (i=0; i<numberOfVariables; i++) {
       sprintf(buffer,"v_%s",variableNames[i]);
-      printf("  %-20s  %c %04xh\n",variableNames[i],variableTypes[i],getLabel(buffer));
+      printf("  %-20s  %c\n",variableNames[i],variableTypes[i]);
       }
     printf("\n");
-    }
-  if (showSymbols) {
-    printf("Symbols:\n");
-    for (i=0; i<numLabels; i++) {
-      printf("  %-20s  %04xh\n",labels[i], labelValues[i]);
-      }
     }
   if (createLst) fclose(lstFile);
   }

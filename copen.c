@@ -13,6 +13,7 @@
 char* copen(char* line) {
   char mode;
   byte fnum;
+  useFiles = -1;
   line = trim(line);
   if (*line != '"') {
     showError("Syntax error");
