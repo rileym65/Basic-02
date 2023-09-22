@@ -101,6 +101,7 @@ char* cinput(char* line) {
       Asm("          plo   rd");
       Asm("          sep   scall                   ; Convert ASCII to integer");
       Asm("          dw    atof");
+      AddExternal(currentProc, "atof");
       }
     else if (use32Bits) {
       sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
@@ -109,6 +110,7 @@ char* cinput(char* line) {
       Asm("          plo   rd");
       Asm("          sep   scall                   ; Convert ASCII to integer");
       Asm("          dw    atoi32");
+      AddExternal(currentProc, "atoi32");
       }
     else {
       Asm("          sep   scall                   ; Convert ASCII to integer");
@@ -122,6 +124,7 @@ char* cinput(char* line) {
       Asm("          inc   rf");
       Asm("          glo   rc");
       Asm("          str   rf");
+      AddExternal(currentProc, "atoi");
       }
     Asm("          sep   scall                   ; Display cr/lf");
     Asm("          dw    f_inmsg");

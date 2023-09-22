@@ -13,11 +13,29 @@
 int pass(char* filename) {
   int   i;
   char  tmp[16];
+  strcpy(currentProc, "_MAIN_");
   source = fopen(filename,"r");
   if (source == NULL) {
     printf("Could not open %s\n",filename);
     exit(1);
     }
+
+  sprintf(buffer,".link .library baslib.lib"); Asm(buffer);
+  sprintf(buffer,"f_inmsg:     equ   0%04xh",lblF_inmsg); Asm(buffer);
+  sprintf(buffer,"f_type:      equ   0%04xh",lblF_type); Asm(buffer);
+  sprintf(buffer,"f_read:      equ   0%04xh",lblF_read); Asm(buffer);
+  sprintf(buffer,"f_input:     equ   0%04xh",lblF_input); Asm(buffer);
+  sprintf(buffer,"f_msg:       equ   0%04xh",lblF_msg); Asm(buffer);
+  sprintf(buffer,"f_setbd:     equ   0%04xh",lblF_setbd); Asm(buffer);
+
+  if (passNumber == 2) {
+    for (i=0; i<numExternals; i++)
+      if (strcmp(externalProcs[i], "_MAIN_") == 0) {
+        sprintf(buffer,"          extrn  %s",externals[i]);
+        Asm(buffer);
+        }
+    }
+
   address = programStart;
   if (useElfos) address -= 6;
   outAddress = address;
@@ -87,9 +105,11 @@ int pass(char* filename) {
     if (passNumber == 2 && showCompiler) printf("\n");
     }
   sprintf(buffer,"iobuffer: ds    %d",iBufferSize); Asm(buffer);
-  if (getDefine("LFSR")) {
+  if (useLfsr) {
     Asm("LFSR_:    dw    0");
     Asm("LFSR__:   dw    0");
+    Asm("          public  LFSR_");
+    Asm("          public  LFSR__");
     }
   if (useData) {
     Asm("DATA_:    dw    0");

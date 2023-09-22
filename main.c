@@ -139,6 +139,7 @@ int main(int argc, char** argv, char** envp) {
   useSelfTerm = 0;
   useElfos = 0;
   useData = 0;
+  useLfsr = 0;
   useStg = 0;
   useAsm = 0;
   use1805 = 0;

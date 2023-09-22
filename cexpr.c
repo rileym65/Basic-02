@@ -155,12 +155,14 @@ void check2args() {
     Asm("           dec     r7");
     Asm("           dec     r7");
     Asm("           dec     r7");
+    AddExternal(currentProc, "itof");
     tokens[numTokens-4] = OP_NUMFP;
     opType = 'F';
     }
   if (tokens[numTokens-1] == OP_NUM && tokens[numTokens-4] == OP_NUMFP) {
     Asm("           sep     scall               ; Convert second number to floating point");
     Asm("           dw      itof");
+    AddExternal(currentProc, "itof");
     tokens[numTokens-1] = OP_NUMFP;
     opType = 'F';
     }
@@ -211,91 +213,220 @@ int reduce(char last) {
   switch (op) {
     case OP_SGN:
          Asm("           sep     scall               ; Perform SGN()");
-         if (opType == 'F') Asm("           dw      sgnfp");
-         else if (use32Bits) Asm("           dw      sgn32");
-         else Asm("           dw      sgn16");
+         if (opType == 'F') {
+           Asm("           dw      sgnfp");
+           AddExternal(currentProc, "sgnfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      sgn32");
+           AddExternal(currentProc, "sgn32");
+           }
+         else {
+           Asm("           dw      sgn16");
+           AddExternal(currentProc, "sgn16");
+           }
          if (opType == 'F') opType = 'I';
          break;
     case OP_RND:
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           sep     scall               ; Perform RND()");
-         if (use32Bits) Asm("           dw      rnd32");
-           else Asm("           dw      rnd16");
+         if (use32Bits) {
+           Asm("           dw      rnd32");
+           AddExternal(currentProc, "rnd32");
+           useLfsr = -1;
+           }
+         else {
+           Asm("           dw      rnd16");
+           AddExternal(currentProc, "rnd16");
+           useLfsr = -1;
+           }
          break;
     case OP_ABS:
          Asm("           sep     scall               ; Perform ABS()");
-         if (opType == 'F') Asm("           dw      absfp");
-         else if (use32Bits) Asm("           dw      abs32");
-         else Asm("           dw      abs16");
+         if (opType == 'F') {
+           Asm("           dw      absfp");
+           AddExternal(currentProc, "absfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      abs32");
+           AddExternal(currentProc, "abs32");
+           }
+         else {
+           Asm("           dw      abs16");
+           AddExternal(currentProc, "abs16");
+           }
          break;
     case OP_MUL:
          Asm("           sep     scall               ; Perform multiplication");
-         if (opType == 'F') Asm("           dw      mulfp");
-         else if (use32Bits) Asm("           dw      mul32");
-         else Asm("           dw      mul16");
+         if (opType == 'F') {
+           Asm("           dw      mulfp");
+           AddExternal(currentProc, "mulfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      mul32");
+           AddExternal(currentProc, "mul32");
+           }
+         else {
+           Asm("           dw      mul16");
+           AddExternal(currentProc, "mul16");
+           }
          break;
     case OP_DIV:
          Asm("           sep     scall               ; Perform division");
-         if (opType == 'F') Asm("           dw      divfp");
-         else if (use32Bits) Asm("           dw      div32");
-         else Asm("           dw      div16");
+         if (opType == 'F') {
+           Asm("           dw      divfp");
+           AddExternal(currentProc, "divfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      div32");
+           AddExternal(currentProc, "div32");
+           }
+         else {
+           Asm("           dw      div16");
+           AddExternal(currentProc, "div16");
+           }
          break;
     case OP_MOD:
          Asm("           sep     scall               ; Perform modulo");
-         if (use32Bits) Asm("           dw      mod32");
-           else Asm("           dw      mod16");
+         if (use32Bits) {
+           Asm("           dw      mod32");
+           AddExternal(currentProc, "mod32");
+           }
+         else {
+           Asm("           dw      mod16");
+           AddExternal(currentProc, "mod16");
+           }
          break;
     case OP_ADD:
          Asm("           sep     scall               ; Perform addition");
-         if (opType == 'F') Asm("           dw      addfp");
-         else if (use32Bits) Asm("           dw      add32");
-         else Asm("           dw      add16");
+         if (opType == 'F') {
+           Asm("           dw      addfp");
+           AddExternal(currentProc, "addfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      add32");
+           AddExternal(currentProc, "add32");
+           }
+         else {
+           Asm("           dw      add16");
+           AddExternal(currentProc, "add16");
+           }
          break;
     case OP_SUB:
          Asm("           sep     scall               ; Perform subtraction");
-         if (opType == 'F') Asm("           dw      subfp");
-         else if (use32Bits) Asm("           dw      sub32");
-         else Asm("           dw      sub16");
+         if (opType == 'F') {
+           Asm("           dw      subfp");
+           AddExternal(currentProc, "subfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      sub32");
+           AddExternal(currentProc, "sub32");
+           }
+         else {
+           Asm("           dw      sub16");
+           AddExternal(currentProc, "sub16");
+           }
          break;
     case OP_GT :
          Asm("           sep     scall               ; Perform greater than");
-         if (opType == 'F') { Asm("           dw      gtfp"); opType = 'I'; }
-         else if (use32Bits) Asm("           dw      gt32");
-         else Asm("           dw      gt16");
+         if (opType == 'F') {
+           Asm("           dw      gtfp");
+           opType = 'I';
+           AddExternal(currentProc, "gtfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      gt32");
+           AddExternal(currentProc, "gt32");
+           }
+         else {
+           Asm("           dw      gt16");
+           AddExternal(currentProc, "gt16");
+           }
          break;
     case OP_LT :
          Asm("           sep     scall               ; Perform less than");
-         if (opType == 'F') { Asm("           dw      ltfp"); opType = 'I'; }
-         else if (use32Bits) Asm("           dw      lt32");
-         else Asm("           dw      lt16");
+         if (opType == 'F') {
+           Asm("           dw      ltfp");
+           opType = 'I';
+           AddExternal(currentProc, "ltfp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      lt32");
+           AddExternal(currentProc, "lt32");
+           }
+         else {
+           Asm("           dw      lt16");
+           AddExternal(currentProc, "lt16");
+           }
          break;
     case OP_GTE:
          Asm("           sep     scall               ; Perform greater or equal");
-         if (opType == 'F') { Asm("           dw      gtefp"); opType = 'I'; }
-         else if (use32Bits) Asm("           dw      gte32");
-         else Asm("           dw      gte16");
+         if (opType == 'F') {
+           Asm("           dw      gtefp");
+           opType = 'I';
+           AddExternal(currentProc, "gtefp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      gte32");
+           AddExternal(currentProc, "gte32");
+           }
+         else {
+           Asm("           dw      gte16");
+           AddExternal(currentProc, "gte16");
+           }
          break;
     case OP_LTE:
          Asm("           sep     scall               ; Perform less or equal");
-         if (opType == 'F') { Asm("           dw      ltefp"); opType = 'I'; }
-         else if (use32Bits) Asm("           dw      lte32");
-         else Asm("           dw      lte16");
+         if (opType == 'F') {
+           Asm("           dw      ltefp");
+           opType = 'I';
+           AddExternal(currentProc, "ltefp");
+           }
+         else if (use32Bits) {
+           Asm("           dw      lte32");
+           AddExternal(currentProc, "lte32");
+           }
+         else {
+           Asm("           dw      lte16");
+           AddExternal(currentProc, "lte16");
+           }
          break;
     case OP_EQ :
          Asm("           sep     scall               ; Perform equal");
-         if (opType == 'F') { Asm("           dw      eqfp"); opType = 'I'; }
-         else if (use32Bits) Asm("           dw      eq32");
-         else Asm("           dw      eq16");
+         if (opType == 'F') {
+           Asm("           dw      eqfp");
+           AddExternal(currentProc, "eqfp");
+           opType = 'I';
+           }
+         else if (use32Bits) {
+           Asm("           dw      eq32");
+           AddExternal(currentProc, "eq32");
+           }
+         else {
+           Asm("           dw      eq16");
+           AddExternal(currentProc, "eq16");
+           }
          break;
     case OP_NE :
          Asm("           sep     scall               ; Perform not equal");
-         if (opType == 'F') { Asm("           dw      nefp"); opType = 'I'; }
-         else if (use32Bits) Asm("           dw      ne32");
-         else Asm("           dw      ne16");
+         if (opType == 'F') {
+           Asm("           dw      nefp");
+           AddExternal(currentProc, "nefp");
+           opType = 'I';
+           }
+         else if (use32Bits) {
+           Asm("           dw      ne32");
+           AddExternal(currentProc, "ne32");
+           }
+         else {
+           Asm("           dw      ne16");
+           AddExternal(currentProc, "ne16");
+           }
          break;
     case OP_AND:
          if (opType == 'F') {
@@ -311,11 +442,18 @@ int reduce(char last) {
            Asm("           dec     r7");
            Asm("           dec     r7");
            Asm("           dec     r7");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           sep     scall               ; Perform AND");
-         if (use32Bits) Asm("           dw      and32");
-           else Asm("           dw      and16");
+         if (use32Bits) {
+           Asm("           dw      and32");
+           AddExternal(currentProc, "and32");
+           }
+         else {
+           Asm("           dw      and16");
+           AddExternal(currentProc, "and16");
+           }
          break;
     case OP_OR :
          if (opType == 'F') {
@@ -331,11 +469,18 @@ int reduce(char last) {
            Asm("           dec     r7");
            Asm("           dec     r7");
            Asm("           dec     r7");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           sep     scall               ; Perform OR");
-         if (use32Bits) Asm("           dw      or32");
-           else Asm("           dw      or16");
+         if (use32Bits) {
+           Asm("           dw      or32");
+           AddExternal(currentProc, "or32");
+           }
+         else {
+           Asm("           dw      or16");
+           AddExternal(currentProc, "or16");
+           }
          break;
     case OP_XOR:
          if (opType == 'F') {
@@ -351,16 +496,24 @@ int reduce(char last) {
            Asm("           dec     r7");
            Asm("           dec     r7");
            Asm("           dec     r7");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           sep     scall               ; Perform XOR");
-         if (use32Bits) Asm("           dw      xor32");
-           else Asm("           dw      xor16");
+         if (use32Bits) {
+           Asm("           dw      xor32");
+           AddExternal(currentProc, "xor32");
+           }
+         else {
+           Asm("           dw      xor16");
+           AddExternal(currentProc, "xor16");
+           }
          break;
     case OP_PEEK:
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           inc     r7                  ; Retrieve address for peek");
@@ -389,6 +542,7 @@ int reduce(char last) {
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           inc     r7                  ; Retrieve address for peek");
@@ -433,6 +587,7 @@ int reduce(char last) {
          Asm("           dw      readef");
          Asm("           str     r7");
          Asm("           dec     r7");
+         AddExternal(currentProc, "readef");
          break;
     case OP_FRE:
          opType = 'I';
@@ -507,6 +662,7 @@ int reduce(char last) {
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           ldi     0d3h                ; Push SEP R3 onto stack");
@@ -543,6 +699,7 @@ int reduce(char last) {
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           inc     r7                  ; Get size from expr stack");
@@ -556,6 +713,7 @@ int reduce(char last) {
            }
          Asm("           sep     scall               ; Call alloc function");
          Asm("           dw      alloc");
+         AddExternal(currentProc, "alloc");
          if (use32Bits) {
            Asm("           ldi     0                   ; Clear high word");
            Asm("           str     r7");
@@ -574,6 +732,7 @@ int reduce(char last) {
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          break;
@@ -581,93 +740,113 @@ int reduce(char last) {
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
     case OP_SIN:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform sin function");
          Asm("           dw      fpsin");
+         AddExternal(currentProc, "fpsin");
          break;
     case OP_COS:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform cos function");
          Asm("           dw      fpcos");
+         AddExternal(currentProc, "fpcos");
          break;
     case OP_TAN:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform tan function");
          Asm("           dw      fptan");
+           AddExternal(currentProc, "fptan");
          break;
     case OP_LN:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform ln function");
          Asm("           dw      fpln");
+         AddExternal(currentProc, "fpln");
          break;
     case OP_EXP:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform exp function");
          Asm("           dw      fpexp");
+         AddExternal(currentProc, "fpexp");
          break;
     case OP_SQRT:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform sqrt function");
          Asm("           dw      fpsqrt");
+         AddExternal(currentProc, "fpsqrt");
          break;
     case OP_ATAN:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform atan function");
          Asm("           dw      fpatan");
+         AddExternal(currentProc, "fpatan");
          break;
     case OP_ACOS:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform acos function");
          Asm("           dw      fpacos");
+         AddExternal(currentProc, "fpacos");
          break;
     case OP_ASIN:
          if (opType == 'I') {
            Asm("           sep     scall               ; Convert integer argument to floating-point");
            Asm("           dw      itof");
+           AddExternal(currentProc, "itof");
            opType = 'F';
            }
          Asm("           sep     scall               ; Perform asin function");
          Asm("           dw      fpasin");
+         AddExternal(currentProc, "fpasin");
          break;
     case OP_POS:
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           inc     r7                  ; Retrieve file number");
@@ -716,6 +895,7 @@ int reduce(char last) {
          if (opType == 'F') {
            Asm("           sep     scall               ; Convert floating point argument to integer");
            Asm("           dw      ftoi");
+           AddExternal(currentProc, "ftoi");
            opType = 'I';
            }
          Asm("           inc     r7                  ; Retrieve file number");
@@ -725,8 +905,8 @@ int reduce(char last) {
            Asm("           inc     r7");
            }
          Asm("           sep     scall               ; check for EOF");
-         Asm("           dw      eof");
          if (use32Bits) {
+           Asm("           dw      eof32");
            Asm("           str     r7                  ; store result");
            Asm("           dec     r7");
            Asm("           str     r7");
@@ -735,12 +915,15 @@ int reduce(char last) {
            Asm("           dec     r7");
            Asm("           str     r7");
            Asm("           dec     r7");
+           AddExternal(currentProc, "eof32");
            }
          else {
+           Asm("           dw      eof16");
            Asm("           str     r7                  ; store result");
            Asm("           dec     r7");
            Asm("           str     r7");
            Asm("           dec     r7");
+           AddExternal(currentProc, "eof16");
            }
          break;
     }
@@ -1314,10 +1497,12 @@ char* cexpr(char* line, int etype) {
   if (tokens[1] == OP_NUM && etype == 1) {
     Asm("           sep     scall               ; Convert integer to floating point");
     Asm("           dw      itof");
+    AddExternal(currentProc, "itof");
     }
   if (tokens[1] == OP_NUMFP && etype == 0) {
     Asm("           sep     scall               ; Convert floating point to integer");
     Asm("           dw      ftoi");
+    AddExternal(currentProc, "ftoi");
     }
   return line;
   }

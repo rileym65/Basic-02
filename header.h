@@ -160,6 +160,7 @@ LINK word   lblF_read;
 LINK word   lblF_input;
 LINK word   lblStart;
 LINK char   currentLine[2048];
+LINK char   currentProc[1024];
 LINK word   keyBuffer;
 LINK int    lineCount;
 LINK char   lineEnding[3];
@@ -212,6 +213,7 @@ LINK byte   use32Bits;
 LINK byte   useFp;
 LINK byte   useStep32;
 LINK byte   useStrings;
+LINK byte   useLfsr;
 LINK char **variableNames;
 LINK word  *variableAddresses;
 LINK char  *variableTypes;
@@ -220,6 +222,9 @@ LINK word   variableRAM;
 LINK word   variableStart;
 LINK FILE  *lstFile;
 
+LINK char** externalProcs;
+LINK char** externals;
+LINK int    numExternals;
 LINK char** defines;
 LINK int*   defineValues;
 LINK int    numDefines;
@@ -296,6 +301,7 @@ extern word getLabel(char* label);
 extern void addDefine(char* define, int value, int redefine);
 extern int  getDefine(char* define);
 extern void writeOutput();
+extern void AddExternal(char* proc, char* name);
 
 #endif
 

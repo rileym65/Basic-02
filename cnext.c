@@ -40,8 +40,14 @@ char* cnext(char* line) {
     }
   if (hasVar == 0) {
     Asm("          sep   scall                   ; Call NEXT handler");
-    if (use32Bits) Asm("          dw    next32");
-      else Asm("          dw    next");
+    if (use32Bits) {
+      Asm("          dw    next32");
+      AddExternal(currentProc, "next32");
+      }
+    else {
+      Asm("          dw    next");
+      AddExternal(currentProc, "next");
+      }
     }
   else {
     sprintf(buffer,"          ldi   v_%s.1                   ; Get loop variable address",varname); Asm(buffer);
@@ -49,8 +55,14 @@ char* cnext(char* line) {
     sprintf(buffer,"          ldi   v_%s.0",varname); Asm(buffer);
     Asm("          plo   rc");
     Asm("          sep   scall                   ; Call NEXT with var handler");
-    if (use32Bits) Asm("          dw    nextvar32");
-      else Asm("          dw    nextvar");
+    if (use32Bits) {
+      Asm("          dw    nextvar32");
+      AddExternal(currentProc, "nextvar32");
+      }
+    else {
+      Asm("          dw    nextvar");
+      AddExternal(currentProc, "nextvar");
+      }
     }
 
   return line;

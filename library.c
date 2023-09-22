@@ -9,7 +9,6 @@
 */
 
 #include "header.h"
-#include "library.h"
 #include <sys/time.h>
 #include <time.h>
 
@@ -99,20 +98,6 @@ void library() {
   Asm("            glo     re");
   Asm("            br      ret-1");
   Asm("return:     sep  sret");
-
-  file = fopen("library.asm","r");
-  if (file == NULL) {
-    i = 0;
-    while (strstr(librarysrc[i],"__END__") == NULL) {
-      Asm(librarysrc[i]);
-      i++;
-      }
-    }
-  else {
-    fclose(file);
-    Asm("#include library.asm");
-    }
-
 
   if (passNumber == 1) lblStart = address;
   if (useElfos) {

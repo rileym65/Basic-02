@@ -81,6 +81,7 @@ char* clocate(char* line) {
   Asm("          plo   rf");
   Asm("          sep   scall                   ; Send position escape sequcne");
   Asm("          dw    f_msg");
+  AddExternal(currentProc, "itoa");
   return line;
   }
 

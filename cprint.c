@@ -80,6 +80,7 @@ char* cprint(char* line) {
           Asm("          inc   r7                      ; Remove expression result");
           Asm("          inc   r7");
           Asm("          inc   r7");
+          AddExternal(currentProc, "itoa32");
           }
         else if (tokens[1] == OP_NUMFP) {
           Asm("          inc   r7                      ; Point to expression result");
@@ -102,6 +103,7 @@ char* cprint(char* line) {
           Asm("          inc   r7                      ; Remove expression result");
           Asm("          inc   r7");
           Asm("          inc   r7");
+          AddExternal(currentProc, "ftoa");
           }
         else {
           showError("Expression error\n");
@@ -130,6 +132,7 @@ char* cprint(char* line) {
         Asm("          inc   r7                      ; Remove expression result");
         Asm("          inc   r7");
         Asm("          inc   r7");
+        AddExternal(currentProc, "itoa32");
         }
       else {
         Asm("          inc   r7                      ; Recover expression result");
@@ -149,6 +152,7 @@ char* cprint(char* line) {
         Asm("          plo   rf");
         Asm("          sep   scall");
         Asm("          dw    f_msg");
+        AddExternal(currentProc, "itoa");
         }
       last = ' ';
       }
