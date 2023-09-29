@@ -89,6 +89,7 @@ char* cprint(char* line) {
         AddExternal(currentProc, "printstring");
         while (*line != 0 && *line != '$') line++;
         if (*line == '$') line++;
+        last = ' ';
         }
       else {
         line = cexpr(line, 2);
