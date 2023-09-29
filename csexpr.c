@@ -22,7 +22,7 @@ char* csexpr(char* line, int level) {
     if (*line == '"') {
       lab1 = ++autoLabel;
       lab2 = ++autoLabel;
-      sprintf(buffer,"          lbr   la_%d                    ; Jump past string data",lab2);
+      sprintf(buffer,"          lbr   lbl_%d                    ; Jump past string data",lab2);
       Asm(buffer);
       pos = 0;
       line++;
@@ -37,14 +37,14 @@ char* csexpr(char* line, int level) {
         }
       line++;
       line = trim(line);
-      sprintf(buffer,"la_%d:    db    '%s',0",lab1, buffer2);
+      sprintf(buffer,"lbl_%d:    db    '%s',0",lab1, buffer2);
       Asm(buffer);
-      sprintf(buffer,"la_%d:",lab2, buffer2);
+      sprintf(buffer,"lbl_%d:",lab2, buffer2);
       Asm(buffer);
-      sprintf(buffer,"          ldi   la_%d.1                  ; Get address of data",lab1);
+      sprintf(buffer,"          ldi   lbl_%d.1                  ; Get address of data",lab1);
       Asm(buffer);
       Asm(           "          phi   rf                       ; Place into RF");
-      sprintf(buffer,"          ldi   la_%d.0                  ; Lsb of data",lab1);
+      sprintf(buffer,"          ldi   lbl_%d.0                  ; Lsb of data",lab1);
       Asm(buffer);
       Asm(           "          plo   rf                       ; Place into RF");
       sprintf(buffer,"          ldi   %s.1                  ; Get address of data",tmpvar1);

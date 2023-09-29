@@ -41,7 +41,7 @@ int compileLine(char* line) {
       }
     }
   line = trim(line);
-  sprintf(buffer,"la_%d:",autoLabel);
+  sprintf(buffer,"la_%d:",autoLine);
   Asm(buffer);
   while (*line != 0) {
     pos = 0;
@@ -104,7 +104,7 @@ int compileLine(char* line) {
       line = trim(line);
       }
     }
-  autoLabel++;
+  autoLine++;
   return 0;
   }
 

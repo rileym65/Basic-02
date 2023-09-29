@@ -222,6 +222,7 @@ LINK word   variableRAM;
 LINK word   variableStart;
 LINK FILE  *lstFile;
 LINK int    autoLabel;
+LINK int    autoLine;
 
 LINK char** externalProcs;
 LINK char** externals;
