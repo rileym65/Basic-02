@@ -94,6 +94,8 @@ char* cfread(char* line) {
   Asm("          phi   rf");
   Asm("          ldi   v_ioresult.0");
   Asm("          plo   rf");
+  AddExternal(currentProc, "ioresults");
+  AddExternal(currentProc, "v_ioresult");
   if (use32Bits) {
   Asm("          ldi   0                       ; Clear high word when 32 bits mode");
     Asm("          str   rf");

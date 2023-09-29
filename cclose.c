@@ -39,6 +39,8 @@ char* cclose(char* line) {
   Asm("          dw    0312h");
   Asm("          sep   scall                   ; Set I/O return variables");
   Asm("          dw    ioresults");
+  AddExternal(currentProc, "ioresults");
+
   sprintf(buffer,"          ldi   (file1_+%d*2).0         ; Point to file handle",fnum % 256);
   Asm(buffer);
   Asm("          plo   rd");

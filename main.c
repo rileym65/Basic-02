@@ -22,88 +22,14 @@ void writeAsm(char* line,char* rem) {
     while (strlen(line) < 40) strcat(line," ");
     sprintf(buffer,"%s; %s\n",line,rem);
     if (showAsm) printf("%s",buffer);
-    if (useAsm) write(asmFile, buffer, strlen(buffer));
+    write(asmFile, buffer, strlen(buffer));
     }
   else {
     sprintf(buffer,"%s\n",line);
     if (showAsm) printf("%s",buffer);
-    if (useAsm) write(asmFile, buffer, strlen(buffer));
+    write(asmFile, buffer, strlen(buffer));
     }
   }
-
-/*
-void writeOutput() {
-  int i;
-  byte checksum;
-  char outLine[80];
-  char temp[16];
-  if (outMode == 'R') {
-    sprintf(outLine,":%04x",outAddress);
-    for (i=0; i<outCount; i++) {
-      sprintf(temp," %02x",outBuffer[i]);
-      strcat(outLine,temp);
-      }
-    sprintf(temp,"%s",lineEnding);
-    strcat(outLine,temp);
-    write(outFile, outLine, strlen(outLine));
-    }
-  if (outMode == 'I') {
-    checksum = outCount;
-    sprintf(outLine,":%02x",outCount);
-    checksum += (outAddress / 256);
-    checksum += (outAddress & 0xff);
-    sprintf(temp,"%04x00",outAddress);
-    strcat(outLine,temp);
-    for (i=0; i<outCount; i++) {
-      checksum += outBuffer[i];
-      sprintf(temp,"%02x",outBuffer[i]);
-      strcat(outLine,temp);
-      }
-    checksum = (checksum ^ 0xff) + 1;
-    sprintf(temp,"%02x",checksum);
-    strcat(outLine, temp);
-    sprintf(temp,"%s",lineEnding);
-    strcat(outLine,temp);
-    write(outFile, outLine, strlen(outLine));
-    }
-  if (outMode == 'B') {
-    write(outFile, outBuffer, outCount);
-    }
-  }
-
-void output(byte value) {
-  if (compMode == 'A' && (address < ramStart || address > ramEnd)) {
-    showError("Address exceeded available RAM");
-    exit(1);
-    }
-  if (compMode == 'O' && (address < romStart || address > romEnd)) {
-    showError("Address exceeded available ROM");
-    exit(1);
-    }
-  if (passNumber == 1) {
-    if (address > highest) highest = address;
-    }
-  if (passNumber == 2) {
-    if (showCompiler) {
-      printf(" %02x",value);
-      listCount++;
-      if (listCount == 16) {
-        printf("\n");
-        printf("     ");
-        listCount = 0;
-        }
-      }
-    outBuffer[outCount++] = value;
-    codeGenerated++;
-    if (outCount == 16) {
-      writeOutput();
-      outCount = 0;
-      outAddress = address+1;
-      }
-    }
-  address++;
-  }
-*/
 
 int main(int argc, char** argv, char** envp) {
   int i;
@@ -118,7 +44,6 @@ int main(int argc, char** argv, char** envp) {
     }
   errorCount = 0;
   iBufferSize = 0;
-  outMode = 'R';
   programStart = 0xffff;
   variableStart = 0xffff;
   exitAddress = 0xffff;
@@ -128,7 +53,6 @@ int main(int argc, char** argv, char** envp) {
   romEnd = 0xffff;
   showAsm = 0;
   showSymbols = 0;
-  showCompiler = 0;
   showList = 0;
   showOptions = 0;
   showVariables = 0;
@@ -141,7 +65,6 @@ int main(int argc, char** argv, char** envp) {
   useData = 0;
   useLfsr = 0;
   useStg = 0;
-  useAsm = 0;
   use1805 = 0;
   use32Bits = 0;
   useFp = 0;
@@ -189,11 +112,6 @@ int main(int argc, char** argv, char** envp) {
     exit(1);
     }
   strcpy(outName,baseName);
-  switch (outMode) {
-    case 'R': strcat(outName, ".prg"); break;
-    case 'I': strcat(outName, ".hex"); break;
-    case 'B': strcat(outName, ".bin"); break;
-    }
   strcpy(asmName,baseName);
   strcat(asmName,".asm");
   strcpy(lstName,baseName);
@@ -232,15 +150,10 @@ int main(int argc, char** argv, char** envp) {
     if (use32Bits) printf("  32-bits\n");
     if (useFp) printf("  Floating point\n");
     if (use1805) printf("  1804/5/6 instructions\n");
-    if (useAsm) printf("  Create .asm file\n");
     if (showAsm) printf("  Show assembly listing\n");
-    if (outMode == 'B') printf("  Produce binary output\n");
-    if (outMode == 'I') printf("  Produce Intel hex output\n");
-    if (outMode == 'R') printf("  Produce RCS hex output\n");
     if (showRuntime) printf("  Show runtime modules\n");
     if (showList) printf("  Show source list\n");
     if (createLst) printf("  Create .lst file\n");
-    if (showCompiler) printf("  Show compiler output\n");
     if (showSymbols) printf("  Show symbols\n");
     if (showVariables) printf("  Show variables\n");
     if (useElfos) printf("  Produce Elf/OS executable\n");
@@ -286,22 +199,11 @@ int main(int argc, char** argv, char** envp) {
     printf("Could not open output file: %s\n",outName);
     exit(1);
     }
-  if (useAsm) asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
+  asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
   if (createLst) lstFile = fopen(lstName,"w");
   pass(sourceFile);
-  if (outCount > 0) writeOutput();
   close(outFile);
-  if (useAsm) {
-//    for (i=0; i<numberOfVariables; i++) {
-//      if (useAsm) {
-//        sprintf(buffer,"%s: ",variableNames[i]);
-//        while (strlen(buffer) < 10) strcat(buffer," ");
-//        strcat(buffer,"dw    0");
-//        writeAsm(buffer,"");
-//        }
-//      }
-    close(asmFile);
-    }
+  close(asmFile);
   if (numNests > 0) printf("#define without #endif\n");
   printf("\n\n");
   printf("Lines compiled: %d\n",lineCount);

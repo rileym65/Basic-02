@@ -74,6 +74,9 @@ char* cget(char* line) {
     }
   Asm("          sep   scall                   ; Set I/O return variables");
   Asm("          dw    ioresults");
+
+  AddExternal(currentProc, "ioresults");
+
   return line;
   }
 

@@ -646,8 +646,14 @@ int reduce(char last) {
          Asm("           str     r7");
          Asm("           dec     r7");
          Asm("           sep     scall               ; Perform subtraction");
-         if (use32Bits) Asm("           dw      sub32");
-           else Asm("           dw      sub16");
+         if (use32Bits) {
+           Asm("           dw      sub32");
+           AddExternal(currentProc, "sub32");
+           }
+         else {
+           Asm("           dw      sub16");
+           AddExternal(currentProc, "sub16");
+           }
          break;
     case OP_INP:
          if (opType == 'F') {

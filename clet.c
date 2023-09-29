@@ -15,8 +15,38 @@ char* clet(char* line) {
   int  fp;
   int  st;
   dword value;
-  char varname[256];
+  char  varname[128];
   line = trim(line);
+  pos = 0;
+  while (line[pos] != 0 && line[pos] != ' ' && line[pos] != '=') {
+    varname[pos] = line[pos];
+    pos++;
+    }
+  varname[pos] = 0;
+  if (pos > 0 && varname[pos-1] == '$') {
+    while (*line != '=' && *line != 0) line++;
+    if (*line != '=') {
+      showError("Syntax error");
+      return line;
+      }
+    line++;
+    line = trim(line);
+    getVariable(varname);
+    line = csexpr(line, 0);
+    sprintf(buffer,"          ldi   v_%s.1                  ; Get variable address", varname); Asm(buffer);
+    Asm(           "          phi   rd                      ; set as destination variable");
+    sprintf(buffer,"          ldi   v_%s.0                  ; Lsb of variable address", varname); Asm(buffer);
+    Asm(           "          plo   rd                      ; set as destination variable");
+    sprintf(buffer,"          ldi   v_STMP0_$.1             ; Get temp variable address"); Asm(buffer);
+    Asm(           "          phi   rf                      ; set as destination variable");
+    sprintf(buffer,"          ldi   v_STMP0_$.0             ; Lsb of temp variable address"); Asm(buffer);
+    Asm(           "          plo   rf                      ; set as destination variable");
+    Asm(           "          sep   scall                    ; Set the string");
+    Asm(           "          dw    assignstring");
+    AddExternal(currentProc, "assignstring");
+
+    return line;
+    }
   /* ********************************** */
   /* ***** Look for optimizations ***** */
   /* ********************************** */

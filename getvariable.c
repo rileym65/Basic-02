@@ -18,13 +18,13 @@ word getVariable(char* name) {
   if (name[strlen(name)-1] == '!') vtype = 'R';
   if (name[strlen(name)-1] == '$') vtype = 'S';
   if (name[strlen(name)-1] == '#') vtype = 'D';
-  if (vtype == 'S') vsize = 2;
+  if (vtype == 'S') { vsize = 2; useStrings = -1; useHeap = -1; }
   else if (vtype == 'R') vsize = 4;
   else if (vtype == 'D') vsize = 8;
   else if (vtype == 'I') vsize = 2;
   else if (vtype == 'L') vsize = 4;
   for (i=0; i<numberOfVariables; i++) {
-    if (strcasecmp(name, variableNames[i]) == 0) return variableAddresses[i];
+    if (strcasecmp(name, variableNames[i]) == 0) return i;
     }
   numberOfVariables++;
   if (numberOfVariables == 1) {
@@ -42,6 +42,6 @@ word getVariable(char* name) {
   variableAddresses[numberOfVariables-1] = variableNextAddress;
   variableTypes[numberOfVariables-1] = vtype;
   variableNextAddress += vsize;
-  return variableAddresses[numberOfVariables-1];
+  return numberOfVariables-1;
   }
 

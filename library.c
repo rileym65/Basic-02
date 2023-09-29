@@ -23,8 +23,6 @@ void library() {
   epochSeconds = time(NULL);
   localtime_r(&(epochSeconds), &(tv));
 
-  ctmp = showCompiler;
-  showCompiler = 0;
   Asm("scall:      equ  r4");
   Asm("sret:       equ  r5");
   if (useElfos == 0) {
@@ -206,7 +204,6 @@ void library() {
     Asm("          sep  scall");
     Asm("          dw   f_setbd");
     }
-  showCompiler = ctmp;
   if (passNumber == 1) runtime = address;
   }
 

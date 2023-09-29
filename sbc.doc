@@ -103,8 +103,8 @@ Notes:
   Multiple statements on a line are supported, statements must be separated
 by the colon (:) character.
 
-  Line numbers must be greater than 0 and less than 65536 and must appear
-in order.
+  Line numbers are not required, but if provided, Line numbers must be greater
+than 0 and less than 65536 and must appear in order.
 
   All other numbers are 16-bit signed integers (unless -32 or -fp is used).
 
@@ -125,7 +125,6 @@ line is currently limited to 2048 character.
 Compiler Directives:
 .1805           - Enable 1804/5/6 assembler mode
 .32             - Enable 32-bit mode
-.binary         - Output file as binary
 .fp             - Enable floating-point mode
 .elfos          - Produce Elf/OS executable
 .list           - Show source list
@@ -141,15 +140,10 @@ Compiler Directives:
 Switches:
 -32             - compile in 32-bit mode
 -fp             - enable floating point
--a              - produce assembly file
 -A              - display assembly
--b              - output as binary
--c              - show compiler output
--i              - output as Intel hex
 -l              - show source list
 -L              - create .lst file
 -o              - show options in effect
--r              - output as RCS hex
 -R              - show runtime modules
 -s              - show assembler symbols
 -v              - show variables

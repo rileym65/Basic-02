@@ -41,11 +41,6 @@ int prepass(char* filename) {
       if (strcasecmp(currentLine,".runtime") == 0) { showRuntime = -1; }
       if (strcasecmp(currentLine,".noruntime") == 0) { showRuntime = 0; }
       if (strcasecmp(currentLine,".options") == 0) { showOptions = -1; }
-      if (strcasecmp(currentLine,".binary") == 0) {
-        outMode = 'B';
-        strcpy(outName,baseName);
-        strcat(outName, ".bin");
-        }
       strcpy(currentLine,"");
       }
     }

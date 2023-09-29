@@ -49,6 +49,7 @@ OBJS = \
 	crestore.o \
 	creturn.o \
 	crmdir.o \
+	csexpr.o \
 	findline.o \
 	findvariable.o \
 	gethex.o \

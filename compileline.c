@@ -16,10 +16,9 @@ int compileLine(char* line) {
   char token[256];
   int  pos;
   char *pline;
-  if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (passNumber == 2 && createLst)
     fprintf(lstFile,"                  ; %s\n",line);
-  if (passNumber == 2 && useAsm) {
+  if (passNumber == 2) {
     sprintf(buffer,"; %s",line); writeAsm(buffer,"");
     }
   line = trim(line);
@@ -106,7 +105,6 @@ int compileLine(char* line) {
       }
     }
   autoLabel++;
-  if (passNumber == 2 && showCompiler) printf("\n");
   return 0;
   }
 

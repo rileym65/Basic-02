@@ -53,7 +53,6 @@ int pass(char* filename) {
       }
     }
   fclose(source);
-  if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (useStg) {
     Asm("            ldi  STG_.1");
     Asm("            phi  rf");
@@ -81,12 +80,10 @@ int pass(char* filename) {
     Asm("          idl                           ; Idle the CPU");
     Asm("          lbr   $-1");
     }
-  if (passNumber == 2 && showCompiler) printf("\n");
   if (useData) {
     if (passNumber == 1) { 
       dataAddress = address;
       }
-    if (showCompiler && passNumber == 2) printf("%04x:",address);
     strcpy(buffer, "data:     dw    ");
     for (i=0; i<numData; i++) {
       if (use32Bits) {
@@ -103,7 +100,6 @@ int pass(char* filename) {
         }
       }
     if (strlen(buffer) > 16) Asm(buffer);
-    if (passNumber == 2 && showCompiler) printf("\n");
     }
   sprintf(buffer,"iobuffer: ds    %d",iBufferSize); Asm(buffer);
   if (useLfsr) {

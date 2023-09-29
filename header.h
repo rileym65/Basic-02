@@ -22,7 +22,7 @@
 #define LINK extern
 #endif
 
-#define VERSION  "0.1.0"
+#define VERSION  "0.2.0"
 
 #define IDL      0x00
 #define LDN      0x00
@@ -177,7 +177,6 @@ LINK word   outAddress;
 LINK byte   outBuffer[16];
 LINK byte   outCount;
 LINK int    outFile;
-LINK char   outMode;
 LINK char   outName[1024];
 LINK int    passNumber;
 LINK word   programStart;
@@ -191,7 +190,6 @@ LINK byte   SERREQ;
 LINK byte   SERP;
 LINK byte   SERN;
 LINK char   showAsm;
-LINK char   showCompiler;
 LINK char   showList;
 LINK char   showOptions;
 LINK char   showRuntime;
@@ -208,7 +206,6 @@ LINK byte   useStep;
 LINK byte   useStg;
 LINK byte   useTrig;
 LINK byte   useElfos;
-LINK byte   useAsm;
 LINK byte   use32Bits;
 LINK byte   useFp;
 LINK byte   useStep32;
@@ -283,6 +280,7 @@ extern char* crename(char* line);
 extern char* crestore(char* line);
 extern char* creturn(char* line);
 extern char* crmdir(char* line);
+extern char* csexpr(char* line, int level);
 extern int   findLine(word lineNumber, word* address);
 extern int   findNextLine(word lineNumber, word* address);
 extern int   findNextLineNumber(word lineNumber, word* address);

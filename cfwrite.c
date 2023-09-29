@@ -107,6 +107,9 @@ char* cfwrite(char* line) {
   Asm("          glo   rc");
   Asm("          str   rf");
 
+  AddExternal(currentProc, "ioresults");
+  AddExternal(currentProc, "v_ioresult");
+
   while (*line != ':' && *line != 0) line++;
   return line;
   }
