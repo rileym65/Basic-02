@@ -87,5 +87,7 @@ ioresults:  plo    re              ; save return code
             str    rf              ; and store into ioflag
             sep    sret            ; return to caller
 
+            public ioresults
+
             endp
 

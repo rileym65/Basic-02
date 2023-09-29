@@ -60,6 +60,7 @@ fact:       db       000h, 000h, 000h, 000h
             public   fp_e
             public   fp_pi
             public   fp_halfpi
+            public   fact
 
             endp
 

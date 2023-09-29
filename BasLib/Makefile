@@ -12,12 +12,15 @@ OBJS=\
 	alloc.prg \
 	and16.prg \
 	and32.prg \
+	assignstring.prg \
 	atoi16.prg \
 	atoi32.prg \
 	atof.prg \
 	checkeom.prg \
 	cmp32.prg \
 	comp32.prg \
+	concat.prg \
+	copystring.prg \
 	dealloc.prg \
 	div16.prg \
 	div32.prg \
@@ -91,9 +94,11 @@ OBJS=\
 	null32.prg \
 	or16.prg \
 	or32.prg \
+	printstring.prg \
 	right.prg \
 	rnd16.prg \
 	rnd32.prg \
+	setstring.prg \
 	sgn16.prg \
 	sgn32.prg \
 	sgnfp.prg \
@@ -121,6 +126,7 @@ OBJS=\
 .SUFFIXES: .asm .prg
 
 $(PROJECT): $(OBJS)
+	-rm $(PROJECT)
 	cat $(OBJS) > $(PROJECT)
 
 .asm.prg:
