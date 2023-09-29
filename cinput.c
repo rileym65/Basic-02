@@ -74,12 +74,14 @@ char* cinput(char* line) {
           }
         }
       }
+    if (*line == '$') name[pos++] = *line++;
     name[pos] = 0;
     if (strlen(name) == 0) {
       showError("Syntax error");
       *line = 0;
       return line;
       }
+printf("variable: %s\n",name);
     getVariable(name);
     Asm("          sep   scall                   ; display question mark");
     Asm("          dw    f_inmsg");
@@ -94,7 +96,17 @@ char* cinput(char* line) {
     Asm("          phi   rf");
     Asm("          ldi   iobuffer.0");
     Asm("          plo   rf");
-    if (fp) {
+    if (name[pos-1] == '$') {
+printf("Input to string variable\n");
+      sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   v_%s.0",name); Asm(buffer);
+      Asm("          plo   rd");
+      Asm("          sep   scall                   ; Send data to string variable");
+      Asm("          dw    setstring");
+      AddExternal(currentProc, "setstring");
+      }
+    else if (fp && name[pos-1] == '!') {
       sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rd");
       sprintf(buffer,"          ldi   v_%s.0",name); Asm(buffer);
