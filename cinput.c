@@ -81,7 +81,6 @@ char* cinput(char* line) {
       *line = 0;
       return line;
       }
-printf("variable: %s\n",name);
     getVariable(name);
     Asm("          sep   scall                   ; display question mark");
     Asm("          dw    f_inmsg");
@@ -97,7 +96,6 @@ printf("variable: %s\n",name);
     Asm("          ldi   iobuffer.0");
     Asm("          plo   rf");
     if (name[pos-1] == '$') {
-printf("Input to string variable\n");
       sprintf(buffer,"          ldi   v_%s.1              ; Point to destination variable",name); Asm(buffer);
       Asm("          phi   rd");
       sprintf(buffer,"          ldi   v_%s.0",name); Asm(buffer);
