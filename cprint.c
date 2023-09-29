@@ -67,7 +67,6 @@ char* cprint(char* line) {
              line[pos] == '_') varname[pos++] = line[pos];
       varname[pos] = 0;
       if (line[pos] == '$') {
-printf("String variable %s\n",varname);
         sprintf(buffer,"          ldi   v_%s$.1              ; Display result",varname);
         Asm(buffer);
         Asm("          phi   rd");
