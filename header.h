@@ -10,8 +10,10 @@
 #include <io.h>
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
+#define localtime_r(X,Y) (localtime_s(Y,X))
 #else
 #include <unistd.h>
+#include <sys/time.h>
 #define O_BINARY 0
 #endif
 
@@ -307,4 +309,3 @@ extern void writeOutput();
 extern void AddExternal(char* proc, char* name);
 
 #endif
-
