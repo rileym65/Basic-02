@@ -29,37 +29,68 @@ char* cdata(char* line) {
     }
   line = trim(line);
   while (*line != ':' && *line != 0) {
-    if ((*line < '0' || *line > '9') && *line != '-') {
+    if (*line == '"') {
+      line++;
+      while (*line != '"' && *line != 0) {
+        num = *line++;
+        if (passNumber == 1) {
+          numData++;
+          if (numData == 1)
+            data = (dword*)malloc(sizeof(dword));
+          else
+            data = (dword*)realloc(data, sizeof(dword) * numData);
+          data[numData-1] = num;
+          }
+        }
+      if (*line != '"') {
+        showError("Syntax error");
+        *line = 0;
+        return line;
+        }
+      line++;
+        if (passNumber == 1) {
+          numData++;
+          if (numData == 1)
+            data = (dword*)malloc(sizeof(dword));
+          else
+            data = (dword*)realloc(data, sizeof(dword) * numData);
+          data[numData-1] = 0;
+          }
+      }
+    else if ((*line >='0' && *line <= '9') || *line == '-') {
+      neg = 0;
+      num = 0;
+      if (*line == '-') {
+        neg = -1;
+        line++;
+        }
+      while (*line >= '0' && *line <= '9') {
+        num = (num * 10) + (*line - '0');
+        line++;
+        }
+      line = trim(line);
+      if (*line != ':' && *line != ',' && *line != 0) {
+        showError("Syntax error");
+        *line = 0;
+        return line;
+        }
+      if (neg) {
+        num = (num ^ 0xffff) + 1;
+        }
+      if (passNumber == 1) {
+        numData += 2;
+        if (numData == 1)
+          data = (dword*)malloc(sizeof(dword));
+        else
+          data = (dword*)realloc(data, sizeof(dword) * numData);
+        data[numData-2] = num / 256;
+        data[numData-1] = num % 256;
+        }
+      }
+    else {
       showError("Syntax error");
       *line = 0;
       return line;
-      }
-    neg = 0;
-    num = 0;
-    if (*line == '-') {
-      neg = -1;
-      line++;
-      }
-    while (*line >= '0' && *line <= '9') {
-      num = (num * 10) + (*line - '0');
-      line++;
-      }
-    line = trim(line);
-    if (*line != ':' && *line != ',' && *line != 0) {
-      showError("Syntax error");
-      *line = 0;
-      return line;
-      }
-    if (neg) {
-      num = (num ^ 0xffff) + 1;
-      }
-    if (passNumber == 1) {
-      numData++;
-      if (numData == 1)
-        data = (dword*)malloc(sizeof(dword));
-      else
-        data = (dword*)realloc(data, sizeof(dword) * numData);
-      data[numData-1] = num;
       }
     if (*line == ',') {
       line++;

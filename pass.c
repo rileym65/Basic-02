@@ -85,19 +85,14 @@ int pass(char* filename) {
     if (passNumber == 1) { 
       dataAddress = address;
       }
-    strcpy(buffer, "data:     dw    ");
+    strcpy(buffer, "data:     db    ");
     for (i=0; i<numData; i++) {
-      if (use32Bits) {
-        sprintf(tmp,"%d,%d",(data[i] & 0xffff0000) >> 16, data[i] & 0xffff);
-        }
-      else {
-        sprintf(tmp,"%d",data[i]);
-        }
+      sprintf(tmp,"%d",data[i]);
       if (strlen(buffer) > 16) strcat(buffer,",");
       strcat(buffer,tmp);
       if (strlen(buffer) > 60) {
         Asm(buffer);
-        strcpy(buffer, "          dw    ");
+        strcpy(buffer, "          db    ");
         }
       }
     if (strlen(buffer) > 16) Asm(buffer);

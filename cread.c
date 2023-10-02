@@ -11,12 +11,13 @@
 #include "header.h"
 
 char* cread(char* line) {
-  word last;
   int  pos;
+  int  lab;
   word addr;
+  int  string;
   char token[128];
   useData = -1;
-  last = 0xffff;
+  string = 0;
   line = trim(line);
   Asm("          ldi   DATA_.1                 ; Point to DATA pointer");
   Asm("          phi   rf");
@@ -37,32 +38,64 @@ char* cread(char* line) {
     while ((*line >= 'a' && *line <= 'z') ||
            (*line >= 'A' && *line <= 'Z') ||
            (*line >= '0' && *line <= '9') ||
-            *line == '_') {
+            *line == '_' || *line == '!' || *line == '$') {
       token[pos++] = *line;
       token[pos] = 0;
       line++;
       }
     addr = getVariable(token);
-    if (last == 0xffff || ((addr & 0xff00) != (last & 0xff00))) {
+    if (token[strlen(token)-1] == '$') {
+      Asm("          ldi   iobuffer.1              ; point to temporary memory");
+      Asm("          phi   rc");
+      Asm("          ldi   iobuffer.0");
+      Asm("          plo   rc");
+      lab = ++autoLabel;
+      sprintf(buffer,"lbl_%d:",lab); Asm(buffer);
+      Asm("          lda   rd                      ; get byte from data pool");
+      Asm("          str   rc                      ; write to temp space");
+      Asm("          inc   rc                      ; Point to next position");
+      sprintf(buffer,"          lbnz  lbl_%d               ; Loop until terminator",lab); Asm(buffer);
+      Asm("          glo   rd                      ; Save data position");
+      Asm("          stxd");
+      Asm("          ghi   rd");
+      Asm("          stxd");
+      Asm("          ldi   iobuffer.1              ; point to temporary memory");
+      Asm("          phi   rf");
+      Asm("          ldi   iobuffer.0");
+      Asm("          plo   rf");
+      sprintf(buffer,"          ldi   v_%s.1               ; Point to variable",token); Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   v_%s.0               ; Point to variable",token); Asm(buffer);
+      Asm("          plo   rd");
+      Asm("          sep   scall                   ; Set the string");
+      Asm("          dw    setstring");
+      AddExternal(currentProc, "setstring");
+      Asm("          irx                           ; Recover data position");
+      Asm("          ldxa");
+      Asm("          phi   rd");
+      Asm("          ldx");
+      Asm("          plo   rd");
+      string = -1;
+      }
+    else {
       sprintf(buffer,"          ldi   v_%s.1               ; Point to variable",token); Asm(buffer);
       Asm("          phi   rc");
-      }
-    sprintf(buffer,"          ldi   v_%s.0               ; Point to variable",token); Asm(buffer);
-    Asm("          plo   rc");
-    Asm("          lda   rd                      ; Retrieve data from DATA pool");
-    Asm("          str   rc                      ; And store into variable");
-    Asm("          inc   rc");
-    Asm("          lda   rd");
-    Asm("          str   rc");
-    if (use32Bits) {
+      sprintf(buffer,"          ldi   v_%s.0               ; Point to variable",token); Asm(buffer);
+      Asm("          plo   rc");
+      Asm("          lda   rd                      ; Retrieve data from DATA pool");
+      Asm("          str   rc                      ; And store into variable");
       Asm("          inc   rc");
       Asm("          lda   rd");
       Asm("          str   rc");
-      Asm("          inc   rc");
-      Asm("          lda   rd");
-      Asm("          str   rc");
+      if (use32Bits) {
+        Asm("          inc   rc");
+        Asm("          lda   rd");
+        Asm("          str   rc");
+        Asm("          inc   rc");
+        Asm("          lda   rd");
+        Asm("          str   rc");
+        }
       }
-    last = addr;
     line = trim(line);
     if (*line != ':' && *line != ',' && *line != 0) {
       showError("Syntax error");
@@ -73,6 +106,12 @@ char* cread(char* line) {
       line++;
       line = trim(line);
       }
+    }
+  if (string) {
+    Asm("          ldi   DATA_.1                 ; Point to DATA pointer");
+    Asm("          phi   rf");
+    Asm("          ldi   DATA_.0");
+    Asm("          plo   rf");
     }
   Asm("          glo   rd                      ; Save DATA pointer");
   Asm("          str   rf");
