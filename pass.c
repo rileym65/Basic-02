@@ -138,6 +138,9 @@ int pass(char* filename) {
     }
     
   Asm("end__:    equ   $");
+  if (useElfos) {
+    Asm("          end   init");
+    }
   return(0);
   }
 

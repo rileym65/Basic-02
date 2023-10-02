@@ -29,10 +29,7 @@ void library() {
     sprintf(buffer,"estack:     equ  0%04xh",estack); Asm(buffer);
     }
   if (useElfos) {
-    t1 = programStart;
-    t2 = (highest - programStart + 1);
-    t3 = programStart;
-    sprintf(buffer,"          dw   %d,%d,%d",t1,t2,t3); Asm(buffer);
+    Asm("            org  02000h");
     }
   if (useElfos ) {
     Asm("init:       br   estart");
