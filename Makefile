@@ -50,6 +50,8 @@ OBJS = \
 	creturn.o \
 	crmdir.o \
 	csexpr.o \
+	cwend.o \
+	cwhile.o \
 	findline.o \
 	findvariable.o \
 	gethex.o \
@@ -119,6 +121,8 @@ crestore.o:      header.h crestore.c
 creturn.o:       header.h creturn.c
 crmdir.o:        header.h crmdir.c
 csexpr.o:        header.h csexpr.c
+cwend.o:         header.h cwend.c
+cwhile.o:        header.h cwhile.c
 findline.o:      header.h findline.c
 findvariable.o:  header.h findvariable.c
 gethex.o:        header.h gethex.c

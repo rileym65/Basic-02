@@ -113,10 +113,10 @@ char* cread(char* line) {
     Asm("          ldi   DATA_.0");
     Asm("          plo   rf");
     }
-  Asm("          glo   rd                      ; Save DATA pointer");
+  Asm("          ghi   rd                      ; Save DATA pointer");
   Asm("          str   rf");
-  Asm("          dec   rf");
-  Asm("          ghi   rd");
+  Asm("          inc   rf");
+  Asm("          glo   rd");
   Asm("          str   rf");
   return line;
   }

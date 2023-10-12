@@ -43,6 +43,7 @@ int pass(char* filename) {
   lineCount = 0;
   autoLabel = 1;
   autoLine = 1;
+  numWhiles = 0;
   library();
   while (fgets(currentLine, 1023, source) != NULL) {
     lineCount++;
