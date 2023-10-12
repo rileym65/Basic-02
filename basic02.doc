@@ -82,6 +82,7 @@ Expressions:
   SIN(expr)
   SQRT(expr)
   TAN(expr)
+  VARPTR(varname)
 
 System variables:
   DATA_        - Address of DATA pointer

@@ -1167,6 +1167,51 @@ char* evaluate(char* buffer) {
         }
       }
 
+    if (term == 0 && strncasecmp(buffer,"varptr(",7) == 0) {
+      buffer += 7;
+      buffer = trim(buffer);
+      if ((*buffer >= 'a' && *buffer <= 'z') ||
+          (*buffer >= 'A' && *buffer <= 'Z')) {
+        p = 0;
+        while ((*buffer >= 'a' && *buffer <= 'z') ||
+               (*buffer >= 'A' && *buffer <= 'Z') ||
+               (*buffer >= '0' && *buffer <= '9') ||
+                *buffer == '_' || *buffer == '!' || *buffer == '$') {
+          token[p++] = *buffer++;
+          }
+        token[p] = 0;
+        number = getVariable(token);
+        Asm("           sex     r7");
+        if (use32Bits) {
+          Asm("           ldi     0              ; High word of address");
+          Asm("           stxd");
+          Asm("           stxd");
+          }
+        sprintf(abuffer,"           ldi     v_%s.1              ; Push variable address onto expr stack",token); Asm(abuffer);
+        Asm("           stxd");
+        sprintf(abuffer,"           ldi     v_%s.0",token); Asm(abuffer);
+        Asm("           stxd");
+        Asm("           sex     r2");
+        tokens[numTokens++] = 0;
+        tokens[numTokens++] = OP_NUM;
+        buffer = trim(buffer);
+        if (*buffer != ')') {
+          showError("Invalid expression");
+          exprErrors++;
+          *buffer = 0;
+          return buffer;
+          }
+        buffer++;
+        }
+      else {
+        showError("Invalid variable name");
+        exprErrors++;
+        *buffer = 0;
+        return buffer;
+        }
+      term = -1;
+      }
+
     /* ************************************ */
     /* ***** Process integer constant ***** */
     /* ************************************ */
