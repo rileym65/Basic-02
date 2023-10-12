@@ -36,9 +36,13 @@ Q expr
 READ var,var,...
 REM text
 RENAME "filename" TO "filename"
+REPEAT
 RESTORE [line]
 RETURN [line]
 RMDIR "dirname"
+UNTIL expr
+WHILE expr
+WEND
 
 Expressions:
   +
@@ -94,6 +98,12 @@ Variables:
   Variable names can be more than 1 character, but must start with a letter
 and then must consist of either upper or lowercase letter or numbers or the
 underscaore (_) character.  Case is irrelevant.
+
+  Floating point variables must have the ! suffix character
+
+  String variables must have the $ suffix character
+
+  Integer variables have no suffix character
 
   Varaibles are stored either at the specified address, else the first byte
 in RAM after the program (if program is compiled for RAM) else the first byte
