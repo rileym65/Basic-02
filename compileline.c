@@ -29,10 +29,6 @@ int compileLine(char* line) {
       showError("Error: Invalid line number");
       return -1;
       }
-    if (l < lastLineNumber) {
-      showError("Error: Line number out of sequence");
-      return -1;
-      }
     lastLineNumber = l;
     if (passNumber == 1) {
       lineNumbers[numberOfLines] = l;
