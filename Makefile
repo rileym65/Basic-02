@@ -46,10 +46,12 @@ OBJS = \
 	cread.o \
 	crem.o \
 	crename.o \
+	crepeat.o \
 	crestore.o \
 	creturn.o \
 	crmdir.o \
 	csexpr.o \
+	cuntil.o \
 	cwend.o \
 	cwhile.o \
 	findline.o \
@@ -119,8 +121,10 @@ crem.o:          header.h crem.c
 crename.o:       header.h crename.c
 crestore.o:      header.h crestore.c
 creturn.o:       header.h creturn.c
+crepeat.o:       header.h crepeat.c
 crmdir.o:        header.h crmdir.c
 csexpr.o:        header.h csexpr.c
+cuntil.o:        header.h cuntil.c
 cwend.o:         header.h cwend.c
 cwhile.o:        header.h cwhile.c
 findline.o:      header.h findline.c

@@ -227,6 +227,8 @@ LINK int    autoLabel;
 LINK int    autoLine;
 LINK int    whiles[100][2];
 LINK int    numWhiles;
+LINK int    repeats[100];
+LINK int    numRepeats;
 
 LINK char** externalProcs;
 LINK char** externals;
@@ -287,6 +289,8 @@ extern char* creturn(char* line);
 extern char* crmdir(char* line);
 extern char* cwhile(char* line);
 extern char* cwend(char* line);
+extern char* crepeat(char* line);
+extern char* cuntil(char* line);
 extern char* csexpr(char* line, int level);
 extern int   findLine(word lineNumber, word* address);
 extern int   findNextLine(word lineNumber, word* address);

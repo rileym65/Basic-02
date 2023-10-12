@@ -82,6 +82,8 @@ int compileLine(char* line) {
     else if (strcasecmp(token,"dealloc") == 0) line=cdealloc(line+7);
     else if (strcasecmp(token,"while") == 0) line=cwhile(line+5);
     else if (strcasecmp(token,"wend") == 0) line=cwend(line+5);
+    else if (strcasecmp(token,"repeat") == 0) line=crepeat(line+6);
+    else if (strcasecmp(token,"until") == 0) line=cuntil(line+5);
     else if (useElfos != 0 && strcasecmp(token, "open") == 0) line = copen(line+4);
     else if (useElfos != 0 && strcasecmp(token, "close") == 0) line = cclose(line+5);
     else if (useElfos != 0 && strcasecmp(token, "put") == 0) line = cput(line+3);
