@@ -229,6 +229,8 @@ LINK int    whiles[100][2];
 LINK int    numWhiles;
 LINK int    repeats[100];
 LINK int    numRepeats;
+LINK int    ifs[100][2];
+LINK int    numIfs;
 
 LINK char** externalProcs;
 LINK char** externals;
@@ -254,7 +256,9 @@ extern char* cdealloc(char* line);
 extern char* cdelete(char* line);
 extern char* cdma(char* line);
 extern char* cdpoke(char* line);
+extern char* celse(char* line);
 extern char* cend(char* line);
+extern char* cendif(char* line);
 extern char* cexpr(char* line, int etype);
 extern char* cfor(char* line);
 extern char* cfread(char* line);

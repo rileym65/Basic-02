@@ -12,10 +12,12 @@
 
 char* cif(char* line) {
   word addr;
+  int  lelse, lendif;
   line = trim(line);
   line = cexpr(line, 0);
   if (exprErrors > 0) return line;
   line = trim(line);
+
   Asm("          sex   r7                      ; Point X to expr stack");
   Asm("          irx                           ; Move to lsb of result");
   Asm("          ldxa                          ; retrieve it");
@@ -27,10 +29,22 @@ char* cif(char* line) {
     Asm("          or                            ; and combine");
     }
   Asm("          sex   r2                      ; Point X to system stack");
-  findNextLineNumber(lastLineNumber, &addr);
-  sprintf(buffer,"          lbz   la_%d                    ; Jump if test failed",autoLine+1); Asm(buffer);
-  if (strncasecmp(line,"then",4) == 0) {
-    line += 4;
+
+  if (*line == 0) {
+    lelse = ++autoLabel;
+    lendif = ++autoLabel;
+    ifs[numIfs][0] = lelse;
+    ifs[numIfs][1] = lendif;
+    sprintf(buffer,"          lbz   lbl_%d                    ; Jump if test failed",lelse); Asm(buffer);
+    numIfs++;
+    }
+
+  else {
+    findNextLineNumber(lastLineNumber, &addr);
+    sprintf(buffer,"          lbz   la_%d                    ; Jump if test failed",autoLine+1); Asm(buffer);
+    if (strncasecmp(line,"then",4) == 0) {
+      line += 4;
+      }
     }
   line = trim(line);
   line--;

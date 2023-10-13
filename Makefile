@@ -18,6 +18,8 @@ OBJS = \
 	cdpoke.o \
 	cend.o \
 	cfor.o \
+	celse.o \
+	cendif.o \
 	cexpr.o \
 	cfread.o \
 	cfwrite.o \
@@ -90,6 +92,8 @@ cdelete.o:       header.h cdelete.c
 cdma.o:          header.h cdma.c
 cdpoke.o:        header.h cdpoke.c
 cend.o:          header.h cend.c
+celse.o:         header.h celse.c
+cendif.o:        header.h cendif.c
 cexpr.o:         header.h cexpr.c
 cfor.o:          header.h cfor.c
 cfread.o:        header.h cfread.c

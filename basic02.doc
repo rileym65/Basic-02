@@ -16,6 +16,11 @@ GOSUB line
 GOTO line
 IDLE
 IF expr THEN statement
+IF
+  true statements
+ELSE
+  false statemsns
+ENDIF
 INPUT ["prompt",]var[,var][,var][,...]
 INTR line
 IOFF
@@ -115,7 +120,7 @@ Notes:
 by the colon (:) character.
 
   Line numbers are not required, but if provided, Line numbers must be greater
-than 0 and less than 65536 and must appear in order.
+than 0 and less than 65536
 
   All other numbers are 16-bit signed integers (unless -32 or -fp is used).
 
